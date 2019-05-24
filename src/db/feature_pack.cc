@@ -82,7 +82,7 @@ geo::tile find_best_tile(geo::tile const& root, feature const& feature) {
       next_best = child;
     }
 
-    verify(next_best, "at least one child must match");
+    verify(static_cast<bool>(next_best), "at least one child must match");
     best = *next_best;
   }
 
@@ -136,7 +136,7 @@ std::string pack_features(geo::tile const& tile,
                                                                1 - tile.z_);
   for (auto const& str : strings) {
     auto const feature = deserialize_feature(str, coding_vec);
-    verify(feature, "feature must be valid (!?)");
+    verify(static_cast<bool>(feature), "feature must be valid (!?)");
 
     auto const str2 = serialize_feature(*feature, coding_map, false);
 
