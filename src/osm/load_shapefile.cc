@@ -42,18 +42,21 @@ auto emplace_back_ref(Vec& vec) -> decltype(vec.back()) {
 
 void read_shapefile(utl::buffer const& buf,
                     std::function<void(fixed_simple_polygon)> const& consumer) {
-  verify(9994 == read_int_big(buf, 0), "shp: invalid magic number");
-  verify(1000 == read_int_little(buf, 28), "shp: invalid file version");
-  verify(5 == read_int_little(buf, 32), "shp: only polygons supported (main)");
+  utl::verify(9994 == read_int_big(buf, 0), "shp: invalid magic number");
+  utl::verify(1000 == read_int_little(buf, 28), "shp: invalid file version");
+  utl::verify(5 == read_int_little(buf, 32),
+              "shp: only polygons supported (main)");
 
   int index = 0;
   size_t rh_offset = 100;
   while (rh_offset < buf.size()) {
-    verify(++index == read_int_big(buf, rh_offset), "shp: unexpected index");
+    utl::verify(++index == read_int_big(buf, rh_offset),
+                "shp: unexpected index");
 
     fixed_simple_polygon polygon;
-    auto const read_ring = [&buf, &polygon](
-        auto const pts_offset, auto const idx_lb, auto const idx_ub) {
+    auto const read_ring = [&buf, &polygon](auto const pts_offset,
+                                            auto const idx_lb,
+                                            auto const idx_ub) {
       auto& ring = polygon.outer().empty() ? polygon.outer()
                                            : emplace_back_ref(polygon.inners());
 
@@ -70,14 +73,14 @@ void read_shapefile(utl::buffer const& buf,
     };
 
     auto const rc_offset = rh_offset + 8;
-    verify(5 == read_int_little(buf, rc_offset),
-           "shp: only polygons supported");
+    utl::verify(5 == read_int_little(buf, rc_offset),
+                "shp: only polygons supported");
 
     auto const num_parts = read_int_little(buf, rc_offset + 36);
     auto const num_points = read_int_little(buf, rc_offset + 40);
 
-    verify(num_parts > 0, "shp: need at least one part");
-    verify(num_points > 0, "shp: need at least one point");
+    utl::verify(num_parts > 0, "shp: need at least one part");
+    utl::verify(num_points > 0, "shp: need at least one point");
 
     auto const parts_offset = rc_offset + 44;
     auto const pts_offset = parts_offset + 4 * num_parts;
@@ -90,11 +93,11 @@ void read_shapefile(utl::buffer const& buf,
               read_int_little(buf, parts_offset + 4 * (num_parts - 1)),  //
               num_points);
 
-    verify(!polygon.outer().empty(), "shp: read polygon is empty?!");
+    utl::verify(!polygon.outer().empty(), "shp: read polygon is empty?!");
     consumer(std::move(polygon));
 
     rh_offset += 8 + read_int_big(buf, rh_offset + 4) * 2;
-    verify(rh_offset <= buf.size(), "shp: offset limit violation");
+    utl::verify(rh_offset <= buf.size(), "shp: offset limit violation");
   }
 }
 
@@ -102,15 +105,15 @@ utl::buffer load_buffer(std::string const& fname) {
   utl::mmap_reader mem{fname.c_str()};
 
   mz_zip_archive ar{};
-  verify(mz_zip_reader_init_mem(&ar, mem.m_.ptr(), mem.m_.size(), 0),
-         "shp: invalid zip");
+  utl::verify(mz_zip_reader_init_mem(&ar, mem.m_.ptr(), mem.m_.size(), 0),
+              "shp: invalid zip");
   raii_helper ar_deleter{[&ar] { mz_zip_reader_end(&ar); }};
 
   auto n = mz_zip_reader_get_num_files(&ar);
   for (auto i = 0u; i < n; ++i) {
     mz_zip_archive_file_stat stat{};
-    verify(mz_zip_reader_file_stat(&ar, i, &stat),
-           "shp: unable to stat zip entry");
+    utl::verify(mz_zip_reader_file_stat(&ar, i, &stat),
+                "shp: unable to stat zip entry");
 
     std::string_view name{stat.m_filename};
     if (name.size() < 4 || name.substr(name.size() - 4) != ".shp") {
@@ -118,11 +121,11 @@ utl::buffer load_buffer(std::string const& fname) {
     }
 
     utl::buffer buf{stat.m_uncomp_size};
-    verify(mz_zip_reader_extract_to_mem(&ar, i, buf.data(), buf.size(), 0),
-           "shp: error extracting .shp file");
+    utl::verify(mz_zip_reader_extract_to_mem(&ar, i, buf.data(), buf.size(), 0),
+                "shp: error extracting .shp file");
     return buf;
   }
-  verify(false, "shp: .zip file contains no .shp file")
+  throw utl::fail("shp: .zip file contains no .shp file");
 }
 
 void load_shapefile(std::string const& fname,

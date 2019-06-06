@@ -163,7 +163,7 @@ void database_stats(tile_db_handle& handle) {
   for (auto el = tc.get<tile_index_t>(lmdb::cursor_op::FIRST); el;
        el = tc.get<tile_index_t>(lmdb::cursor_op::NEXT)) {
     auto const& tile = tile_key_to_tile(el->first);
-    verify(tile.z_ <= max_prep, "tile outside prepared range found!");
+    utl::verify(tile.z_ <= max_prep, "tile outside prepared range found!");
     tile_sizes.at(tile.z_).emplace_back(el->second.size());
   }
 

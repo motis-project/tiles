@@ -19,9 +19,10 @@ tmp_quad_tree_t make_tmp_quad_tree(geo::tile const& root,
   std::vector<std::map<geo::tile, tmp_quad_node_t>> nodes{{}};
   for (auto const& entry : input) {
     auto const& tile = entry.tile_;
-    verify_silent(static_cast<int>(tile.z_) >= static_cast<int>(root_z),
-                  "entry z less than root z");
-    verify_silent(root_z != tile.z_ || root == tile, "another tile at root z");
+    utl::verify_silent(static_cast<int>(tile.z_) >= static_cast<int>(root_z),
+                       "entry z less than root z");
+    utl::verify_silent(root_z != tile.z_ || root == tile,
+                       "another tile at root z");
 
     auto const rel_z = tile.z_ - root_z;
     if (rel_z + 1 > nodes.size()) {
@@ -51,8 +52,8 @@ tmp_quad_tree_t make_tmp_quad_tree(geo::tile const& root,
     }
   }
 
-  verify_silent(nodes.at(0).size() == 1, "root node missing / not unique");
-  verify_silent(begin(nodes.at(0))->first == root, "root node mismatch");
+  utl::verify_silent(nodes.at(0).size() == 1, "root node missing / not unique");
+  utl::verify_silent(begin(nodes.at(0))->first == root, "root node mismatch");
   return nodes;
 }
 
@@ -71,7 +72,7 @@ std::vector<quad_entry_t> serialize_quad_tree(tmp_quad_node_t const root) {
 
   allocate_and_enqueue(&root);
   while (!stack.empty()) {
-    auto const[offset, node] = stack.top();  // copy required!
+    auto const [offset, node] = stack.top();  // copy required!
     stack.pop();
 
     vec.at(offset + 1) = node->offset_;  // set: range/offset

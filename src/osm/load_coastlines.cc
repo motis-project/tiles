@@ -145,19 +145,19 @@ cl::Path box_to_path(fixed_box const& box) {
 
 cl::Paths intersection(cl::Paths const& subject, cl::Path const& clip) {
   cl::Clipper clpr;
-  verify(clpr.AddPaths(subject, cl::ptSubject, true), "AddPath failed");
-  verify(clpr.AddPath(clip, cl::ptClip, true), "AddPaths failed");
+  utl::verify(clpr.AddPaths(subject, cl::ptSubject, true), "AddPath failed");
+  utl::verify(clpr.AddPath(clip, cl::ptClip, true), "AddPaths failed");
 
   cl::Paths solution;
-  verify(clpr.Execute(cl::ctIntersection, solution, cl::pftEvenOdd,
-                      cl::pftEvenOdd),
-         "Execute failed");
+  utl::verify(clpr.Execute(cl::ctIntersection, solution, cl::pftEvenOdd,
+                           cl::pftEvenOdd),
+              "Execute failed");
   return solution;
 }
 
 void to_fixed_polygon(fixed_polygon& polygon, cl::PolyNodes const& nodes) {
   auto const path_to_ring = [](auto const& path) {
-    verify(!path.empty(), "path empty");
+    utl::verify(!path.empty(), "path empty");
     fixed_ring ring;
     ring.reserve(path.size() + 1);
     for (auto const& pt : path) {
@@ -168,12 +168,12 @@ void to_fixed_polygon(fixed_polygon& polygon, cl::PolyNodes const& nodes) {
   };
 
   for (auto const* outer : nodes) {
-    verify(!outer->IsHole(), "outer ring is hole");
+    utl::verify(!outer->IsHole(), "outer ring is hole");
     fixed_simple_polygon simple;
     simple.outer() = path_to_ring(outer->Contour);
 
     for (auto const* inner : outer->Childs) {
-      verify(inner->IsHole(), "inner ring is no hole");
+      utl::verify(inner->IsHole(), "inner ring is no hole");
       simple.inners().emplace_back(path_to_ring(inner->Contour));
 
       to_fixed_polygon(polygon, inner->Childs);
@@ -194,7 +194,7 @@ std::optional<std::string> finalize_tile(
 
   cl::PolyTree solution;
   clpr.Execute(cl::ctDifference, solution, cl::pftEvenOdd, cl::pftEvenOdd);
-  verify(!solution.Childs.empty(), "difference empty!");
+  utl::verify(!solution.Childs.empty(), "difference empty!");
 
   cl::Paths solution_paths;
   cl::ClosedPathsFromPolyTree(solution, solution_paths);
@@ -344,8 +344,8 @@ void load_coastlines(tile_db_handle& handle, std::string const& fname) {
 
   std::for_each(begin(threads), end(threads), [](auto& t) { t.join(); });
 
-  verify(geo_queue.queue_.size_approx() == 0, "geo_queue not empty");
-  verify(db_queue.queue_.size_approx() == 0, "db_queue not empty");
+  utl::verify(geo_queue.queue_.size_approx() == 0, "geo_queue not empty");
+  utl::verify(db_queue.queue_.size_approx() == 0, "db_queue not empty");
   stats.summary();
 
   bq_tree seaside_tree;

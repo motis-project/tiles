@@ -50,7 +50,7 @@ void encode(pz::pbf_builder<ttm::Feature>& pb, fixed_point const& point,
 template <bool ClosePath, typename Container>
 void encode_path(pz::packed_field_uint32& sw, delta_encoder& x_enc,
                  delta_encoder& y_enc, Container const& c) {
-  verify(c.size() > 1, "container polyline");
+  utl::verify(c.size() > 1, "container polyline");
 
   sw.add_element(encode_command(MOVE_TO, 1));
   sw.add_element(encode_zigzag32(x_enc.encode(c.front().x())));
@@ -85,7 +85,7 @@ void encode(pz::pbf_builder<ttm::Feature>& pb,
 void encode(pz::pbf_builder<ttm::Feature>& pb,
             fixed_polygon const& multi_polygon, tile_spec const& spec) {
   pb.add_enum(ttm::Feature::optional_GeomType_type, ttm::GeomType::POLYGON);
-  verify(!multi_polygon.empty(), "multi_polygon empty");
+  utl::verify(!multi_polygon.empty(), "multi_polygon empty");
 
   auto [x_enc, y_enc] = delta_encoders(spec.px_bounds_);
   {

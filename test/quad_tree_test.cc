@@ -9,7 +9,7 @@
 namespace tiles {
 
 void dump_tree(std::string const& tree) {
-  verify_silent(tree.size() % (4 * 4) == 0, "invalid tree size");
+  utl::verify_silent(tree.size() % (4 * 4) == 0, "invalid tree size");
   for (auto i = 0u; i < tree.size() / 4; i += 4) {
     std::cout << fmt::format(
                      "{:4} {:032b} : {:10x} : {:5} : {:10} {:10} {:10}", i,

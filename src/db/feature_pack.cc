@@ -28,7 +28,7 @@ struct packer {
     uint32_t offset = buf_.size();
 
     for (auto it = begin; it != end; ++it) {
-      verify(it->size() >= 32, "MINI FEATURE?!");
+      utl::verify(it->size() >= 32, "MINI FEATURE?!");
       protozero::write_varint(std::back_inserter(buf_), it->size());
       buf_.append(it->data(), it->size());
     }
@@ -82,7 +82,7 @@ geo::tile find_best_tile(geo::tile const& root, feature const& feature) {
       next_best = child;
     }
 
-    verify(static_cast<bool>(next_best), "at least one child must match");
+    utl::verify(static_cast<bool>(next_best), "at least one child must match");
     best = *next_best;
   }
 
@@ -97,7 +97,7 @@ std::vector<uint8_t> make_quad_key(geo::tile const& root,
 
   std::vector<geo::tile> trace{tile};
   while (!(trace.back().parent() == root)) {
-    verify(trace.back().z_ > root.z_, "tile outside root");
+    utl::verify(trace.back().z_ > root.z_, "tile outside root");
     trace.push_back(trace.back().parent());
   }
   trace.push_back(root);
@@ -136,7 +136,7 @@ std::string pack_features(geo::tile const& tile,
                                                                1 - tile.z_);
   for (auto const& str : strings) {
     auto const feature = deserialize_feature(str, coding_vec);
-    verify(static_cast<bool>(feature), "feature must be valid (!?)");
+    utl::verify(static_cast<bool>(feature), "feature must be valid (!?)");
 
     auto const str2 = serialize_feature(*feature, coding_map, false);
 
@@ -194,10 +194,9 @@ void pack_features(tile_db_handle& handle) {
                      std::numeric_limits<uint32_t>::max()};
       std::vector<std::string> features;
 
-      auto el =
-          resume_key
-              ? c.get<tile_index_t>(lmdb::cursor_op::SET_RANGE, *resume_key)
-              : c.get<tile_index_t>(lmdb::cursor_op::FIRST);
+      auto el = resume_key ? c.get<tile_index_t>(lmdb::cursor_op::SET_RANGE,
+                                                 *resume_key)
+                           : c.get<tile_index_t>(lmdb::cursor_op::FIRST);
       resume_key = std::nullopt;
 
       for (; el; el = c.get<tile_index_t>(lmdb::cursor_op::NEXT)) {
@@ -246,7 +245,7 @@ void pack_features(tile_db_handle& handle) {
     {  // writeback features
       auto txn = handle.make_txn();
       auto feature_dbi = handle.features_dbi(txn);
-      for (auto const & [ key, data ] : packed_features) {
+      for (auto const& [key, data] : packed_features) {
         txn.put(feature_dbi, key, data);
       }
       txn.commit();

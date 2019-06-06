@@ -285,7 +285,7 @@ struct tile_builder::impl {
       : spec_{tile}, layer_names_{layer_names}, config_{cfg} {}
 
   void add_feature(feature const& f) {
-    verify(f.layer_ < layer_names_.size(), "invalid layer in db");
+    utl::verify(f.layer_ < layer_names_.size(), "invalid layer in db");
     utl::get_or_create(builders_, f.layer_, [&] {
       return std::make_unique<layer_builder>(layer_names_.at(f.layer_), spec_,
                                              config_);

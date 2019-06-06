@@ -1,6 +1,6 @@
 #include "tiles/util.h"
 
-#include "utl/parser/util.h"
+#include "utl/verify.h"
 
 #include "zlib.h"
 
@@ -13,7 +13,7 @@ std::string compress_deflate(std::string const& input) {
   auto error = compress2(reinterpret_cast<uint8_t*>(&buffer[0]), &out_size,
                          reinterpret_cast<uint8_t const*>(&input[0]),
                          input.size(), Z_BEST_COMPRESSION);
-  verify(!error, "compress_deflate failed");
+  utl::verify(!error, "compress_deflate failed");
 
   buffer.resize(out_size);
   return buffer;

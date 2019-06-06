@@ -7,8 +7,10 @@
 #include <string>
 
 #include "fmt/core.h"
-#include "fmt/ostream.h"
 #include "fmt/format.h"
+#include "fmt/ostream.h"
+
+#include "utl/verify.h"
 
 namespace tiles {
 template <typename... Args>
@@ -25,45 +27,6 @@ inline void t_log(Args&&... args) {
   fmt::print(std::cout, std::forward<Args>(args)...);
   std::cout << std::endl;
 }
-
-}  // namespace tiles
-
-template <typename Msg, typename... FmtArgs>
-inline void log_err(Msg&& msg, FmtArgs... args) {
-  fmt::print(msg, std::forward<FmtArgs>(args)...);
-}
-
-template <typename Msg, typename... FmtArgs>
-inline void log_info(Msg&& msg, FmtArgs... args) {
-  fmt::print(msg, std::forward<FmtArgs>(args)...);
-}
-
-template <typename NameType, typename Fn>
-inline void log_time(NameType&& name, Fn&& fn) {
-  auto start = std::chrono::steady_clock::now();
-  fn();
-  auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(
-      std::chrono::steady_clock::now() - start)
-      .count();
-  log_info("%s took %lldms", name, ms);
-}
-
-template <typename Msg, typename... FmtArgs>
-inline void verify(bool condition, Msg&& msg, FmtArgs... args) {
-  if (!condition) {
-    log_info(std::forward<Msg>(msg), std::forward<FmtArgs>(args)...);
-    throw std::runtime_error(msg);
-  }
-}
-
-template <typename Msg, typename... FmtArgs>
-inline void verify_silent(bool condition, Msg&& msg, FmtArgs...) {
-  if (!condition) {
-    throw std::runtime_error(msg);
-  }
-}
-
-namespace tiles {
 
 std::string compress_deflate(std::string const&);
 

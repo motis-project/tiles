@@ -20,5 +20,5 @@ enum class FixedGeometry : protozero::pbf_tag_type {
   packed_sint64_geometry = 2
 };
 
-} // namespace tags
-} // namespace tiles
+}  // namespace tags
+}  // namespace tiles

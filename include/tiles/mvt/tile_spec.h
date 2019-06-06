@@ -13,7 +13,7 @@ constexpr auto kOverdraw = 4096;
 
 struct tile_spec {
   tile_spec(geo::tile tile) : tile_(std::move(tile)) {
-    verify(kMaxZoomLevel >= tile.z_, "invalid z");
+    utl::verify(kMaxZoomLevel >= tile.z_, "invalid z");
     auto delta_z = kMaxZoomLevel - tile.z_;
 
     auto px_bounds = proj::tile_bounds_pixel(tile.x_, tile.y_);  // lvl z

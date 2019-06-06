@@ -15,7 +15,7 @@ namespace pz = protozero;
 namespace tiles {
 
 std::string serialize(fixed_null const&) {
-  verify(false, "tries to serialize null geometry!");
+  throw utl::fail("tries to serialize null geometry!");
 }
 
 template <typename SW, typename Points>
@@ -43,7 +43,7 @@ std::string serialize(fixed_point const& point) {
     delta_encoder x_encoder{kFixedCoordMagicOffset};
     delta_encoder y_encoder{kFixedCoordMagicOffset};
 
-    verify(!point.empty(), "empty point");
+    utl::verify(!point.empty(), "empty point");
     serialize_points(sw, x_encoder, y_encoder, point);
   }
   return buffer;
@@ -64,7 +64,7 @@ std::string serialize(fixed_polyline const& polyline) {
     delta_encoder x_encoder{kFixedCoordMagicOffset};
     delta_encoder y_encoder{kFixedCoordMagicOffset};
 
-    verify(!polyline.empty(), "empty polyline");
+    utl::verify(!polyline.empty(), "empty polyline");
     sw.add_element(boost::numeric_cast<fixed_delta_t>(polyline.size()));
 
     for (auto const& line : polyline) {
@@ -88,7 +88,7 @@ std::string serialize(fixed_polygon const& multi_polygon) {
     delta_encoder x_encoder{kFixedCoordMagicOffset};
     delta_encoder y_encoder{kFixedCoordMagicOffset};
 
-    verify(!multi_polygon.empty(), "empty polygon");
+    utl::verify(!multi_polygon.empty(), "empty polygon");
     sw.add_element(boost::numeric_cast<fixed_delta_t>(multi_polygon.size()));
 
     for (auto const& polygon : multi_polygon) {

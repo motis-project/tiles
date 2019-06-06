@@ -15,12 +15,7 @@ namespace tiles {
 namespace tags {
 namespace mvt {
 
-enum GeomType : int {
-  UNKNOWN = 0,
-  POINT = 1,
-  LINESTRING = 2,
-  POLYGON = 3
-};
+enum GeomType : int { UNKNOWN = 0, POINT = 1, LINESTRING = 2, POLYGON = 3 };
 
 enum class Value : protozero::pbf_tag_type {
   optional_string_string_value = 1,
@@ -48,10 +43,8 @@ enum class Layer : protozero::pbf_tag_type {
   optional_uint32_extent = 5
 };
 
-enum class Tile : protozero::pbf_tag_type {
-  repeated_Layer_layers = 3
-};
+enum class Tile : protozero::pbf_tag_type { repeated_Layer_layers = 3 };
 
-} // namespace mvt
-} // namespace tags
-} // namespace tiles
+}  // namespace mvt
+}  // namespace tags
+}  // namespace tiles

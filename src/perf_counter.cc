@@ -78,8 +78,7 @@ void perf_report_get_tile(perf_counter& pc) {
                 pc.finished_[perf_task::RENDER_TILE_DESER_FEATURE_SKIP]);
   print_counter("RNDR: ADD FEAT",
                 pc.finished_[perf_task::RENDER_TILE_ADD_FEATURE]);
-  print_counter("RNDR: FINISH",
-                pc.finished_[perf_task::RENDER_TILE_FINISH]);
+  print_counter("RNDR: FINISH", pc.finished_[perf_task::RENDER_TILE_FINISH]);
 }
 
 }  // namespace tiles

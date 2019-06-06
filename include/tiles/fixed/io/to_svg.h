@@ -6,4 +6,4 @@ namespace tiles {
 
 std::string to_svg(fixed_geometry const&);
 
-} // namespace tiles
+}  // namespace tiles

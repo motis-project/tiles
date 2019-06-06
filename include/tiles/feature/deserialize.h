@@ -39,7 +39,7 @@ inline std::optional<feature> deserialize_feature(
       case tags::Feature::packed_sint64_header: {
         auto range = msg.get_packed_sint64();
         auto next = [&range] {
-          verify(!range.empty(), "read_header: range empty");
+          utl::verify(!range.empty(), "read_header: range empty");
           return *(range.first++);
         };
 
@@ -75,13 +75,14 @@ inline std::optional<feature> deserialize_feature(
         }
 
         layer = static_cast<size_t>(next());  // layer key
-        verify(range.empty(), "read_header: superfluous elements");
+        utl::verify(range.empty(), "read_header: superfluous elements");
       } break;
 
       case tags::Feature::required_uint64_id: id = msg.get_uint64(); break;
 
       case tags::Feature::packed_uint64_meta_pairs:
-        verify(meta.empty(), "meta_pairs must come before, meta keys/values!");
+        utl::verify(meta.empty(),
+                    "meta_pairs must come before, meta keys/values!");
         for (auto const& idx : msg.get_packed_uint64()) {
           meta.push_back(meta_coding.at(idx));
         }
@@ -91,7 +92,7 @@ inline std::optional<feature> deserialize_feature(
         meta.emplace_back(msg.get_string(), "");
         break;
       case tags::Feature::repeated_string_values:
-        verify(meta_fill < meta.size(), "meta data imbalance! (a)");
+        utl::verify(meta_fill < meta.size(), "meta data imbalance! (a)");
         meta[meta_fill++].second = msg.get_string();
         break;
 
@@ -113,8 +114,8 @@ inline std::optional<feature> deserialize_feature(
     }
   }
 
-  verify(meta_fill == meta.size(), "meta data imbalance! (b)");
-  verify(layer != kInvalidLayer, "invalid layer found!");
+  utl::verify(meta_fill == meta.size(), "meta data imbalance! (b)");
+  utl::verify(layer != kInvalidLayer, "invalid layer found!");
 
   return feature{id, layer, zoom_levels,
                  std::map<std::string, std::string>{begin(meta), end(meta)},

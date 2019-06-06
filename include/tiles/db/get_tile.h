@@ -107,7 +107,7 @@ std::optional<std::string> get_tile(tile_db_handle& handle, lmdb::txn& txn,
                                     lmdb::cursor& features_cursor,
                                     render_ctx const& ctx,
                                     geo::tile const& tile, PerfCounter& pc) {
-  verify(tile.z_ <= kMaxZoomLevel, "invalid zoom level");
+  utl::verify(tile.z_ <= kMaxZoomLevel, "invalid zoom level");
 
   auto total = scoped_perf_counter<perf_task::GET_TILE_TOTAL>(pc);
 

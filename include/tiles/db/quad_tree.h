@@ -76,7 +76,7 @@ void walk_quad_tree(char const* tree, geo::tile const& root,
     }
 
     // descend to next level
-    verify(std::next(it) != end(trace), "should not happen");
+    utl::verify(std::next(it) != end(trace), "should not happen");
     auto const& next_tile = *std::next(it);
 
     auto const curr = read_nth<quad_entry_t>(tree, offset);

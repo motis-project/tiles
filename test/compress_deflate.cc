@@ -9,7 +9,7 @@ TEST_CASE("compress_deflate") {
 
   std::mt19937 gen{42};
   std::uniform_int_distribution<char> dist;
-  for(auto i = 0u; i < test.size(); ++i) {
+  for (auto i = 0u; i < test.size(); ++i) {
     test[i] = dist(gen);
   }
 

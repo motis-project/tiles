@@ -46,7 +46,7 @@ fixed_geometry read_osm_geometry(osmium::Area const& area) {
                        polygon.back().outer());
         break;
       case osmium::item_type::inner_ring:
-        verify(!polygon.empty(), "inner ring first!");
+        utl::verify(!polygon.empty(), "inner ring first!");
 
         polygon.back().inners().emplace_back();
         nodes_to_fixed(*reinterpret_cast<osmium::InnerRing const*>(item.data()),
@@ -56,7 +56,7 @@ fixed_geometry read_osm_geometry(osmium::Area const& area) {
     }
   }
 
-  if(polygon.empty()) {
+  if (polygon.empty()) {
     return fixed_null{};
   }
 

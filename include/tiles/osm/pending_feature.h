@@ -50,8 +50,8 @@ struct pending_feature {
   // pairwise growing area, lower zoom_level:
   // >> max_area_1, zoom_level_1, max_area_2, zoom_level_2, ...
   void set_approved_min_by_area(sol::variadic_args va) {
-    verify(std::distance(va.begin(), va.end()) % 2 == 0,
-           "set_approved_by_area input size not even!");
+    utl::verify(std::distance(va.begin(), va.end()) % 2 == 0,
+                "set_approved_by_area input size not even!");
 
     if (!geometry_) {
       geometry_ = read_geometry_();

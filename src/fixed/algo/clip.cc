@@ -47,7 +47,7 @@ fixed_geometry clip(fixed_polyline const& in, fixed_box const& box) {
 
 void to_fixed_polygon2(fixed_polygon& polygon, cl::PolyNodes const& nodes) {
   auto const path_to_ring = [](auto const& path) {
-    verify(!path.empty(), "path empty");
+    utl::verify(!path.empty(), "path empty");
     fixed_ring ring;
     ring.reserve(path.size() + 1);
     for (auto const& pt : path) {
@@ -58,12 +58,12 @@ void to_fixed_polygon2(fixed_polygon& polygon, cl::PolyNodes const& nodes) {
   };
 
   for (auto const* outer : nodes) {
-    verify(!outer->IsHole(), "outer ring is hole");
+    utl::verify(!outer->IsHole(), "outer ring is hole");
     fixed_simple_polygon simple;
     simple.outer() = path_to_ring(outer->Contour);
 
     for (auto const* inner : outer->Childs) {
-      verify(inner->IsHole(), "inner ring is no hole");
+      utl::verify(inner->IsHole(), "inner ring is no hole");
       simple.inners().emplace_back(path_to_ring(inner->Contour));
 
       to_fixed_polygon2(polygon, inner->Childs);
@@ -97,8 +97,8 @@ fixed_geometry clip(fixed_polygon const& in, fixed_box const& box) {
   }
 
   cl::Clipper clpr;
-  verify(clpr.AddPaths(subject, cl::ptSubject, true), "AddPath1 failed");
-  verify(clpr.AddPath(clip, cl::ptClip, true), "AddPath2 failed");
+  utl::verify(clpr.AddPaths(subject, cl::ptSubject, true), "AddPath1 failed");
+  utl::verify(clpr.AddPath(clip, cl::ptClip, true), "AddPath2 failed");
 
   cl::PolyTree solution;
   clpr.Execute(cl::ctIntersection, solution, cl::pftEvenOdd, cl::pftEvenOdd);

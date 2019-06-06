@@ -31,42 +31,44 @@ int main() {
   });
 
   // z, x, y
-  router.route("GET", "^\\/(\\d+)\\/(\\d+)\\/(\\d+).mvt$", [&](auto const& req,
-                                                               auto cb) {
-    if (std::find_if(begin(req.headers), end(req.headers), [](auto const& h) {
-          return h.name == "Accept-Encoding" &&
-                 h.value.find("deflate") != std::string::npos;
-        }) == end(req.headers)) {
-      return cb(reply::stock_reply(reply::not_implemented));
-    }
+  router.route(
+      "GET", "^\\/(\\d+)\\/(\\d+)\\/(\\d+).mvt$",
+      [&](auto const& req, auto cb) {
+        if (std::find_if(begin(req.headers), end(req.headers),
+                         [](auto const& h) {
+                           return h.name == "Accept-Encoding" &&
+                                  h.value.find("deflate") != std::string::npos;
+                         }) == end(req.headers)) {
+          return cb(reply::stock_reply(reply::not_implemented));
+        }
 
-    try {
-      tiles::t_log("received a request: {}", req.uri);
-      auto const tile =
-          geo::tile{static_cast<uint32_t>(std::stoul(req.path_params[1])),
-                    static_cast<uint32_t>(std::stoul(req.path_params[2])),
-                    static_cast<uint32_t>(std::stoul(req.path_params[0]))};
+        try {
+          tiles::t_log("received a request: {}", req.uri);
+          auto const tile =
+              geo::tile{static_cast<uint32_t>(std::stoul(req.path_params[1])),
+                        static_cast<uint32_t>(std::stoul(req.path_params[2])),
+                        static_cast<uint32_t>(std::stoul(req.path_params[0]))};
 
-      tiles::perf_counter pc;
-      auto rendered_tile = tiles::get_tile(handle, render_ctx, tile, pc);
-      tiles::perf_report_get_tile(pc);
+          tiles::perf_counter pc;
+          auto rendered_tile = tiles::get_tile(handle, render_ctx, tile, pc);
+          tiles::perf_report_get_tile(pc);
 
-      reply rep = reply::stock_reply(reply::ok);
-      if (rendered_tile) {
-        rep.headers.emplace_back("Content-Encoding", "deflate");
-        rep.content = std::move(*rendered_tile);
-      } else {
-        rep.status = reply::no_content;
-      }
+          reply rep = reply::stock_reply(reply::ok);
+          if (rendered_tile) {
+            rep.headers.emplace_back("Content-Encoding", "deflate");
+            rep.content = std::move(*rendered_tile);
+          } else {
+            rep.status = reply::no_content;
+          }
 
-      add_cors_headers(rep);
-      return cb(rep);
-    } catch (std::exception const& e) {
-      tiles::t_log("unhandled error: {}", e.what());
-    } catch (...) {
-      tiles::t_log("unhandled unknown error");
-    }
-  });
+          add_cors_headers(rep);
+          return cb(rep);
+        } catch (std::exception const& e) {
+          tiles::t_log("unhandled error: {}", e.what());
+        } catch (...) {
+          tiles::t_log("unhandled unknown error");
+        }
+      });
 
   server.listen("0.0.0.0", "8888", router);
 
