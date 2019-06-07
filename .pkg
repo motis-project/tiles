@@ -13,7 +13,7 @@
 [fmt]
   url=git@git.motis-project.de:lib/fmt.git
   branch=master
-  commit=e124e07d2e6782a9a6ef1ee9e0099b83f22fd8ce
+  commit=c748245847abf12fd9d3b4c04f2a3b9c9a1ae590
 [geo]
   url=git@git.motis-project.de:lib/geo.git
   branch=master
@@ -49,7 +49,7 @@
 [utl]
   url=git@git.motis-project.de:lib/utl.git
   branch=master
-  commit=52d468470881e2b3c3fc4d1580216f03162cb8f0
+  commit=f58b0e19bbae92fe20423cfa5186a2cdf7138601
 [zlib]
   url=git@git.motis-project.de:lib/zlib.git
   branch=master
