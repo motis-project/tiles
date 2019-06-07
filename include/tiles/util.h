@@ -94,13 +94,13 @@ struct formatter<tiles::printable_num> {
     auto const m = n / 1e6;
     auto const g = n / 1e9;
     if (n < 1e3) {
-      return format_to(ctx.begin(), "{:>6}  ", n);
+      return format_to(ctx.out(), "{:>6}  ", n);
     } else if (k < 1e3) {
-      return format_to(ctx.begin(), "{:>6.1f}K ", k);
+      return format_to(ctx.out(), "{:>6.1f}K ", k);
     } else if (m < 1e3) {
-      return format_to(ctx.begin(), "{:>6.1f}M ", m);
+      return format_to(ctx.out(), "{:>6.1f}M ", m);
     } else {
-      return format_to(ctx.begin(), "{:>6.1f}G ", g);
+      return format_to(ctx.out(), "{:>6.1f}G ", g);
     }
   }
 };
@@ -119,13 +119,13 @@ struct formatter<tiles::printable_bytes> {
     auto const m = n / (1024 * 1024);
     auto const g = n / (1024 * 1024 * 1024);
     if (n < 1024) {
-      return format_to(ctx.begin(), "{:>7.2f}B  ", n);
+      return format_to(ctx.out(), "{:>7.2f}B  ", n);
     } else if (k < 1024) {
-      return format_to(ctx.begin(), "{:>7.2f}KB ", k);
+      return format_to(ctx.out(), "{:>7.2f}KB ", k);
     } else if (m < 1024) {
-      return format_to(ctx.begin(), "{:>7.2f}MB ", m);
+      return format_to(ctx.out(), "{:>7.2f}MB ", m);
     } else {
-      return format_to(ctx.begin(), "{:>7.2f}GB ", g);
+      return format_to(ctx.out(), "{:>7.2f}GB ", g);
     }
   }
 };
