@@ -21,7 +21,7 @@ if(NOT IS_DIRECTORY "${CMAKE_SOURCE_DIR}/deps")
     endif()
   endif()
 
-  message(STATUS ${pkg-bin})
+  message(STATUS "${pkg-bin} -l")
   execute_process(
     COMMAND ${pkg-bin} -l
     WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
@@ -31,3 +31,10 @@ endif()
 if (IS_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/deps")
   add_subdirectory(deps)
 endif()
+
+set_property(
+  DIRECTORY
+  APPEND
+  PROPERTY CMAKE_CONFIGURE_DEPENDS
+  "${CMAKE_CURRENT_SOURCE_DIR}/.pkg"
+)
