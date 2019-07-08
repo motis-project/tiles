@@ -27,7 +27,6 @@ file(GLOB_RECURSE tiles-files
 add_library(tiles STATIC ${tiles-files})
 set_target_properties(tiles PROPERTIES COMPILE_FLAGS ${TILES_CXX_FLAGS})
 target_include_directories(tiles PUBLIC include)
-target_compile_definitions(tiles PUBLIC -DPROTOZERO_USE_VIEW=std::string_view)
 target_link_libraries(tiles
   ${Boost_LIBRARIES}
   clipper
