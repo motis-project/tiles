@@ -29,7 +29,7 @@
 [miniz]
   url=git@git.motis-project.de:lib/miniz.git
   branch=master
-  commit=f5d1cf73092133260fd705b1ff9128cae59a2e27
+  commit=97f1bd3397d5449339305f08fe07f6a8d2111f72
 [net-old]
   url=git@git.motis-project.de:lib/net-old.git
   branch=net-old
