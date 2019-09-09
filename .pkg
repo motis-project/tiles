@@ -17,7 +17,7 @@
 [geo]
   url=git@git.motis-project.de:lib/geo.git
   branch=master
-  commit=9ae6bebd42378840ed125f2b3eacb296d8a2274a
+  commit=73593483ed0aa410b91e334a452be89d2775cac9
 [lmdb]
   url=git@git.motis-project.de:lib/lmdb.git
   branch=master
@@ -49,7 +49,7 @@
 [utl]
   url=git@git.motis-project.de:lib/utl.git
   branch=master
-  commit=521b65a86bf421424d97e89656bdf1c6043657f5
+  commit=4516f246a859858c70c9632e1db2619c3efe490c
 [zlib]
   url=git@git.motis-project.de:lib/zlib.git
   branch=master
