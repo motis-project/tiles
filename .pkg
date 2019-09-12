@@ -37,7 +37,7 @@
 [osmium]
   url=git@git.motis-project.de:lib/osmium.git
   branch=master
-  commit=e8185d7c1644e720d8355697d39b99ff9e2299e2
+  commit=3cfcbaeebc3d7a9a94babf3577f1c4dbf53ca714
 [protozero]
   url=git@git.motis-project.de:lib/protozero.git
   branch=tiles
