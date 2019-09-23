@@ -13,7 +13,7 @@
 [fmt]
   url=git@git.motis-project.de:lib/fmt.git
   branch=master
-  commit=c748245847abf12fd9d3b4c04f2a3b9c9a1ae590
+  commit=618f694f2c47b668b96435e84a4ba69bfb3f79b6
 [geo]
   url=git@git.motis-project.de:lib/geo.git
   branch=master
@@ -37,7 +37,7 @@
 [osmium]
   url=git@git.motis-project.de:lib/osmium.git
   branch=master
-  commit=3cfcbaeebc3d7a9a94babf3577f1c4dbf53ca714
+  commit=5c5e2d61b2defb4bb065fa31b4270e6f96293e71
 [protozero]
   url=git@git.motis-project.de:lib/protozero.git
   branch=tiles
@@ -49,7 +49,7 @@
 [utl]
   url=git@git.motis-project.de:lib/utl.git
   branch=master
-  commit=4516f246a859858c70c9632e1db2619c3efe490c
+  commit=aead860f891f0effe558db77d95a88edd6e582f8
 [zlib]
   url=git@git.motis-project.de:lib/zlib.git
   branch=master
