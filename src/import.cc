@@ -1,7 +1,7 @@
 #include <iostream>
 
+#include "conf/configuration.h"
 #include "conf/options_parser.h"
-#include "conf/simple_config.h"
 
 #include "tiles/db/clear_database.h"
 #include "tiles/db/database_stats.h"
@@ -16,20 +16,14 @@ namespace tiles {
 // "/home/sebastian/Downloads/land-polygons-complete-4326.zip"
 // "/data/osm/2017-10-29/hessen-171029.osm.pbf"
 
-struct import_settings : public conf::simple_config {
-  explicit import_settings(
-      std::string const& db_fname = "tiles.mdb",
-      std::string const& osm_fname = "latest.osm.pbf",
-      std::string const& coastlines_fname = "coastlines.zip",
-      std::vector<std::string> const& tasks = {"all"})
-      : simple_config("tiles-import options", "") {
-    string_param(db_fname_, db_fname, "db_fname", "/path/to/tiles.mdb");
-    string_param(osm_fname_, osm_fname, "osm_fname", "/path/to/latest.osm.pbf");
-    string_param(coastlines_fname_, coastlines_fname, "coastlines_fname",
-                 "/path/to/coastlines.zip");
-    multitoken_param(tasks_, tasks, "tasks",
-                     "'all' or any combination of: 'coastlines', "
-                     "'features', 'stats', 'tiles'");
+struct import_settings : public conf::configuration {
+  import_settings() : conf::configuration("tiles-import options", "") {
+    param(db_fname_, "db_fname", "/path/to/tiles.mdb");
+    param(osm_fname_, "osm_fname", "/path/to/latest.osm.pbf");
+    param(coastlines_fname_, "coastlines_fname", "/path/to/coastlines.zip");
+    param(tasks_, "tasks",
+          "'all' or any combination of: 'coastlines', "
+          "'features', 'stats', 'tiles'");
   }
 
   bool has_any_task(std::vector<std::string> const& query) {
@@ -39,11 +33,11 @@ struct import_settings : public conf::simple_config {
            });
   }
 
-  std::string db_fname_;
-  std::string osm_fname_;
-  std::string coastlines_fname_;
+  std::string db_fname_{"tiles.mdb"};
+  std::string osm_fname_{"latest.osm.pbf"};
+  std::string coastlines_fname_{"coastlines.zip"};
 
-  std::vector<std::string> tasks_;
+  std::vector<std::string> tasks_{{"all"}};
 };
 
 }  // namespace tiles
