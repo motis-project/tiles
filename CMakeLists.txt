@@ -8,9 +8,9 @@ link_directories(${Boost_LIBRARY_DIRS})
 include_directories(SYSTEM ${Boost_INCLUDE_DIR})
 
 if (MSVC)
-  set(TILES_CXX_FLAGS "-std=c++17 -Wall")
+  set(TILES_CXX_FLAGS "/W3")
 else()
-  set(TILES_CXX_FLAGS "-std=c++17 -Wall -Wextra")
+  set(TILES_CXX_FLAGS "-Wall -Wextra")
 endif()
 
 include(cmake/pkg.cmake)
@@ -25,6 +25,7 @@ file(GLOB_RECURSE tiles-files
 )
 
 add_library(tiles STATIC ${tiles-files})
+target_compile_features(geo PUBLIC cxx_std_17)
 set_target_properties(tiles PROPERTIES COMPILE_FLAGS ${TILES_CXX_FLAGS})
 target_include_directories(tiles PUBLIC include)
 target_link_libraries(tiles

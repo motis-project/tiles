@@ -25,7 +25,7 @@ struct packer {
 
   template <typename It>
   uint32_t append_span(It begin, It end) {
-    uint32_t offset = buf_.size();
+    auto offset = static_cast<uint32_t>(buf_.size());
 
     for (auto it = begin; it != end; ++it) {
       utl::verify(it->size() >= 32, "MINI FEATURE?!");
@@ -39,7 +39,7 @@ struct packer {
   }
 
   uint32_t append_packed(std::vector<uint32_t> const& vec) {
-    uint32_t offset = buf_.size();
+    auto offset = static_cast<uint32_t>(buf_.size());
     for (auto const& e : vec) {
       protozero::write_varint(std::back_inserter(buf_), e);
     }
@@ -48,7 +48,7 @@ struct packer {
 
   template <typename String>
   uint32_t append(String const& string) {
-    uint32_t offset = buf_.size();
+    auto offset = static_cast<uint32_t>(buf_.size());
     buf_.append(string);
     return offset;
   }

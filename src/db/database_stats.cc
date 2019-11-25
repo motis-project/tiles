@@ -21,7 +21,7 @@
 namespace tiles {
 
 void database_stats(tile_db_handle& handle) {
-  auto const format_num = [](auto& os, char const* label, double const n) {
+  auto const format_num = [](auto& os, char const* label, auto const n) {
     auto const k = n / 1e3;
     auto const m = n / 1e6;
     auto const g = n / 1e9;
@@ -36,7 +36,7 @@ void database_stats(tile_db_handle& handle) {
     }
   };
 
-  auto const format_bytes = [](auto& os, char const* label, double const n) {
+  auto const format_bytes = [](auto& os, char const* label, auto const n) {
     auto const k = n / 1024;
     auto const m = n / (1024 * 1024);
     auto const g = n / (1024 * 1024 * 1024);
@@ -76,7 +76,7 @@ void database_stats(tile_db_handle& handle) {
     }
 
     format_bytes(std::cout, "mean", sum / m.size());
-    format_bytes(std::cout, "q95", m[m.size() * .95]);
+    format_bytes(std::cout, "q95", m[static_cast<size_t>(m.size() * .95)]);
     format_bytes(std::cout, "max", m.back());
     std::cout << "\n";
   };

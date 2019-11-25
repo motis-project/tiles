@@ -15,10 +15,10 @@ inline geo::tile_range make_tile_range(fixed_box /*copy*/ box,
                                        uint32_t z = kTileDefaultIndexZoomLvl) {
   shift(box, z);
 
-  uint32_t const x_1 = box.min_corner().x() / kTileSize;
-  uint32_t const y_1 = box.min_corner().y() / kTileSize;
-  uint32_t const x_2 = box.max_corner().x() / kTileSize;
-  uint32_t const y_2 = box.max_corner().y() / kTileSize;
+  auto const x_1 = static_cast<uint32_t>(box.min_corner().x() / kTileSize);
+  auto const y_1 = static_cast<uint32_t>(box.min_corner().y() / kTileSize);
+  auto const x_2 = static_cast<uint32_t>(box.max_corner().x() / kTileSize);
+  auto const y_2 = static_cast<uint32_t>(box.max_corner().y() / kTileSize);
 
   return geo::make_tile_range(x_1, y_1, x_2, y_2, z);
 }
