@@ -49,7 +49,7 @@
 [utl]
   url=git@git.motis-project.de:lib/utl.git
   branch=master
-  commit=11a648b200079d4a5d1f7b853c8d71898e410fda
+  commit=76527202b714e54125f128302a6e075ceec4801a
 [zlib]
   url=git@git.motis-project.de:lib/zlib.git
   branch=master
