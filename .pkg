@@ -30,10 +30,6 @@
   url=git@git.motis-project.de:lib/miniz.git
   branch=master
   commit=b7d9c4e8db9e9b9dbd68d303d67c492cc0dc7e2b
-[net-old]
-  url=git@git.motis-project.de:lib/net-old.git
-  branch=net-old
-  commit=3c8eef1eb1cfa2d4c8101461d5b12a73bbd21b1e
 [osmium]
   url=git@git.motis-project.de:lib/osmium.git
   branch=master
