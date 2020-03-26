@@ -1,52 +1,60 @@
 [clipper]
-  url=git@git.motis-project.de:lib/clipper.git
+  url=git@github.com:motis-project/clipper.git
   branch=master
   commit=904f0e6644c7f01c176443613be8f7788d59c658
 [concurrentqueue]
-  url=git@git.motis-project.de:lib/concurrentqueue.git
+  url=git@github.com:motis-project/concurrentqueue.git
   branch=master
-  commit=b11bbfc1f8e3891d425c7045146cfc8d34e32906
+  commit=ef2227ada6f76cd65e517b7a6e902964443c0ffc
 [conf]
-  url=git@git.motis-project.de:lib/conf.git
+  url=git@github.com:motis-project/conf.git
   branch=master
-  commit=359d801d5118761a13663e4b114acd58720d4b81
+  commit=7897a6cd02ad9a47ff1c36722354e3638fb17000
 [fmt]
-  url=git@git.motis-project.de:lib/fmt.git
+  url=git@github.com:motis-project/fmt.git
   branch=master
-  commit=3eca62d66c7c9a2ca97dc8381299d911978b9fb2
+  commit=6117fab8ab38a9b7d9ec26bf0fbfc06d0e27a375
 [geo]
-  url=git@git.motis-project.de:lib/geo.git
+  url=git@github.com:motis-project/geo.git
   branch=master
-  commit=89be6bf2b541bde01ec7fa5b483de840ec225170
+  commit=60ae688fcb68859478b4742705c9b59cf20984c8
 [lmdb]
-  url=git@git.motis-project.de:lib/lmdb.git
+  url=git@github.com:motis-project/lmdb.git
   branch=master
-  commit=7c6b6da48bd5d8deb7987d6792799b0ec10bf7ed
+  commit=a7b9674b28c53e3cd9e43bda6d417c8d0a424ea5
 [lua]
-  url=git@git.motis-project.de:lib/lua.git
+  url=git@github.com:motis-project/lua.git
   branch=master
   commit=f410081ee2eac25ac9a15f73269033700419bd4c
 [miniz]
-  url=git@git.motis-project.de:lib/miniz.git
+  url=git@github.com:motis-project/miniz.git
   branch=master
   commit=b7d9c4e8db9e9b9dbd68d303d67c492cc0dc7e2b
 [osmium]
-  url=git@git.motis-project.de:lib/osmium.git
+  url=git@github.com:motis-project/libosmium.git
   branch=master
-  commit=5c5e2d61b2defb4bb065fa31b4270e6f96293e71
+  commit=5401d772b677272e46802e04931eaf8c0ea2b6da
 [protozero]
-  url=git@git.motis-project.de:lib/protozero.git
+  url=git@github.com:motis-project/protozero.git
   branch=tiles
-  commit=855ce94a2d1441db7e48a8e5505eac742777759b
+  commit=8c9f3fa97c2cfdceef86d0b61818ae98e9328f29
 [sol2]
-  url=git@git.motis-project.de:lib/sol2.git
-  branch=v2.20.6-mod
-  commit=4c0fd7069ac78f44cb422a1733ee892ce0546832
-[utl]
-  url=git@git.motis-project.de:lib/utl.git
+  url=git@github.com:motis-project/sol2.git
   branch=master
-  commit=76527202b714e54125f128302a6e075ceec4801a
+  commit=ad819d443cd71e3b0b413b77616a5571851285ef
+[utl]
+  url=git@github.com:motis-project/utl.git
+  branch=master
+  commit=4f6963e369852bd48e376f4c93a2eb2956b460b0
 [zlib]
-  url=git@git.motis-project.de:lib/zlib.git
+  url=git@github.com:motis-project/zlib.git
   branch=master
   commit=8e7c86d3a0e49101b9a67d74c4a07345dcb0e485
+[net]
+  url=git@github.com:motis-project/net.git
+  branch=master
+  commit=badafc2c7be7cb3c1088a0b03e0e1ba9d2a88b2b
+[catch]
+  url=git@github.com:motis-project/Catch2.git
+  branch=master
+  commit=e5c9a58d66ff0780e956b5447573af9d6b9b2ca3

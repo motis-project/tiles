@@ -62,7 +62,6 @@ target_link_libraries(tiles-import
 )
 
 file(GLOB_RECURSE tiles-server-files src/server.cc)
-
 add_executable(tiles-server EXCLUDE_FROM_ALL ${tiles-server-files})
 set_target_properties(tiles-server PROPERTIES COMPILE_FLAGS ${TILES_CXX_FLAGS})
 target_include_directories(tiles-server PUBLIC include)
@@ -70,13 +69,12 @@ target_link_libraries(tiles-server
   ${Boost_LIBRARIES}
   geo
   lmdb
-  net-http_server
+  web-server
   tiles
 )
 
 
 file(GLOB_RECURSE tiles-benchmark-files src/benchmark.cc)
-
 add_executable(tiles-benchmark EXCLUDE_FROM_ALL ${tiles-benchmark-files})
 set_target_properties(tiles-benchmark PROPERTIES COMPILE_FLAGS ${TILES_CXX_FLAGS})
 target_include_directories(tiles-benchmark PUBLIC include)
@@ -88,8 +86,7 @@ target_link_libraries(tiles-benchmark
 )
 
 file(GLOB_RECURSE tiles-test-files test/*.cc)
-
 add_executable(tiles-test EXCLUDE_FROM_ALL ${tiles-test-files})
 set_target_properties(tiles-test PROPERTIES COMPILE_FLAGS ${TILES_CXX_FLAGS})
 target_include_directories(tiles-test PUBLIC include)
-target_link_libraries(tiles-test tiles)
+target_link_libraries(tiles-test tiles Catch2)

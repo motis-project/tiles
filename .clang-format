@@ -10,6 +10,7 @@ KeepEmptyLinesAtTheStartOfBlocks: true
 AllowShortCaseLabelsOnASingleLine: true
 AlwaysBreakTemplateDeclarations: true
 SpacesBeforeTrailingComments: 2
+IncludeBlocks: Preserve
 IncludeCategories:
   - Regex:           '^<.*\.h>'
     Priority:        1

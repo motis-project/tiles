@@ -1,0 +1,64 @@
+name: Linux Build
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  formatting:
+    runs-on: ubuntu-latest
+
+    steps:
+
+      - uses: actions/checkout@v2
+
+      - name: Format files
+        run: find include src test -type f -a \( -name "*.cc" -o -name "*.h" \) -print0 | xargs -0 clang-format-9 -i
+
+      - name: Check for differences
+        run: |
+          git status --porcelain
+          git status --porcelain | xargs -I {} -0 test -z \"{}\"
+
+  build:
+    runs-on: ubuntu-latest
+    container:
+      image: motisproject/cpp-build:latest
+    strategy:
+      matrix:
+        cxx: [gcc-9, clang-9, clang-9-san]
+        mode: [Debug, Release]
+        lint: [Off]
+        exclude:
+          - cxx: clang-9-san
+            mode: Release
+            lint: Off
+    env:
+      CCACHE_DIR: ${{ github.workspace }}/.ccache
+      CCACHE_NOHASHDIR: true
+
+    steps:
+
+      - uses: actions/checkout@v2
+
+      - name: Cache
+        uses: actions/cache@v1.1.2
+        with:
+          path: ${{ github.workspace }}/.ccache
+          key: ccache-${{ matrix.cxx }}-${{ matrix.mode }}-${{ hashFiles('**/*.h') }}-${{ hashFiles('**/*.cc') }}
+
+      - name: CMake
+        run: cmake-ccache-${{ matrix.cxx }} -G Ninja -S . -B build -DCMAKE_BUILD_TYPE=${{ matrix.mode }} -DTAR_LINT=${{ matrix.lint }}
+
+      - name: Build
+        run: |
+          ccache -z
+          cmake --build build --target tiles-import tiles-server tiles-benchmark tiles-test
+          ccache -s
+
+      - name: Run Tests
+        run: |
+          cd build
+          ./tiles-test

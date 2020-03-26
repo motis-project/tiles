@@ -16,9 +16,10 @@
 namespace tiles {
 
 struct feature_inserter : public batch_inserter {
-  feature_inserter(tile_db_handle& handle,
-                   lmdb::txn::dbi (tile_db_handle::*dbi_opener)(lmdb::txn&, lmdb::dbi_flags),
-                   lmdb::dbi_flags flags = lmdb::dbi_flags::CREATE)
+  feature_inserter(
+      tile_db_handle& handle,
+      lmdb::txn::dbi (tile_db_handle::*dbi_opener)(lmdb::txn&, lmdb::dbi_flags),
+      lmdb::dbi_flags flags = lmdb::dbi_flags::CREATE)
       : batch_inserter(handle, dbi_opener, flags) {
     init_fill_state();
   }
@@ -69,9 +70,9 @@ struct feature_inserter : public batch_inserter {
       auto it = pending_features_.find(tile);
       utl::verify(it != end(pending_features_), "cannot happen");
 
-      auto const size =
-          std::accumulate(begin(it->second.second), end(it->second.second), 0ull,
-                          [](auto const acc, auto const str) { return acc + str.size(); });
+      auto const size = std::accumulate(
+          begin(it->second.second), end(it->second.second), 0ull,
+          [](auto const acc, auto const str) { return acc + str.size(); });
       pending_size_ -= size;
 
       ++persisted_packs;
@@ -82,11 +83,14 @@ struct feature_inserter : public batch_inserter {
       pending_features_.erase(it);
     }
 
-    t_log("persisted {} packs with {} features ({})", printable_num{persisted_packs},
-          printable_num{persisted_features}, printable_bytes{persisted_size});
+    t_log("persisted {} packs with {} features ({})",
+          printable_num{persisted_packs}, printable_num{persisted_features},
+          printable_bytes{persisted_size});
   }
 
-  void insert_unbuffered(geo::tile const& tile, std::string const& str) { persist(tile, {str}); }
+  void insert_unbuffered(geo::tile const& tile, std::string const& str) {
+    persist(tile, {str});
+  }
 
   void flush() {
     for (auto const& [tile, features] : pending_features_) {
@@ -95,7 +99,8 @@ struct feature_inserter : public batch_inserter {
     pending_features_ = {};
   }
 
-  void persist(geo::tile const& tile, std::vector<std::string> const& features) {
+  void persist(geo::tile const& tile,
+               std::vector<std::string> const& features) {
     auto const idx = ++fill_state_[tile];
     auto const key = make_feature_key(tile, idx);
     batch_inserter::insert(key, pack_features(features));
@@ -118,7 +123,8 @@ private:
   size_t pending_size_{0};
 
   // (x, y) -> feature string
-  std::map<geo::tile, std::pair<size_t, std::vector<std::string>>> pending_features_;
+  std::map<geo::tile, std::pair<size_t, std::vector<std::string>>>
+      pending_features_;
 };
 
 }  // namespace tiles

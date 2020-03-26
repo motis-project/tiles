@@ -44,7 +44,9 @@ inline std::vector<std::string> read_layer_names(std::string_view const& str) {
 }
 
 struct layer_names_builder {
-  layer_names_builder() { layer_names_[kLayerCoastlineName] = kLayerCoastlineIdx; }
+  layer_names_builder() {
+    layer_names_[kLayerCoastlineName] = kLayerCoastlineIdx;
+  }
 
   size_t get_layer_idx(std::string const& name) {
     return utl::get_or_create_index(layer_names_, name);
@@ -65,7 +67,8 @@ struct layer_names_builder {
   std::map<std::string, size_t> layer_names_;
 };
 
-inline std::vector<std::string> get_layer_names(tile_db_handle& handle, lmdb::txn& txn) {
+inline std::vector<std::string> get_layer_names(tile_db_handle& handle,
+                                                lmdb::txn& txn) {
   auto meta_dbi = handle.meta_dbi(txn);
   auto const opt_names = txn.get(meta_dbi, kMetaKeyLayerNames);
   if (!opt_names) {
@@ -107,9 +110,12 @@ inline void make_meta_coding(tile_db_handle& handle) {
       protozero::pbf_message<tags::Feature> msg{str};
       while (msg.next()) {
         switch (msg.tag()) {
-          case tags::Feature::repeated_string_keys: tile_meta.emplace_back(msg.get_string()); break;
+          case tags::Feature::repeated_string_keys:
+            tile_meta.emplace_back(msg.get_string());
+            break;
           case tags::Feature::repeated_string_values:
-            utl::verify(meta_fill < tile_meta.size(), "tile_meta data imbalance! (a)");
+            utl::verify(meta_fill < tile_meta.size(),
+                        "tile_meta data imbalance! (a)");
             tile_meta[meta_fill++].val_ = msg.get_string();
             break;
           default: msg.skip();
@@ -119,24 +125,27 @@ inline void make_meta_coding(tile_db_handle& handle) {
     utl::verify(meta_fill == tile_meta.size(), "meta data imbalance! (b)");
 
     utl::equal_ranges(tile_meta, [&](auto lb, auto ub) {
-      meta_acc.emplace_back(lb->key_, lb->val_,
-                            std::accumulate(lb, ub, 0ull, [](auto const acc, auto const& e) {
-                              return acc + e.freq_;
-                            }));
+      meta_acc.emplace_back(
+          lb->key_, lb->val_,
+          std::accumulate(lb, ub, 0ull, [](auto const acc, auto const& e) {
+            return acc + e.freq_;
+          }));
     });
   }
 
   std::vector<pair_freq> metas;
   utl::equal_ranges(meta_acc, [&](auto lb, auto ub) {
-    auto const freq =
-        std::accumulate(lb, ub, 0ull, [](auto const acc, auto const& e) { return acc + e.freq_; });
+    auto const freq = std::accumulate(
+        lb, ub, 0ull,
+        [](auto const acc, auto const& e) { return acc + e.freq_; });
     if (freq > 1) {  // XXX
       metas.emplace_back(lb->key_, lb->val_, freq);
     }
   });
 
-  std::sort(begin(metas), end(metas),
-            [](auto const& lhs, auto const& rhs) { return lhs.freq_ > rhs.freq_; });
+  std::sort(begin(metas), end(metas), [](auto const& lhs, auto const& rhs) {
+    return lhs.freq_ > rhs.freq_;
+  });
 
   std::string buf;
   protozero::pbf_writer writer{buf};
@@ -175,7 +184,8 @@ inline meta_coding_map_t load_meta_coding_map(tile_db_handle& handle) {
 
 using meta_coding_vec_t = std::vector<std::pair<std::string, std::string>>;
 
-inline meta_coding_vec_t load_meta_coding_vec(tile_db_handle& handle, lmdb::txn& txn) {
+inline meta_coding_vec_t load_meta_coding_vec(tile_db_handle& handle,
+                                              lmdb::txn& txn) {
   auto meta_dbi = handle.meta_dbi(txn);
   auto const opt_coding = txn.get(meta_dbi, kMetaKeyFeatureMetaCoding);
   if (!opt_coding) {
