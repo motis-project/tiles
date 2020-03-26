@@ -42,7 +42,7 @@ struct import_settings : public conf::configuration {
 
 }  // namespace tiles
 
-int main(int argc, char** argv) {
+int main(int argc, char const** argv) {
   tiles::import_settings opt;
 
   try {

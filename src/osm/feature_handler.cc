@@ -1,6 +1,6 @@
 #include "tiles/osm/feature_handler.h"
 
-#include "sol.hpp"
+#include "sol/sol.hpp"
 
 #include "tiles/fixed/algo/bounding_box.h"
 #include "tiles/fixed/fixed_geometry.h"

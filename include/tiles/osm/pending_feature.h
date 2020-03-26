@@ -4,7 +4,7 @@
 
 #include "osmium/osm.hpp"
 
-#include "sol.hpp"
+#include "sol/sol.hpp"
 
 #include "tiles/fixed/algo/area.h"
 #include "tiles/osm/read_osm_geometry.h"
