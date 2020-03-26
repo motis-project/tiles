@@ -53,7 +53,7 @@
 [net]
   url=git@github.com:motis-project/net.git
   branch=master
-  commit=badafc2c7be7cb3c1088a0b03e0e1ba9d2a88b2b
+  commit=6676d800c0d14db931347cf8d166fe02be683757
 [catch]
   url=git@github.com:motis-project/Catch2.git
   branch=master
