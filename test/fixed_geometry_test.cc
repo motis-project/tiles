@@ -44,7 +44,7 @@ TEST_CASE("fixed polyline io") {
                                                           kFixedCoordMax};
   std::uniform_int_distribution<fixed_coord_t> len_dist{1, 10000};
 
-  for (auto i = 0u; i < 1000; ++i) {
+  for (auto i = 0u; i < 100; ++i) {
     auto len = len_dist(gen);
 
     fixed_polyline line;

@@ -8,9 +8,9 @@ TEST_CASE("compress_deflate") {
   std::string test(1024ul * 1024, '\0');
 
   std::mt19937 gen{42};
-  std::uniform_int_distribution<char> dist;
+  std::uniform_int_distribution<unsigned> dist;
   for (auto i = 0u; i < test.size(); ++i) {
-    test[i] = dist(gen);
+    test[i] = static_cast<char>(dist(gen));
   }
 
   auto out = tiles::compress_deflate(test);
