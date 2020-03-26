@@ -1,6 +1,13 @@
 cmake_minimum_required(VERSION 3.16)
 project(tiles)
 
+set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+
+if (MSVC)
+  set(Boost_USE_STATIC_LIBS ON)
+  set(Boost_USE_MULTITHREADED ON)
+  set(Boost_USE_STATIC_RUNTIME ON)
+endif()
 find_package(Boost REQUIRED COMPONENTS system filesystem)
 find_package(Threads)
 
