@@ -8,6 +8,7 @@ else()
   set(TILES_WARNINGS "-Wall" "-Wextra")
 endif()
 
+include(cmake/buildcache.cmake)
 include(cmake/pkg.cmake)
 
 file(GLOB_RECURSE tiles-server-res "${CMAKE_CURRENT_SOURCE_DIR}/client/*.*")
