@@ -49,7 +49,7 @@
 [res]
   url=git@github.com:motis-project/res.git
   branch=master
-  commit=e72c6d59a7bd05fdc08665af7d31b78b08de818d
+  commit=f4e7f0193290133ed73f4bdaa534b040d0a9c253
 [sol2]
   url=git@github.com:motis-project/sol2.git
   branch=master
