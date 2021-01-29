@@ -44,7 +44,7 @@ struct progress_tracker {
             [](auto const& t) { t_log("{} : {:>3}%", t.status_, t.out_); })} {}
 #endif
 
-  utl::progress_tracker* operator->() { return ptr_.get(); }
+  utl::progress_tracker* operator->() const { return ptr_.get(); }
 
   utl::progress_tracker_ptr ptr_;
 };
