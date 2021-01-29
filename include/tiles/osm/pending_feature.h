@@ -32,7 +32,7 @@ struct pending_feature {
     if (std::distance(va.begin(), va.end()) == 0) {
       return obj_.get_value_by_key(key.c_str()) != nullptr;
     } else {
-      auto const actual_value = obj_.get_value_by_key(key.c_str(), "");
+      auto const* const actual_value = obj_.get_value_by_key(key.c_str(), "");
       return std::any_of(std::begin(va), std::end(va),
                          [&actual_value](std::string const& value) {
                            return actual_value == value;

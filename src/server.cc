@@ -48,7 +48,7 @@ std::string url_decode(request_t const& req) {
     if (in[i] == '%') {
       utl::verify(i + 3 <= in.size(), "invalid url");
       int value = 0;
-      std::istringstream is{in.substr(i + 1, 2).to_string()};
+      std::istringstream is{std::string{in.substr(i + 1, 2)}};
       utl::verify(static_cast<bool>(is >> std::hex >> value), "invalid url");
       out += static_cast<char>(value);
       i += 2;
@@ -83,7 +83,7 @@ struct http_connection : public std::enable_shared_from_this<http_connection> {
               self->response_.result(http::status::internal_server_error);
             }
             self->response_.set(http::field::content_length,
-                                self->response_.body().size());
+                                std::to_string(self->response_.body().size()));
             http::async_write(self->socket_, self->response_,
                               [self](beast::error_code ec, std::size_t) {
                                 self->socket_.shutdown(
@@ -115,7 +115,9 @@ struct http_connection : public std::enable_shared_from_this<http_connection> {
 void http_server(tcp::acceptor& acceptor, tcp::socket& socket,
                  callback_t const& cb) {
   acceptor.async_accept(socket, [&](beast::error_code ec) {
-    if (!ec) std::make_shared<http_connection>(std::move(socket), cb)->start();
+    if (!ec) {
+      std::make_shared<http_connection>(std::move(socket), cb)->start();
+    }
     http_server(acceptor, socket, cb);
   });
 }
@@ -194,7 +196,7 @@ int run_tiles_server(int argc, char const** argv) {
     }
 
     if (req[http::field::accept_encoding]  //
-            .find("deflate") == boost::string_view::npos) {
+            .find("deflate") == std::string_view::npos) {
       res.result(http::status::not_implemented);
       return true;
     }

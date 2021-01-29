@@ -44,7 +44,7 @@ std::vector<line_handle> make_line_handles(FeatureIt lb, FeatureIt ub) {
       lines.back()->to_ = l[i].back();
       lines.back()->feature_ = &*it;
       lines.back()->geo_idx_ = i;
-      // TODO oneway support (needs special tag?!)
+      // TODO(root): oneway support (needs special tag?!)
     }
   }
   return lines;

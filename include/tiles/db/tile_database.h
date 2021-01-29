@@ -65,34 +65,37 @@ struct tile_db_handle {
   }
 
   lmdb::txn::dbi meta_dbi(lmdb::txn& txn,
-                          lmdb::dbi_flags flags = lmdb::dbi_flags::NONE) {
+                          lmdb::dbi_flags flags = lmdb::dbi_flags::NONE) const {
     return txn.dbi_open(dbi_name_meta_, flags);
   }
 
-  lmdb::txn::dbi features_dbi(lmdb::txn& txn,
-                              lmdb::dbi_flags flags = lmdb::dbi_flags::NONE) {
+  lmdb::txn::dbi features_dbi(
+      lmdb::txn& txn, lmdb::dbi_flags flags = lmdb::dbi_flags::NONE) const {
     return txn.dbi_open(dbi_name_features_,
                         flags | lmdb::dbi_flags::INTEGERKEY);
   }
 
-  lmdb::txn::dbi tiles_dbi(lmdb::txn& txn,
-                           lmdb::dbi_flags flags = lmdb::dbi_flags::NONE) {
+  lmdb::txn::dbi tiles_dbi(
+      lmdb::txn& txn, lmdb::dbi_flags flags = lmdb::dbi_flags::NONE) const {
     return txn.dbi_open(dbi_name_tiles_, flags | lmdb::dbi_flags::INTEGERKEY);
   }
 
-  dbi_opener_fn meta_dbi_opener() {
-    using namespace std::placeholders;
-    return std::bind(&tile_db_handle::meta_dbi, this, _1, _2);
+  auto meta_dbi_opener() {
+    return [this](lmdb::txn& txn, lmdb::dbi_flags flags) {
+      return meta_dbi(txn, flags);
+    };
   }
 
-  dbi_opener_fn features_dbi_opener() {
-    using namespace std::placeholders;
-    return std::bind(&tile_db_handle::features_dbi, this, _1, _2);
+  auto features_dbi_opener() {
+    return [this](lmdb::txn& txn, lmdb::dbi_flags flags) {
+      return features_dbi(txn, flags);
+    };
   }
 
-  dbi_opener_fn tiles_dbi_opener() {
-    using namespace std::placeholders;
-    return std::bind(&tile_db_handle::tiles_dbi, this, _1, _2);
+  auto tiles_dbi_opener() {
+    return [this](lmdb::txn& txn, lmdb::dbi_flags flags) {
+      return tiles_dbi(txn, flags);
+    };
   }
 
   lmdb::env& env_;

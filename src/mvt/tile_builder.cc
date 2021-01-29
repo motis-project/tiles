@@ -291,8 +291,10 @@ tile_builder::tile_builder(render_ctx const& ctx, geo::tile const& tile)
 
 tile_builder::~tile_builder() = default;
 
-void tile_builder::add_feature(feature f) { impl_->add_feature(std::move(f)); }
+void tile_builder::add_feature(feature f) const {
+  impl_->add_feature(std::move(f));
+}
 
-std::string tile_builder::finish() { return impl_->finish(); }
+std::string tile_builder::finish() const { return impl_->finish(); }
 
 }  // namespace tiles

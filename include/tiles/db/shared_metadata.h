@@ -25,7 +25,7 @@ struct shared_metadata_builder {
   void update(std::vector<metadata> const& data) {
     queue_.enqueue_bulk(data);
 
-    // TODO flush in other thread
+    // TODO(root): flush in other thread
     if (should_flush()) {
       flush();
     }

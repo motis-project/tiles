@@ -101,18 +101,21 @@ void transform_erase(Container& c, Fn&& fn) {
 
 struct printable_num {
   template <typename T>
+  // NOLINTNEXTLINE(bugprone-forwarding-reference-overload)
   explicit printable_num(T&& t) : n_{static_cast<double>(t)} {}
   double n_;
 };
 
 struct printable_ns {
   template <typename T>
+  // NOLINTNEXTLINE(bugprone-forwarding-reference-overload)
   explicit printable_ns(T&& t) : n_{static_cast<double>(t)} {}
   double n_;
 };
 
 struct printable_bytes {
   template <typename T>
+  // NOLINTNEXTLINE(bugprone-forwarding-reference-overload)
   explicit printable_bytes(T&& t) : n_{static_cast<double>(t)} {}
   double n_;
 };
@@ -201,7 +204,7 @@ struct formatter<tiles::printable_bytes> {
 namespace tiles {
 
 inline uint32_t stou(std::string_view sv) {
-  uint32_t var;
+  uint32_t var = 0;
   auto result = std::from_chars(sv.data(), sv.data() + sv.size(), var);
   utl::verify(result.ec == std::errc(), "cannot convert to uint32_t: {}", sv);
   return var;
