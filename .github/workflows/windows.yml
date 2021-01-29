@@ -55,9 +55,9 @@ jobs:
           Import-Module $devShell
           Enter-VsDevShell -VsInstallPath $installPath -SkipAutomaticLocation -DevCmdArguments "-arch=amd64"
           cmake -GNinja -S . -B build -DCMAKE_BUILD_TYPE=${{ matrix.mode }}
-          .\build\bin\buildcache.exe -z
+          .\build\buildcache\bin\buildcache.exe -z
           cmake --build build --target tiles-import tiles-server tiles-benchmark tiles-test
-          .\build\bin\buildcache.exe -s
+          .\build\buildcache\bin\buildcache.exe -s
 
       # ==== TESTS ====
       - name: Run Tests

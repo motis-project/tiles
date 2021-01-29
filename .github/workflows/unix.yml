@@ -143,9 +143,9 @@ jobs:
           -DTILES_TIDY=${{ matrix.config.lint }}
       - name: Build
         run: |
-          ./build/bin/buildcache -z
+          ./build/buildcache/bin/buildcache -z
           cmake --build build --target tiles-import tiles-server tiles-benchmark tiles-test
-          ./build/bin/buildcache -s
+          ./build/buildcache/bin/buildcache -s
 
       # ==== TESTS ====
       - name: Run Tests
