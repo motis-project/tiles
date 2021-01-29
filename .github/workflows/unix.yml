@@ -150,10 +150,10 @@ jobs:
       # ==== TESTS ====
       - name: Run Tests
         run: |
-          ./tiles-test
+          ./build/tiles-test
 
       # ==== VALGRIND ====
       - name: Run Tests Valgrind
         if: matrix.config.mode == 'Debug' && matrix.config.cc == 'gcc-10'
         run: |
-          valgrind --error-exitcode=1 --show-reachable=yes --leak-check=full ./tiles-test
+          valgrind --error-exitcode=1 --show-reachable=yes --leak-check=full ./build/tiles-test
