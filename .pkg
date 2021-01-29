@@ -13,7 +13,7 @@
 [conf]
   url=git@github.com:motis-project/conf.git
   branch=master
-  commit=7897a6cd02ad9a47ff1c36722354e3638fb17000
+  commit=7b687da879396cf5f2692121a0e3735444e7700e
 [fmt]
   url=git@github.com:motis-project/fmt.git
   branch=master
@@ -21,7 +21,7 @@
 [geo]
   url=git@github.com:motis-project/geo.git
   branch=master
-  commit=92019571ceafb4e6016ecccbf9127cc673017038
+  commit=c925fb042fa6c717ee4caad50f6230345ff40f40
 [lmdb]
   url=git@github.com:motis-project/lmdb.git
   branch=master
@@ -29,11 +29,11 @@
 [lua]
   url=git@github.com:motis-project/lua.git
   branch=master
-  commit=f33872490a19655ff7c5623246a90d851446dc79
+  commit=7bb93325b26f84c7e8b51fcbd857361ce7605a1d
 [miniz]
   url=git@github.com:motis-project/miniz.git
   branch=master
-  commit=b2dc9a422f0f146ac0fb941e6f3c990cb50bca76
+  commit=1edbdece9d71dc65c6ff405572ee37cbdcef7af4
 [osmium]
   url=git@github.com:motis-project/libosmium.git
   branch=master
@@ -49,7 +49,7 @@
 [res]
   url=git@github.com:motis-project/res.git
   branch=master
-  commit=e72c6d59a7bd05fdc08665af7d31b78b08de818d
+  commit=c500c261531a2b8b8d475fc9d42c075f28f72aaf
 [sol2]
   url=git@github.com:motis-project/sol2.git
   branch=master
@@ -57,8 +57,16 @@
 [utl]
   url=git@github.com:motis-project/utl.git
   branch=master
-  commit=55c1f939c12aa3f9b0279761766a6bf980be6e01
+  commit=8a293414defd6fac4d2448b4ea1afca766f71730
 [zlib]
   url=git@github.com:motis-project/zlib.git
   branch=master
   commit=8e7c86d3a0e49101b9a67d74c4a07345dcb0e485
+[boost]
+  url=git@github.com:motis-project/boost.git
+  branch=master
+  commit=d60b850a4be7e7690e4098c0e55125608c040d28
+[variant]
+  url=git@github.com:motis-project/variant.git
+  branch=master
+  commit=3c7fc8266bb46046b42c2dc2663f9f505f0cec28

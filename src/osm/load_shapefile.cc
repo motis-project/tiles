@@ -1,5 +1,6 @@
 #include "tiles/osm/load_shapefile.h"
 
+#include <cmath>
 #include <iostream>
 
 #include "miniz.h"
@@ -24,13 +25,13 @@ int32_t read_int_big(utl::buffer const& buf, size_t const pos) {
 }
 
 int32_t read_int_little(utl::buffer const& buf, size_t const pos) {
-  int32_t val;
+  int32_t val = 0;
   std::memcpy(&val, buf.data() + pos, sizeof(int32_t));
   return val;
 }
 
 double read_double_little(utl::buffer const& buf, size_t const pos) {
-  double val;
+  double val = NAN;
   std::memcpy(&val, buf.data() + pos, sizeof(double));
   return val;
 }

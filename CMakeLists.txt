@@ -2,23 +2,13 @@ cmake_minimum_required(VERSION 3.15)
 project(tiles)
 
 if (MSVC)
-  set(Boost_USE_STATIC_LIBS ON)
-  set(Boost_USE_MULTITHREADED ON)
-  set(Boost_USE_STATIC_RUNTIME ON)
-endif()
-find_package(Boost 1.70.0 REQUIRED COMPONENTS system filesystem)
-find_package(Threads)
-
-link_directories(${Boost_LIBRARY_DIRS})
-include_directories(SYSTEM ${Boost_INCLUDE_DIR})
-
-if (MSVC)
   set(TILES_WARNINGS "/W4")
   set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
 else()
   set(TILES_WARNINGS "-Wall" "-Wextra")
 endif()
 
+include(cmake/buildcache.cmake)
 include(cmake/pkg.cmake)
 
 file(GLOB_RECURSE tiles-server-res "${CMAKE_CURRENT_SOURCE_DIR}/client/*.*")
@@ -41,7 +31,7 @@ set_property(TARGET tiles PROPERTY CXX_STANDARD 17)
 target_compile_options(tiles PRIVATE ${TILES_WARNINGS})
 target_include_directories(tiles PUBLIC include)
 target_link_libraries(tiles
-  ${Boost_LIBRARIES}
+  boost
   clipper
   fmt
   geo
@@ -54,6 +44,7 @@ target_link_libraries(tiles
   sol2
   miniz
   zlibstatic
+  mpark_variant
 )
 
 file(GLOB_RECURSE tiles-import-files src/osm/*.cc)
@@ -64,7 +55,7 @@ set_property(TARGET tiles-import-library PROPERTY CXX_STANDARD 17)
 target_compile_options(tiles-import-library PRIVATE ${TILES_WARNINGS})
 target_include_directories(tiles-import-library PUBLIC include)
 target_link_libraries(tiles-import-library
-  ${Boost_LIBRARIES}
+  boost-filesystem
   geo
   lmdb
   lua
@@ -79,7 +70,7 @@ set_property(TARGET tiles-import PROPERTY CXX_STANDARD 17)
 target_compile_options(tiles-import PRIVATE ${TILES_WARNINGS})
 target_include_directories(tiles-import PUBLIC include)
 target_link_libraries(tiles-import
-  ${Boost_LIBRARIES}
+  boost
   conf
   lmdb
   tiles-import-library
@@ -87,10 +78,11 @@ target_link_libraries(tiles-import
 
 add_executable(tiles-server EXCLUDE_FROM_ALL src/server.cc)
 set_property(TARGET tiles-server PROPERTY CXX_STANDARD 17)
+target_compile_definitions(tiles-server PRIVATE BOOST_BEAST_USE_STD_STRING_VIEW=1)
 target_compile_options(tiles-server PRIVATE ${TILES_WARNINGS})
 target_include_directories(tiles-server PUBLIC include)
 target_link_libraries(tiles-server
-  ${Boost_LIBRARIES}
+  boost-filesystem
   conf
   geo
   lmdb
@@ -114,7 +106,7 @@ set_property(TARGET tiles-benchmark PROPERTY CXX_STANDARD 17)
 target_compile_options(tiles-benchmark PRIVATE ${TILES_WARNINGS})
 target_include_directories(tiles-benchmark PUBLIC include)
 target_link_libraries(tiles-benchmark
-  ${Boost_LIBRARIES}
+  boost
   tiles
   lmdb
   geo

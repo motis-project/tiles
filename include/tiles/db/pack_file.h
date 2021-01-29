@@ -87,7 +87,7 @@ inline void clear_pack_file(char const* db_fname) {
 #ifdef _MSC_VER
   auto f = std::fopen(fname.c_str(), "wb+");
 #else
-  auto f = std::fopen(fname.c_str(), "wb+e");
+  auto* f = std::fopen(fname.c_str(), "wb+e");
 #endif
   utl::verify(f != nullptr, "clear_pack_file: failed to fopen {}", fname);
   utl::verify(std::fclose(f) == 0, "clear_pack_file: problem while fclose");

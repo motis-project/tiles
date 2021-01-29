@@ -145,8 +145,8 @@ size_t unpack_features(std::string_view const& string, Fn&& fn) {
   auto const feature_count = read_nth<uint32_t>(string.data(), 0);
   auto const segment_count = read_nth<uint8_t>(string.data(), 4);
 
-  auto ptr = string.data() + static_cast<size_t>(segment_count + 1) * 5;
-  auto const end = string.data() + string.size();
+  auto const* ptr = string.data() + static_cast<size_t>(segment_count + 1) * 5;
+  auto const* const end = string.data() + string.size();
   for (auto i = 0ULL; i < feature_count; ++i) {
     uint64_t size = 0;
     while (size == 0) {  // skip zero elements (= span terminators)
@@ -169,8 +169,8 @@ void unpack_features(geo::tile const& root, std::string_view const& string,
   }
 
   utl::verify(string.size() >= *idx_offset, "invalid feature_pack idx_offset");
-  auto idx_ptr = string.data() + *idx_offset;
-  auto const end = string.data() + string.size();
+  auto const* idx_ptr = string.data() + *idx_offset;
+  auto const* const end = string.data() + string.size();
   for (auto z = root.z_; z <= std::max(root.z_, tile.z_); ++z) {
     auto const tree_offset = protozero::decode_varint(&idx_ptr, end);
     if (tree_offset == 0) {
@@ -182,7 +182,7 @@ void unpack_features(geo::tile const& root, std::string_view const& string,
         [&](auto const span_offset, auto const span_count) {
           auto span_ptr = string.data() + span_offset;
           for (auto i = 0ULL; i < span_count; ++i) {
-            uint64_t size;
+            uint64_t size = 0;
             while ((size = protozero::decode_varint(&span_ptr, end)) != 0) {
               fn(std::string_view{span_ptr, size});
               span_ptr += size;

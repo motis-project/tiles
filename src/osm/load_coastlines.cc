@@ -53,7 +53,7 @@ struct coastline_stats {
     progress_->status("Process Coastline").out_mod(5.F).in_high(kTotal);
   }
 
-  void report_progess(uint32_t z) {
+  void report_progess(uint32_t z) const {
     progress_->increment(1ULL << (10 - z) * 1ULL << (10 - z));
   }
 

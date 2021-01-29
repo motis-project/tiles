@@ -33,7 +33,7 @@ std::vector<feature> aggregate_polygon_features(std::vector<feature> features,
         f.id_ = lb->id_;
         f.meta_ = std::move(lb->meta_);
 
-        // TODO this is a noop
+        // TODO(root): this is a noop
         f.geometry_ =
             simplify(std::move(final_polygon), 1ULL << (kMaxZoomLevel - z));
 

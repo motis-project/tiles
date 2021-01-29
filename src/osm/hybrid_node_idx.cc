@@ -74,7 +74,7 @@ struct hybrid_node_idx::impl {
 };
 
 uint32_t read_fixed(char const** data) {
-  auto p = reinterpret_cast<const uint8_t*>(*data);
+  auto const* p = reinterpret_cast<uint8_t const*>(*data);
   uint32_t val = 0;
   val |= *p++;
   val |= (*p++) << 8;
@@ -93,7 +93,7 @@ std::optional<fixed_xy> get_coords(hybrid_node_idx const& nodes,
     return std::nullopt;
   }
   auto const abs_id = std::abs(id);
-  auto it =
+  auto const* it =
       std::lower_bound(std::begin(idx), std::end(idx), abs_id,
                        [](auto const& o, auto const& i) { return o.id_ < i; });
 
@@ -106,7 +106,7 @@ std::optional<fixed_xy> get_coords(hybrid_node_idx const& nodes,
   }
 
   osm_id_t curr_id = it->id_;
-  auto dat_it = dat.data() + it->offset_;
+  auto const* dat_it = dat.data() + it->offset_;
 
   while (curr_id <= abs_id && dat_it != std::end(dat)) {
     auto const header = pz::decode_varint(&dat_it, std::end(dat));
@@ -187,7 +187,7 @@ void get_coords(
     switch (state) {
       // pre cond: have any query_id
       case fsm_state::from_index: {
-        auto it_idx = std::lower_bound(
+        auto const* it_idx = std::lower_bound(
             std::begin(idx), std::end(idx), query_id,
             [](auto const& o, auto const& i) { return o.id_ < i; });
 
@@ -514,11 +514,11 @@ hybrid_node_idx_builder::hybrid_node_idx_builder(int idx_fd, int dat_fd)
 hybrid_node_idx_builder::~hybrid_node_idx_builder() = default;
 
 void hybrid_node_idx_builder::push(o::object_id_type const id,
-                                   fixed_xy const& coords) {
+                                   fixed_xy const& coords) const {
   impl_->push(id, coords);
 }
 
-void hybrid_node_idx_builder::finish() { impl_->finish(); }
+void hybrid_node_idx_builder::finish() const { impl_->finish(); }
 
 void hybrid_node_idx_builder::dump_stats() const { impl_->dump_stats(); }
 size_t hybrid_node_idx_builder::get_stat_spans() const {

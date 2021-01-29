@@ -19,9 +19,9 @@ struct tile_builder {
   tile_builder& operator=(tile_builder const&) = delete;
   tile_builder& operator=(tile_builder&&) noexcept = default;
 
-  void add_feature(feature);
+  void add_feature(feature) const;
 
-  std::string finish();
+  std::string finish() const;
 
   struct impl;
   std::unique_ptr<impl> impl_;

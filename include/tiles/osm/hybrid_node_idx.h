@@ -33,7 +33,7 @@ struct hybrid_node_idx : public osmium::handler::Handler {
   std::unique_ptr<impl> impl_;
 };
 
-// TODO not real fixed_xy here
+// TODO(root): not real fixed_xy here
 std::optional<fixed_xy> get_coords(hybrid_node_idx const&,
                                    osmium::object_id_type const&);
 
@@ -54,15 +54,15 @@ struct hybrid_node_idx_builder : public osmium::handler::Handler {
   hybrid_node_idx_builder& operator=(hybrid_node_idx_builder&&) noexcept =
       default;
 
-  void node(osmium::Node const& n) {
+  void node(osmium::Node const& n) const {
     push(n.id(), {static_cast<fixed_coord_t>(n.location().x()) +
                       hybrid_node_idx::x_offset,
                   static_cast<fixed_coord_t>(n.location().y()) +
                       hybrid_node_idx::y_offset});
   }
 
-  void push(osmium::object_id_type, fixed_xy const&);
-  void finish();
+  void push(osmium::object_id_type, fixed_xy const&) const;
+  void finish() const;
 
   void dump_stats() const;
   [[nodiscard]] size_t get_stat_spans() const;  // for tests
