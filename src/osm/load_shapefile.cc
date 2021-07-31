@@ -122,7 +122,10 @@ utl::buffer load_buffer(std::string const& fname) {
       continue;
     }
 
-    utl::buffer buf{stat.m_uncomp_size};
+    utl::verify(stat.m_uncomp_size <= std::numeric_limits<size_t>::max(),
+                "uncompressed size {} larger than size_t max {}",
+                stat.m_uncomp_size, std::numeric_limits<size_t>::max());
+    utl::buffer buf{static_cast<size_t>(stat.m_uncomp_size)};
     utl::verify(
         mz_zip_reader_extract_to_mem(&ar, i, buf.data(), buf.size(), 0) != 0,
         "shp: error extracting .shp file");

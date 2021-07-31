@@ -25,7 +25,9 @@ inline lmdb::env make_tile_database(
     char const* db_fname,
     lmdb::env_open_flags flags = lmdb::env_open_flags::NOSUBDIR) {
   lmdb::env e;
-  e.set_mapsize(1024ULL * 1024 * 1024 * 1024);
+  e.set_mapsize(sizeof(mdb_size_t) >= 8
+                    ? 1024ULL * 1024 * 1024 * 1024
+                    : std::numeric_limits<mdb_size_t>::max());
   e.set_maxdbs(8);
   try {
     e.open(db_fname, flags);

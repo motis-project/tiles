@@ -82,8 +82,8 @@ struct repack_memory_manager {
     {
       size_t used_space = 0;
       size_t largest_record = 0;
-      for (auto i = 0ULL; i < tasks_.size(); ++i) {
-        for (auto j = 0ULL; j < tasks_[i].records_.size(); ++j) {
+      for (auto i = size_t{0U}; i < tasks_.size(); ++i) {
+        for (auto j = size_t{0U}; j < tasks_[i].records_.size(); ++j) {
           auto& record = tasks_[i].records_[j];
           used_space += record.size_;
           largest_record = std::max(largest_record, record.size_);

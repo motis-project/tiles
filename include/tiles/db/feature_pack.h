@@ -15,7 +15,7 @@
 // one "bucket" of the toplevel geo index.
 //
 // Each pack contains n renderable geometry features and m extra segments e.g.
-// for index or meta data. Both, n and m may be zero. Each segment has a offset
+// for index or meta-data. Both, n and m may be zero. Each segment has an offset
 // as entry point for the consumer (the offset does not necessarily have to
 // point to the first byte!) and a type. Type ids < 128 are reserved, >= 128 can
 // be used for application specific data.
@@ -36,12 +36,12 @@
 //
 // Feature data starts directly afterwards at offset (m + 1) * 5. A
 // renderable geography feature consists of a binary string of o > 0 bytes.
-// It is prefixed by its size (encoded as varint, prefix does not add to
+// It is prefixed by its size (encoded as variant, prefix does not add to
 // size).
 //
 // There may also be null features which zero-length strings, in this case
-// only the zero valued varint is present. Indexing schemes may use these
-// null features to delimit associad features.
+// only the zero valued variant is present. Indexing schemes may use these
+// null features to delimit associated features.
 //
 // There must be exactly n geography features and any number of null
 // features after the header and before any other segment data (or end of
@@ -148,7 +148,7 @@ size_t unpack_features(std::string_view const& string, Fn&& fn) {
   auto const* ptr = string.data() + static_cast<size_t>(segment_count + 1) * 5;
   auto const* const end = string.data() + string.size();
   for (auto i = 0ULL; i < feature_count; ++i) {
-    uint64_t size = 0;
+    size_t size = 0;
     while (size == 0) {  // skip zero elements (= span terminators)
       size = protozero::decode_varint(&ptr, end);
     }
@@ -182,7 +182,7 @@ void unpack_features(geo::tile const& root, std::string_view const& string,
         [&](auto const span_offset, auto const span_count) {
           auto span_ptr = string.data() + span_offset;
           for (auto i = 0ULL; i < span_count; ++i) {
-            uint64_t size = 0;
+            size_t size = 0;
             while ((size = protozero::decode_varint(&span_ptr, end)) != 0) {
               fn(std::string_view{span_ptr, size});
               span_ptr += size;
