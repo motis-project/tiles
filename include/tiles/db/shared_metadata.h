@@ -20,7 +20,7 @@
 namespace tiles {
 
 struct shared_metadata_builder {
-  static constexpr auto kFlushThreshold = 1e7;
+  static constexpr auto kFlushThreshold = sizeof(void*) >= 8 ? 1e7 : 1e6;
 
   void update(std::vector<metadata> const& data) {
     queue_.enqueue_bulk(data);
