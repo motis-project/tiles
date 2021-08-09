@@ -20,7 +20,12 @@
 namespace tiles {
 
 struct shared_metadata_builder {
-  static constexpr auto kFlushThreshold = sizeof(void*) >= 8 ? 1e7 : 1e6;
+  static constexpr auto const kDefaultFlushThreshold =
+      sizeof(void*) >= 8 ? 1e7 : 1e5;
+
+  explicit shared_metadata_builder(
+      size_t const flush_threshold = kDefaultFlushThreshold)
+      : flush_threshold_{flush_threshold} {}
 
   void update(std::vector<metadata> const& data) {
     queue_.enqueue_bulk(data);
@@ -31,14 +36,14 @@ struct shared_metadata_builder {
     }
   }
 
-  bool should_flush() { return queue_.pending_ > kFlushThreshold; }
+  bool should_flush() { return queue_.pending_ > flush_threshold_; }
 
   bool flush(bool force = false) {
     if (!should_flush() && !force) {
       return false;
     }
 
-    std::vector<metadata> buf(kFlushThreshold);
+    std::vector<metadata> buf(flush_threshold_);
     queue_.dequeue_bulk(buf);
     queue_.finish_bulk(buf.size());  // directly (shutdown determined globally)
     if (buf.empty()) {
@@ -96,6 +101,8 @@ struct shared_metadata_builder {
     auto meta_dbi = db_handle.meta_dbi(txn);
     txn.put(meta_dbi, kMetaKeyFeatureMetaCoding, buf);
   }
+
+  size_t flush_threshold_;
 
   queue_wrapper<metadata> queue_;
 
