@@ -15,8 +15,8 @@ inline void clear_database(tile_db_handle& handle, lmdb::txn& txn) {
   txn.dbi_clear(tiles_dbi);
 }
 
-inline void clear_database(std::string const& db_fname) {
-  lmdb::env db_env = make_tile_database(db_fname.c_str());
+inline void clear_database(std::string const& db_fname, size_t const db_size) {
+  lmdb::env db_env = make_tile_database(db_fname.c_str(), db_size);
   tile_db_handle handle{db_env};
 
   lmdb::txn txn{handle.env_};

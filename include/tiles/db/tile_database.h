@@ -22,9 +22,7 @@ using dbi_opener_fn =
     std::function<lmdb::txn::dbi(lmdb::txn&, lmdb::dbi_flags)>;
 
 inline lmdb::env make_tile_database(
-    char const* db_fname,
-    size_t const db_size = sizeof(void*) >= 8 ? 1024ULL * 1024 * 1024 * 1024
-                                              : 256 * 1024 * 1024,
+    char const* db_fname, size_t const db_size,
     lmdb::env_open_flags flags = lmdb::env_open_flags::NOSUBDIR) {
   lmdb::env e;
   e.set_mapsize(db_size);
