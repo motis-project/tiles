@@ -61,7 +61,9 @@ target_link_libraries(tiles-import-library
   lua
   tiles
 )
-
+if(UNIX AND NOT APPLE)
+  target_link_libraries(tiles-import-library atomic)
+endif()
 file(GLOB tiles-import-main-files src/import.cc)
 
 add_executable(tiles-import EXCLUDE_FROM_ALL
