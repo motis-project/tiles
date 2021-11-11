@@ -9,6 +9,9 @@
 
 namespace tiles {
 
+constexpr auto kDefaultSize =
+    sizeof(void*) >= 8 ? 1024ULL * 1024 * 1024 * 1024 : 256 * 1024 * 1024;
+
 constexpr auto kDefaultMeta = "default_meta";
 constexpr auto kDefaultFeatures = "default_features";
 constexpr auto kDefaultTiles = "default_tiles";

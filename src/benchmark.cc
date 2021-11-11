@@ -49,7 +49,7 @@ int run_tiles_benchmark(int argc, char const** argv) {
     return 1;
   }
 
-  lmdb::env db_env = make_tile_database(opt.db_fname_.c_str());
+  lmdb::env db_env = make_tile_database(opt.db_fname_.c_str(), kDefaultSize);
   tile_db_handle db_handle{db_env};
   pack_handle pack_handle{opt.db_fname_.c_str()};
 

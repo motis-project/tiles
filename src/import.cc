@@ -69,11 +69,11 @@ int run_tiles_import(int argc, char const** argv) {
 
   if (opt.has_any_task({"coastlines", "features"})) {
     t_log("clear database");
-    clear_database(opt.db_fname_);
+    clear_database(opt.db_fname_, kDefaultSize);
     clear_pack_file(opt.db_fname_.c_str());
   }
 
-  lmdb::env db_env = make_tile_database(opt.db_fname_.c_str());
+  lmdb::env db_env = make_tile_database(opt.db_fname_.c_str(), kDefaultSize);
   tile_db_handle db_handle{db_env};
   pack_handle pack_handle{opt.db_fname_.c_str()};
 

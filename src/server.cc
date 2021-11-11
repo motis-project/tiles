@@ -182,7 +182,7 @@ int run_tiles_server(int argc, char const** argv) {
   utl::verify(boost::filesystem::is_regular_file(opt.db_fname_.c_str()),
               "tiles database file not found: {}", opt.db_fname_);
 
-  lmdb::env db_env = make_tile_database(opt.db_fname_.c_str());
+  lmdb::env db_env = make_tile_database(opt.db_fname_.c_str(), kDefaultSize);
   tile_db_handle handle{db_env};
   auto const render_ctx = make_render_ctx(handle);
   pack_handle pack_handle{opt.db_fname_.c_str()};
