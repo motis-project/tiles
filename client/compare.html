@@ -80,7 +80,7 @@ updateHash();
 
 let maps = [];
 const addMap = (container, style) => {
-  let map = new mapboxgl.Map({
+  let map = new maplibregl.Map({
     container, style, zoom, center, dragRotate:false, 
     transformRequest: (url, resourceType) => {
       if (url.startsWith('/')) {
