@@ -71,7 +71,7 @@ var official = {
 
 const locationStr = location.hash.substr(1) || "[14, [8.6671065, 49.8747541]]";
 let [zoom, center] = JSON.parse(locationStr);
-center = mapboxgl.LngLat.convert(center);
+center = maplibregl.LngLat.convert(center);
 
 const updateHash = () => {
   location.hash =  JSON.stringify([zoom, center.toArray()]);
