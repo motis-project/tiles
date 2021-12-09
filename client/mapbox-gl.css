@@ -1,600 +1,871 @@
-.mapboxgl-map {
-    font: 12px/20px 'Helvetica Neue', Arial, Helvetica, sans-serif;
-    overflow: hidden;
-    position: relative;
-    -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
-    text-align: left;
+.mapboxgl-map,
+.maplibregl-map {
+    font:12px/20px Helvetica Neue,Arial,Helvetica,sans-serif;
+    overflow:hidden
+    ;position:relative;
+    -webkit-tap-highlight-color:rgba(0,0,0,0)
 }
 
-.mapboxgl-map:-webkit-full-screen {
-    width: 100%;
-    height: 100%;
+.mapboxgl-canvas,
+.maplibregl-canvas {
+    position:absolute;
+    left:0;
+    top:0
 }
 
-.mapboxgl-canary {
-    background-color: salmon;
+.mapboxgl-map:-webkit-full-screen,
+.maplibregl-map:-webkit-full-screen {
+    width:100%;
+    height:100%
 }
 
 .mapboxgl-canvas-container.mapboxgl-interactive,
-.mapboxgl-ctrl-group > button.mapboxgl-ctrl-compass {
-    cursor: -webkit-grab;
-    cursor: -moz-grab;
-    cursor: grab;
-    -moz-user-select: none;
-    -webkit-user-select: none;
-    -ms-user-select: none;
-    user-select: none;
+.mapboxgl-ctrl-group button.mapboxgl-ctrl-compass,
+.maplibregl-canvas-container.maplibregl-interactive,
+.maplibregl-ctrl-group button.maplibregl-ctrl-compass {
+    cursor:-webkit-grab;
+    cursor:-moz-grab;
+    cursor:grab;
+    -moz-user-select:none;
+    -webkit-user-select:none;
+    -ms-user-select:none;
+    user-select:none
 }
 
-.mapboxgl-canvas-container.mapboxgl-interactive.mapboxgl-track-pointer {
-    cursor: pointer;
+.mapboxgl-canvas-container.mapboxgl-interactive.mapboxgl-track-pointer,
+.maplibregl-canvas-container.maplibregl-interactive.maplibregl-track-pointer {
+    cursor:pointer
 }
 
 .mapboxgl-canvas-container.mapboxgl-interactive:active,
-.mapboxgl-ctrl-group > button.mapboxgl-ctrl-compass:active {
-    cursor: -webkit-grabbing;
-    cursor: -moz-grabbing;
-    cursor: grabbing;
+.mapboxgl-ctrl-group button.mapboxgl-ctrl-compass:active,
+.maplibregl-canvas-container.maplibregl-interactive:active,
+.maplibregl-ctrl-group button.maplibregl-ctrl-compass:active {
+    cursor:-webkit-grabbing;
+    cursor:-moz-grabbing;
+    cursor:grabbing
 }
 
 .mapboxgl-canvas-container.mapboxgl-touch-zoom-rotate,
-.mapboxgl-canvas-container.mapboxgl-touch-zoom-rotate .mapboxgl-canvas {
-    touch-action: pan-x pan-y;
+.mapboxgl-canvas-container.mapboxgl-touch-zoom-rotate .mapboxgl-canvas,
+.maplibregl-canvas-container.maplibregl-touch-zoom-rotate,
+.maplibregl-canvas-container.maplibregl-touch-zoom-rotate .maplibregl-canvas {
+    touch-action:pan-x pan-y
 }
 
 .mapboxgl-canvas-container.mapboxgl-touch-drag-pan,
-.mapboxgl-canvas-container.mapboxgl-touch-drag-pan .mapboxgl-canvas {
-    touch-action: pinch-zoom;
+.mapboxgl-canvas-container.mapboxgl-touch-drag-pan .mapboxgl-canvas,
+.maplibregl-canvas-container.maplibregl-touch-drag-pan,
+.maplibregl-canvas-container.maplibregl-touch-drag-pan .maplibregl-canvas {
+    touch-action:pinch-zoom
 }
 
 .mapboxgl-canvas-container.mapboxgl-touch-zoom-rotate.mapboxgl-touch-drag-pan,
-.mapboxgl-canvas-container.mapboxgl-touch-zoom-rotate.mapboxgl-touch-drag-pan .mapboxgl-canvas {
-    touch-action: none;
+.mapboxgl-canvas-container.mapboxgl-touch-zoom-rotate.mapboxgl-touch-drag-pan .mapboxgl-canvas,
+.maplibregl-canvas-container.maplibregl-touch-zoom-rotate.maplibregl-touch-drag-pan,
+.maplibregl-canvas-container.maplibregl-touch-zoom-rotate.maplibregl-touch-drag-pan .maplibregl-canvas {
+    touch-action:none
 }
 
+.mapboxgl-ctrl-bottom-left,
+.mapboxgl-ctrl-bottom-right,
 .mapboxgl-ctrl-top-left,
 .mapboxgl-ctrl-top-right,
+.maplibregl-ctrl-bottom-left,
+.maplibregl-ctrl-bottom-right,
+.maplibregl-ctrl-top-left,
+.maplibregl-ctrl-top-right { position:absolute; pointer-events:none; z-index:2 }
+.mapboxgl-ctrl-top-left,
+.maplibregl-ctrl-top-left { top:0; left:0 }
+.mapboxgl-ctrl-top-right,
+.maplibregl-ctrl-top-right {top:0; right:0 }
 .mapboxgl-ctrl-bottom-left,
-.mapboxgl-ctrl-bottom-right { position: absolute; pointer-events: none; z-index: 2; }
-.mapboxgl-ctrl-top-left     { top: 0; left: 0; }
-.mapboxgl-ctrl-top-right    { top: 0; right: 0; }
-.mapboxgl-ctrl-bottom-left  { bottom: 0; left: 0; }
-.mapboxgl-ctrl-bottom-right { right: 0; bottom: 0; }
+.maplibregl-ctrl-bottom-left{ bottom:0; left:0 }
+.mapboxgl-ctrl-bottom-right,
+.maplibregl-ctrl-bottom-right{ right:0; bottom:0 }
+.mapboxgl-ctrl,
 
-.mapboxgl-ctrl {
-    clear: both;
-    pointer-events: auto;
-
-    /* workaround for a Safari bug https://github.com/mapbox/mapbox-gl-js/issues/8185 */
-    transform: translate(0, 0);
-}
-.mapboxgl-ctrl-top-left .mapboxgl-ctrl     { margin: 10px 0 0 10px; float: left; }
-.mapboxgl-ctrl-top-right .mapboxgl-ctrl    { margin: 10px 10px 0 0; float: right; }
-.mapboxgl-ctrl-bottom-left .mapboxgl-ctrl  { margin: 0 0 10px 10px; float: left; }
-.mapboxgl-ctrl-bottom-right .mapboxgl-ctrl { margin: 0 10px 10px 0; float: right; }
-
-.mapboxgl-ctrl-group {
-    border-radius: 4px;
-    background: #fff;
+.maplibregl-ctrl {
+    clear:both;
+    pointer-events:auto;
+    transform:translate(0)
 }
 
-.mapboxgl-ctrl-group:not(:empty) {
-    -moz-box-shadow: 0 0 2px rgba(0, 0, 0, 0.1);
-    -webkit-box-shadow: 0 0 2px rgba(0, 0, 0, 0.1);
-    box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.1);
+.mapboxgl-ctrl-top-left .mapboxgl-ctrl,
+.maplibregl-ctrl-top-left .maplibregl-ctrl { margin:10px 0 0 10px; float:left }
+.mapboxgl-ctrl-top-right .mapboxgl-ctrl,
+.maplibregl-ctrl-top-right .maplibregl-ctrl { margin:10px 10px 0 0; float:right }
+.mapboxgl-ctrl-bottom-left .mapboxgl-ctrl,
+.maplibregl-ctrl-bottom-left .maplibregl-ctrl { margin:0 0 10px 10px; float:left }
+.mapboxgl-ctrl-bottom-right .mapboxgl-ctrl,
+.maplibregl-ctrl-bottom-right .maplibregl-ctrl { margin:0 10px 10px 0; float:right }
+
+.mapboxgl-ctrl-group,
+.maplibregl-ctrl-group {
+    border-radius:4px;
+    background:#fff
 }
 
-.mapboxgl-ctrl-group > button {
-    width: 30px;
-    height: 30px;
-    display: block;
-    padding: 0;
-    outline: none;
-    border: 0;
-    box-sizing: border-box;
-    background-color: transparent;
-    cursor: pointer;
+.mapboxgl-ctrl-group:not(:empty),
+.maplibregl-ctrl-group:not(:empty) {
+    -moz-box-shadow:0 0 2px rgba(0,0,0,.1);
+    -webkit-box-shadow:0 0 2px rgba(0,0,0,.1);
+    box-shadow:0 0 0 2px rgba(0,0,0,.1)
 }
 
-.mapboxgl-ctrl-group > button + button {
-    border-top: 1px solid #ddd;
+@media (-ms-high-contrast:active) {
+    .mapboxgl-ctrl-group:not(:empty),
+    .maplibregl-ctrl-group:not(:empty) {
+        box-shadow:0 0 0 2px ButtonText
+    }
 }
 
-/* https://bugzilla.mozilla.org/show_bug.cgi?id=140562 */
-.mapboxgl-ctrl > button::-moz-focus-inner {
-    border: 0;
-    padding: 0;
+.mapboxgl-ctrl-group button,
+.maplibregl-ctrl-group button {
+    width:29px;
+    height:29px;
+    display:block;
+    padding:0;
+    outline:none;
+    border:0;
+    box-sizing:border-box;
+    background-color:transparent;
+    cursor:pointer
 }
 
-.mapboxgl-ctrl-group > button:focus {
-    box-shadow: 0 0 2px 2px rgba(0, 150, 255, 1);
+.mapboxgl-ctrl-group button+button,
+.maplibregl-ctrl-group button+button {
+    border-top:1px solid #ddd
 }
 
-.mapboxgl-ctrl > button:not(:disabled):hover {
-    background-color: rgba(0, 0, 0, 0.05);
+.mapboxgl-ctrl button .mapboxgl-ctrl-icon,
+.maplibregl-ctrl button .maplibregl-ctrl-icon {
+    display:block;width:100%;
+    height:100%;
+    background-repeat:no-repeat;
+    background-position:50%
 }
 
-.mapboxgl-ctrl-group > button:focus:focus-visible {
-    box-shadow: 0 0 2px 2px rgba(0, 150, 255, 1);
+@media (-ms-high-contrast:active) {
+    .mapboxgl-ctrl-icon,
+    .maplibregl-ctrl-icon {
+        background-color:transparent
+    }
+
+    .mapboxgl-ctrl-group button+button,
+    .maplibregl-ctrl-group button+button {
+        border-top:1px solid ButtonText
+    }
 }
 
-.mapboxgl-ctrl-group > button:focus:not(:focus-visible) {
-    box-shadow: none;
+.mapboxgl-ctrl button::-moz-focus-inner,
+.maplibregl-ctrl button::-moz-focus-inner {
+    border:0;
+    padding:0
 }
 
-.mapboxgl-ctrl-group > button:focus:first-child {
-    border-radius: 4px 4px 0 0;
+.mapboxgl-ctrl-attrib-button:focus,
+.mapboxgl-ctrl-group button:focus,
+.maplibregl-ctrl-attrib-button:focus,
+.maplibregl-ctrl-group button:focus {
+    box-shadow:0 0 2px 2px #0096ff
 }
 
-.mapboxgl-ctrl-group > button:focus:last-child {
-    border-radius: 0 0 4px 4px;
+.mapboxgl-ctrl button:disabled,
+.maplibregl-ctrl button:disabled {
+    cursor:not-allowed
 }
 
-.mapboxgl-ctrl-group > button:focus:only-child {
-    border-radius: inherit;
+.mapboxgl-ctrl button:disabled .mapboxgl-ctrl-icon,
+.maplibregl-ctrl button:disabled .maplibregl-ctrl-icon {
+    opacity:.25
 }
 
-.mapboxgl-ctrl-icon,
-.mapboxgl-ctrl-icon > .mapboxgl-ctrl-compass-arrow {
-    speak: none;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
+.mapboxgl-ctrl button:not(:disabled):hover,
+.maplibregl-ctrl button:not(:disabled):hover {
+    background-color:rgba(0,0,0,.05)
 }
 
-.mapboxgl-ctrl-icon {
-    padding: 5px;
+.mapboxgl-ctrl-group button:focus:focus-visible,
+.maplibregl-ctrl-group button:focus:focus-visible {
+    box-shadow:0 0 2px 2px #0096ff
 }
 
-.mapboxgl-ctrl-icon.mapboxgl-ctrl-icon-disabled {
-    opacity: 0.25;
-    border-color: #373737;
+.mapboxgl-ctrl-group button:focus:not(:focus-visible),
+.maplibregl-ctrl-group button:focus:not(:focus-visible) {
+    box-shadow:none
 }
 
-.mapboxgl-ctrl-icon.mapboxgl-ctrl-zoom-out {
-    background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg'%3E %3Cpath style='fill:%23333333;' d='m 7,9 c -0.554,0 -1,0.446 -1,1 0,0.554 0.446,1 1,1 l 6,0 c 0.554,0 1,-0.446 1,-1 0,-0.554 -0.446,-1 -1,-1 z'/%3E %3C/svg%3E");
+.mapboxgl-ctrl-group button:focus:first-child,
+.maplibregl-ctrl-group button:focus:first-child {
+    border-radius:4px 4px 0 0
 }
 
-.mapboxgl-ctrl-icon.mapboxgl-ctrl-zoom-in {
-    background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg'%3E %3Cpath style='fill:%23333333;' d='M 10 6 C 9.446 6 9 6.4459904 9 7 L 9 9 L 7 9 C 6.446 9 6 9.446 6 10 C 6 10.554 6.446 11 7 11 L 9 11 L 9 13 C 9 13.55401 9.446 14 10 14 C 10.554 14 11 13.55401 11 13 L 11 11 L 13 11 C 13.554 11 14 10.554 14 10 C 14 9.446 13.554 9 13 9 L 11 9 L 11 7 C 11 6.4459904 10.554 6 10 6 z'/%3E %3C/svg%3E");
+.mapboxgl-ctrl-group button:focus:last-child,
+.maplibregl-ctrl-group button:focus:last-child {
+    border-radius:0 0 4px 4px
 }
 
-.mapboxgl-ctrl-icon.mapboxgl-ctrl-geolocate::before {
-    background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg' fill='%23333'%3E %3Cpath d='M10 4C9 4 9 5 9 5L9 5.1A5 5 0 0 0 5.1 9L5 9C5 9 4 9 4 10 4 11 5 11 5 11L5.1 11A5 5 0 0 0 9 14.9L9 15C9 15 9 16 10 16 11 16 11 15 11 15L11 14.9A5 5 0 0 0 14.9 11L15 11C15 11 16 11 16 10 16 9 15 9 15 9L14.9 9A5 5 0 0 0 11 5.1L11 5C11 5 11 4 10 4zM10 6.5A3.5 3.5 0 0 1 13.5 10 3.5 3.5 0 0 1 10 13.5 3.5 3.5 0 0 1 6.5 10 3.5 3.5 0 0 1 10 6.5zM10 8.3A1.8 1.8 0 0 0 8.3 10 1.8 1.8 0 0 0 10 11.8 1.8 1.8 0 0 0 11.8 10 1.8 1.8 0 0 0 10 8.3z'/%3E %3C/svg%3E");
-    content: "";
-    display: block;
-    width: 100%;
-    height: 100%;
+.mapboxgl-ctrl-group button:focus:only-child,
+.maplibregl-ctrl-group button:focus:only-child {
+    border-radius:inherit
 }
 
-.mapboxgl-ctrl-icon.mapboxgl-ctrl-geolocate:disabled::before {
-    background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg' fill='%23aaa'%3E %3Cpath d='M14.434,7.688c0.213,0.407 0.371,0.848 0.466,1.312l0.1,0c0,0 1,0 1,1c0,1 -1,1 -1,1l-0.1,0c-0.4,1.96 -1.94,3.5 -3.9,3.9l0,0.1c0,0 0,1 -1,1c-1,0 -1,-1 -1,-1l0,-0.1c-0.477,-0.097 -0.93,-0.262 -1.347,-0.484c0.383,-0.377 0.767,-0.753 1.151,-1.129c0.374,0.138 0.777,0.213 1.196,0.213c1.92,0 3.5,-1.58 3.5,-3.5c0,-0.403 -0.07,-0.791 -0.197,-1.153c0.379,-0.384 0.756,-0.77 1.131,-1.159Zm-9.334,1.312c0.4,-1.961 1.94,-3.5 3.9,-3.9l0,-0.1c0,0 0,-1 1,-1c1,0 1,1 1,1l0,0.1c0.477,0.097 0.93,0.262 1.347,0.484c-0.383,0.377 -0.767,0.753 -1.151,1.129c-0.374,-0.138 -0.777,-0.213 -1.196,-0.213c-1.92,0 -3.5,1.58 -3.5,3.5c0,0.403 0.07,0.791 0.197,1.153c-0.379,0.384 -0.756,0.77 -1.131,1.159c-0.213,-0.407 -0.371,-0.848 -0.466,-1.312l-0.1,0c-0.005,0 -1,-0.003 -1,-1c0,-0.997 0.995,-1 1,-1l0.1,0Z'/%3E %3Cpath d='M14,5l1,1l-9,9l-1,-1l9,-9Z'/%3E %3C/svg%3E");
+.mapboxgl-ctrl button.mapboxgl-ctrl-zoom-out .mapboxgl-ctrl-icon,
+.maplibregl-ctrl button.maplibregl-ctrl-zoom-out .maplibregl-ctrl-icon {
+    background-image:url("data:image/svg+xml;charset=utf-8,%3Csvg width='29' height='29' viewBox='0 0 29 29' xmlns='http://www.w3.org/2000/svg' fill='%23333'%3E%3Cpath d='M10 13c-.75 0-1.5.75-1.5 1.5S9.25 16 10 16h9c.75 0 1.5-.75 1.5-1.5S19.75 13 19 13h-9z'/%3E%3C/svg%3E")
 }
 
-.mapboxgl-ctrl-icon.mapboxgl-ctrl-geolocate.mapboxgl-ctrl-geolocate-active::before {
-    background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg' fill='%2333b5e5'%3E %3Cpath d='M10 4C9 4 9 5 9 5L9 5.1A5 5 0 0 0 5.1 9L5 9C5 9 4 9 4 10 4 11 5 11 5 11L5.1 11A5 5 0 0 0 9 14.9L9 15C9 15 9 16 10 16 11 16 11 15 11 15L11 14.9A5 5 0 0 0 14.9 11L15 11C15 11 16 11 16 10 16 9 15 9 15 9L14.9 9A5 5 0 0 0 11 5.1L11 5C11 5 11 4 10 4zM10 6.5A3.5 3.5 0 0 1 13.5 10 3.5 3.5 0 0 1 10 13.5 3.5 3.5 0 0 1 6.5 10 3.5 3.5 0 0 1 10 6.5zM10 8.3A1.8 1.8 0 0 0 8.3 10 1.8 1.8 0 0 0 10 11.8 1.8 1.8 0 0 0 11.8 10 1.8 1.8 0 0 0 10 8.3z'/%3E %3C/svg%3E");
+.mapboxgl-ctrl button.mapboxgl-ctrl-zoom-in .mapboxgl-ctrl-icon,
+.maplibregl-ctrl button.maplibregl-ctrl-zoom-in .maplibregl-ctrl-icon {
+    background-image:url("data:image/svg+xml;charset=utf-8,%3Csvg width='29' height='29' viewBox='0 0 29 29' xmlns='http://www.w3.org/2000/svg' fill='%23333'%3E%3Cpath d='M14.5 8.5c-.75 0-1.5.75-1.5 1.5v3h-3c-.75 0-1.5.75-1.5 1.5S9.25 16 10 16h3v3c0 .75.75 1.5 1.5 1.5S16 19.75 16 19v-3h3c.75 0 1.5-.75 1.5-1.5S19.75 13 19 13h-3v-3c0-.75-.75-1.5-1.5-1.5z'/%3E%3C/svg%3E")
 }
 
-.mapboxgl-ctrl-icon.mapboxgl-ctrl-geolocate.mapboxgl-ctrl-geolocate-active-error::before {
-    background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg' fill='%23e58978'%3E %3Cpath d='M10 4C9 4 9 5 9 5L9 5.1A5 5 0 0 0 5.1 9L5 9C5 9 4 9 4 10 4 11 5 11 5 11L5.1 11A5 5 0 0 0 9 14.9L9 15C9 15 9 16 10 16 11 16 11 15 11 15L11 14.9A5 5 0 0 0 14.9 11L15 11C15 11 16 11 16 10 16 9 15 9 15 9L14.9 9A5 5 0 0 0 11 5.1L11 5C11 5 11 4 10 4zM10 6.5A3.5 3.5 0 0 1 13.5 10 3.5 3.5 0 0 1 10 13.5 3.5 3.5 0 0 1 6.5 10 3.5 3.5 0 0 1 10 6.5zM10 8.3A1.8 1.8 0 0 0 8.3 10 1.8 1.8 0 0 0 10 11.8 1.8 1.8 0 0 0 11.8 10 1.8 1.8 0 0 0 10 8.3z'/%3E %3C/svg%3E");
+@media (-ms-high-contrast:active) {
+    .mapboxgl-ctrl button.mapboxgl-ctrl-zoom-out .mapboxgl-ctrl-icon,
+    .maplibregl-ctrl button.maplibregl-ctrl-zoom-out .maplibregl-ctrl-icon {
+        background-image:url("data:image/svg+xml;charset=utf-8,%3Csvg width='29' height='29' viewBox='0 0 29 29' xmlns='http://www.w3.org/2000/svg' fill='%23fff'%3E%3Cpath d='M10 13c-.75 0-1.5.75-1.5 1.5S9.25 16 10 16h9c.75 0 1.5-.75 1.5-1.5S19.75 13 19 13h-9z'/%3E%3C/svg%3E")
+    }
+    
+    .mapboxgl-ctrl button.mapboxgl-ctrl-zoom-in .mapboxgl-ctrl-icon,
+    .maplibregl-ctrl button.maplibregl-ctrl-zoom-in .maplibregl-ctrl-icon {
+        background-image:url("data:image/svg+xml;charset=utf-8,%3Csvg width='29' height='29' viewBox='0 0 29 29' xmlns='http://www.w3.org/2000/svg' fill='%23fff'%3E%3Cpath d='M14.5 8.5c-.75 0-1.5.75-1.5 1.5v3h-3c-.75 0-1.5.75-1.5 1.5S9.25 16 10 16h3v3c0 .75.75 1.5 1.5 1.5S16 19.75 16 19v-3h3c.75 0 1.5-.75 1.5-1.5S19.75 13 19 13h-3v-3c0-.75-.75-1.5-1.5-1.5z'/%3E%3C/svg%3E")
+    }
 }
 
-.mapboxgl-ctrl-icon.mapboxgl-ctrl-geolocate.mapboxgl-ctrl-geolocate-background::before {
-    background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg' fill='%2333b5e5'%3E %3Cpath d='M 10,4 C 9,4 9,5 9,5 L 9,5.1 C 7.0357113,5.5006048 5.5006048,7.0357113 5.1,9 L 5,9 c 0,0 -1,0 -1,1 0,1 1,1 1,1 l 0.1,0 c 0.4006048,1.964289 1.9357113,3.499395 3.9,3.9 L 9,15 c 0,0 0,1 1,1 1,0 1,-1 1,-1 l 0,-0.1 c 1.964289,-0.400605 3.499395,-1.935711 3.9,-3.9 l 0.1,0 c 0,0 1,0 1,-1 C 16,9 15,9 15,9 L 14.9,9 C 14.499395,7.0357113 12.964289,5.5006048 11,5.1 L 11,5 c 0,0 0,-1 -1,-1 z m 0,2.5 c 1.932997,0 3.5,1.5670034 3.5,3.5 0,1.932997 -1.567003,3.5 -3.5,3.5 C 8.0670034,13.5 6.5,11.932997 6.5,10 6.5,8.0670034 8.0670034,6.5 10,6.5 Z'/%3E %3C/svg%3E");
+@media (-ms-high-contrast:black-on-white) {
+    .mapboxgl-ctrl button.mapboxgl-ctrl-zoom-out .mapboxgl-ctrl-icon,
+    .maplibregl-ctrl button.maplibregl-ctrl-zoom-out .maplibregl-ctrl-icon {
+        background-image:url("data:image/svg+xml;charset=utf-8,%3Csvg width='29' height='29' viewBox='0 0 29 29' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M10 13c-.75 0-1.5.75-1.5 1.5S9.25 16 10 16h9c.75 0 1.5-.75 1.5-1.5S19.75 13 19 13h-9z'/%3E%3C/svg%3E")
+    }
+    
+    .mapboxgl-ctrl button.mapboxgl-ctrl-zoom-in .mapboxgl-ctrl-icon,
+    .maplibregl-ctrl button.maplibregl-ctrl-zoom-in .maplibregl-ctrl-icon {
+        background-image:url("data:image/svg+xml;charset=utf-8,%3Csvg width='29' height='29' viewBox='0 0 29 29' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M14.5 8.5c-.75 0-1.5.75-1.5 1.5v3h-3c-.75 0-1.5.75-1.5 1.5S9.25 16 10 16h3v3c0 .75.75 1.5 1.5 1.5S16 19.75 16 19v-3h3c.75 0 1.5-.75 1.5-1.5S19.75 13 19 13h-3v-3c0-.75-.75-1.5-1.5-1.5z'/%3E%3C/svg%3E")
+    }
 }
 
-.mapboxgl-ctrl-icon.mapboxgl-ctrl-geolocate.mapboxgl-ctrl-geolocate-background-error::before {
-    background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg' fill='%23e54e33'%3E %3Cpath d='M 10,4 C 9,4 9,5 9,5 L 9,5.1 C 7.0357113,5.5006048 5.5006048,7.0357113 5.1,9 L 5,9 c 0,0 -1,0 -1,1 0,1 1,1 1,1 l 0.1,0 c 0.4006048,1.964289 1.9357113,3.499395 3.9,3.9 L 9,15 c 0,0 0,1 1,1 1,0 1,-1 1,-1 l 0,-0.1 c 1.964289,-0.400605 3.499395,-1.935711 3.9,-3.9 l 0.1,0 c 0,0 1,0 1,-1 C 16,9 15,9 15,9 L 14.9,9 C 14.499395,7.0357113 12.964289,5.5006048 11,5.1 L 11,5 c 0,0 0,-1 -1,-1 z m 0,2.5 c 1.932997,0 3.5,1.5670034 3.5,3.5 0,1.932997 -1.567003,3.5 -3.5,3.5 C 8.0670034,13.5 6.5,11.932997 6.5,10 6.5,8.0670034 8.0670034,6.5 10,6.5 Z'/%3E %3C/svg%3E");
+.mapboxgl-ctrl button.mapboxgl-ctrl-fullscreen .mapboxgl-ctrl-icon,
+.maplibregl-ctrl button.maplibregl-ctrl-fullscreen .maplibregl-ctrl-icon {
+    background-image:url("data:image/svg+xml;charset=utf-8,%3Csvg width='29' height='29' viewBox='0 0 29 29' xmlns='http://www.w3.org/2000/svg' fill='%23333'%3E%3Cpath d='M24 16v5.5c0 1.75-.75 2.5-2.5 2.5H16v-1l3-1.5-4-5.5 1-1 5.5 4 1.5-3h1zM6 16l1.5 3 5.5-4 1 1-4 5.5 3 1.5v1H7.5C5.75 24 5 23.25 5 21.5V16h1zm7-11v1l-3 1.5 4 5.5-1 1-5.5-4L6 13H5V7.5C5 5.75 5.75 5 7.5 5H13zm11 2.5c0-1.75-.75-2.5-2.5-2.5H16v1l3 1.5-4 5.5 1 1 5.5-4 1.5 3h1V7.5z'/%3E%3C/svg%3E")
 }
 
-.mapboxgl-ctrl-icon.mapboxgl-ctrl-geolocate.mapboxgl-ctrl-geolocate-waiting::before {
-    -webkit-animation: mapboxgl-spin 2s infinite linear;
-    -moz-animation: mapboxgl-spin 2s infinite linear;
-    -o-animation: mapboxgl-spin 2s infinite linear;
-    -ms-animation: mapboxgl-spin 2s infinite linear;
-    animation: mapboxgl-spin 2s infinite linear;
+.mapboxgl-ctrl button.mapboxgl-ctrl-shrink .mapboxgl-ctrl-icon,
+.maplibregl-ctrl button.maplibregl-ctrl-shrink .maplibregl-ctrl-icon {
+    background-image:url("data:image/svg+xml;charset=utf-8,%3Csvg width='29' height='29' viewBox='0 0 29 29' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M18.5 16c-1.75 0-2.5.75-2.5 2.5V24h1l1.5-3 5.5 4 1-1-4-5.5 3-1.5v-1h-5.5zM13 18.5c0-1.75-.75-2.5-2.5-2.5H5v1l3 1.5L4 24l1 1 5.5-4 1.5 3h1v-5.5zm3-8c0 1.75.75 2.5 2.5 2.5H24v-1l-3-1.5L25 5l-1-1-5.5 4L17 5h-1v5.5zM10.5 13c1.75 0 2.5-.75 2.5-2.5V5h-1l-1.5 3L5 4 4 5l4 5.5L5 12v1h5.5z'/%3E%3C/svg%3E")
 }
 
-@-webkit-keyframes mapboxgl-spin {
-    0% { -webkit-transform: rotate(0deg); }
-    100% { -webkit-transform: rotate(360deg); }
+@media (-ms-high-contrast:active) {
+    .mapboxgl-ctrl button.mapboxgl-ctrl-fullscreen .mapboxgl-ctrl-icon,
+    .maplibregl-ctrl button.maplibregl-ctrl-fullscreen .maplibregl-ctrl-icon {
+        background-image:url("data:image/svg+xml;charset=utf-8,%3Csvg width='29' height='29' viewBox='0 0 29 29' xmlns='http://www.w3.org/2000/svg' fill='%23fff'%3E%3Cpath d='M24 16v5.5c0 1.75-.75 2.5-2.5 2.5H16v-1l3-1.5-4-5.5 1-1 5.5 4 1.5-3h1zM6 16l1.5 3 5.5-4 1 1-4 5.5 3 1.5v1H7.5C5.75 24 5 23.25 5 21.5V16h1zm7-11v1l-3 1.5 4 5.5-1 1-5.5-4L6 13H5V7.5C5 5.75 5.75 5 7.5 5H13zm11 2.5c0-1.75-.75-2.5-2.5-2.5H16v1l3 1.5-4 5.5 1 1 5.5-4 1.5 3h1V7.5z'/%3E%3C/svg%3E")
+    }
+    
+    .mapboxgl-ctrl button.mapboxgl-ctrl-shrink .mapboxgl-ctrl-icon,
+    .maplibregl-ctrl button.maplibregl-ctrl-shrink .maplibregl-ctrl-icon {
+        background-image:url("data:image/svg+xml;charset=utf-8,%3Csvg width='29' height='29' viewBox='0 0 29 29' xmlns='http://www.w3.org/2000/svg' fill='%23fff'%3E%3Cpath d='M18.5 16c-1.75 0-2.5.75-2.5 2.5V24h1l1.5-3 5.5 4 1-1-4-5.5 3-1.5v-1h-5.5zM13 18.5c0-1.75-.75-2.5-2.5-2.5H5v1l3 1.5L4 24l1 1 5.5-4 1.5 3h1v-5.5zm3-8c0 1.75.75 2.5 2.5 2.5H24v-1l-3-1.5L25 5l-1-1-5.5 4L17 5h-1v5.5zM10.5 13c1.75 0 2.5-.75 2.5-2.5V5h-1l-1.5 3L5 4 4 5l4 5.5L5 12v1h5.5z'/%3E%3C/svg%3E")
+    }
 }
 
-@-moz-keyframes mapboxgl-spin {
-    0% { -moz-transform: rotate(0deg); }
-    100% { -moz-transform: rotate(360deg); }
+@media (-ms-high-contrast:black-on-white) {
+    .mapboxgl-ctrl button.mapboxgl-ctrl-fullscreen .mapboxgl-ctrl-icon,
+    .maplibregl-ctrl button.maplibregl-ctrl-fullscreen .maplibregl-ctrl-icon {
+        background-image:url("data:image/svg+xml;charset=utf-8,%3Csvg width='29' height='29' viewBox='0 0 29 29' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M24 16v5.5c0 1.75-.75 2.5-2.5 2.5H16v-1l3-1.5-4-5.5 1-1 5.5 4 1.5-3h1zM6 16l1.5 3 5.5-4 1 1-4 5.5 3 1.5v1H7.5C5.75 24 5 23.25 5 21.5V16h1zm7-11v1l-3 1.5 4 5.5-1 1-5.5-4L6 13H5V7.5C5 5.75 5.75 5 7.5 5H13zm11 2.5c0-1.75-.75-2.5-2.5-2.5H16v1l3 1.5-4 5.5 1 1 5.5-4 1.5 3h1V7.5z'/%3E%3C/svg%3E")
+    }
+    
+    .mapboxgl-ctrl button.mapboxgl-ctrl-shrink .mapboxgl-ctrl-icon,
+    .maplibregl-ctrl button.maplibregl-ctrl-shrink .maplibregl-ctrl-icon {
+        background-image:url("data:image/svg+xml;charset=utf-8,%3Csvg width='29' height='29' viewBox='0 0 29 29' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M18.5 16c-1.75 0-2.5.75-2.5 2.5V24h1l1.5-3 5.5 4 1-1-4-5.5 3-1.5v-1h-5.5zM13 18.5c0-1.75-.75-2.5-2.5-2.5H5v1l3 1.5L4 24l1 1 5.5-4 1.5 3h1v-5.5zm3-8c0 1.75.75 2.5 2.5 2.5H24v-1l-3-1.5L25 5l-1-1-5.5 4L17 5h-1v5.5zM10.5 13c1.75 0 2.5-.75 2.5-2.5V5h-1l-1.5 3L5 4 4 5l4 5.5L5 12v1h5.5z'/%3E%3C/svg%3E")
+    }
 }
 
-@-o-keyframes mapboxgl-spin {
-    0% { -o-transform: rotate(0deg); }
-    100% { -o-transform: rotate(360deg); }
+.mapboxgl-ctrl button.mapboxgl-ctrl-compass .mapboxgl-ctrl-icon,
+.maplibregl-ctrl button.maplibregl-ctrl-compass .maplibregl-ctrl-icon {
+    background-image:url("data:image/svg+xml;charset=utf-8,%3Csvg width='29' height='29' viewBox='0 0 29 29' xmlns='http://www.w3.org/2000/svg' fill='%23333'%3E%3Cpath d='M10.5 14l4-8 4 8h-8z'/%3E%3Cpath d='M10.5 16l4 8 4-8h-8z' fill='%23ccc'/%3E%3C/svg%3E")
 }
 
-@-ms-keyframes mapboxgl-spin {
-    0% { -ms-transform: rotate(0deg); }
-    100% { -ms-transform: rotate(360deg); }
+@media (-ms-high-contrast:active) {
+    .mapboxgl-ctrl button.mapboxgl-ctrl-compass .mapboxgl-ctrl-icon,
+    .maplibregl-ctrl button.maplibregl-ctrl-compass .maplibregl-ctrl-icon {
+        background-image:url("data:image/svg+xml;charset=utf-8,%3Csvg width='29' height='29' viewBox='0 0 29 29' xmlns='http://www.w3.org/2000/svg' fill='%23fff'%3E%3Cpath d='M10.5 14l4-8 4 8h-8z'/%3E%3Cpath d='M10.5 16l4 8 4-8h-8z' fill='%23999'/%3E%3C/svg%3E")
+    }
 }
 
-@keyframes mapboxgl-spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
+@media (-ms-high-contrast:black-on-white) {
+    .mapboxgl-ctrl button.mapboxgl-ctrl-compass .mapboxgl-ctrl-icon,
+    .maplibregl-ctrl button.maplibregl-ctrl-compass .maplibregl-ctrl-icon {
+        background-image:url("data:image/svg+xml;charset=utf-8,%3Csvg width='29' height='29' viewBox='0 0 29 29' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M10.5 14l4-8 4 8h-8z'/%3E%3Cpath d='M10.5 16l4 8 4-8h-8z' fill='%23ccc'/%3E%3C/svg%3E")
+    }
 }
 
-.mapboxgl-ctrl-icon.mapboxgl-ctrl-fullscreen {
-    background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg'%3E %3Cpath d='M 5 4 C 4.5 4 4 4.5 4 5 L 4 6 L 4 9 L 4.5 9 L 5.7773438 7.296875 C 6.7771319 8.0602131 7.835765 8.9565728 8.890625 10 C 7.8257121 11.0633 6.7761791 11.951675 5.78125 12.707031 L 4.5 11 L 4 11 L 4 15 C 4 15.5 4.5 16 5 16 L 9 16 L 9 15.5 L 7.2734375 14.205078 C 8.0428931 13.187886 8.9395441 12.133481 9.9609375 11.068359 C 11.042371 12.14699 11.942093 13.2112 12.707031 14.21875 L 11 15.5 L 11 16 L 14 16 L 15 16 C 15.5 16 16 15.5 16 15 L 16 14 L 16 11 L 15.5 11 L 14.205078 12.726562 C 13.177985 11.949617 12.112718 11.043577 11.037109 10.009766 C 12.151856 8.981061 13.224345 8.0798624 14.228516 7.3046875 L 15.5 9 L 16 9 L 16 5 C 16 4.5 15.5 4 15 4 L 11 4 L 11 4.5 L 12.703125 5.7773438 C 11.932647 6.7864834 11.026693 7.8554712 9.9707031 8.9199219 C 8.9584739 7.8204943 8.0698767 6.7627188 7.3046875 5.7714844 L 9 4.5 L 9 4 L 6 4 L 5 4 z '/%3E %3C/svg%3E");
+.mapboxgl-ctrl button.mapboxgl-ctrl-geolocate .mapboxgl-ctrl-icon,
+.maplibregl-ctrl button.maplibregl-ctrl-geolocate .maplibregl-ctrl-icon {
+    background-image:url("data:image/svg+xml;charset=utf-8,%3Csvg width='29' height='29' viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg' fill='%23333'%3E%3Cpath d='M10 4C9 4 9 5 9 5v.1A5 5 0 005.1 9H5s-1 0-1 1 1 1 1 1h.1A5 5 0 009 14.9v.1s0 1 1 1 1-1 1-1v-.1a5 5 0 003.9-3.9h.1s1 0 1-1-1-1-1-1h-.1A5 5 0 0011 5.1V5s0-1-1-1zm0 2.5a3.5 3.5 0 110 7 3.5 3.5 0 110-7z'/%3E%3Ccircle cx='10' cy='10' r='2'/%3E%3C/svg%3E")
 }
 
-.mapboxgl-ctrl-icon.mapboxgl-ctrl-shrink {
-    background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg'%3E %3Cpath style='fill:%23000000;' d='M 4.2421875 3.4921875 A 0.750075 0.750075 0 0 0 3.71875 4.78125 L 5.9648438 7.0273438 L 4 8.5 L 4 9 L 8 9 C 8.500001 8.9999988 9 8.4999992 9 8 L 9 4 L 8.5 4 L 7.0175781 5.9550781 L 4.78125 3.71875 A 0.750075 0.750075 0 0 0 4.2421875 3.4921875 z M 15.734375 3.4921875 A 0.750075 0.750075 0 0 0 15.21875 3.71875 L 12.984375 5.953125 L 11.5 4 L 11 4 L 11 8 C 11 8.4999992 11.499999 8.9999988 12 9 L 16 9 L 16 8.5 L 14.035156 7.0273438 L 16.28125 4.78125 A 0.750075 0.750075 0 0 0 15.734375 3.4921875 z M 4 11 L 4 11.5 L 5.9648438 12.972656 L 3.71875 15.21875 A 0.75130096 0.75130096 0 1 0 4.78125 16.28125 L 7.0273438 14.035156 L 8.5 16 L 9 16 L 9 12 C 9 11.500001 8.500001 11.000001 8 11 L 4 11 z M 12 11 C 11.499999 11.000001 11 11.500001 11 12 L 11 16 L 11.5 16 L 12.972656 14.035156 L 15.21875 16.28125 A 0.75130096 0.75130096 0 1 0 16.28125 15.21875 L 14.035156 12.972656 L 16 11.5 L 16 11 L 12 11 z '/%3E %3C/svg%3E");
+.mapboxgl-ctrl button.mapboxgl-ctrl-geolocate:disabled .mapboxgl-ctrl-icon,
+.maplibregl-ctrl button.maplibregl-ctrl-geolocate:disabled .maplibregl-ctrl-icon {
+    background-image:url("data:image/svg+xml;charset=utf-8,%3Csvg width='29' height='29' viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg' fill='%23aaa'%3E%3Cpath d='M10 4C9 4 9 5 9 5v.1A5 5 0 005.1 9H5s-1 0-1 1 1 1 1 1h.1A5 5 0 009 14.9v.1s0 1 1 1 1-1 1-1v-.1a5 5 0 003.9-3.9h.1s1 0 1-1-1-1-1-1h-.1A5 5 0 0011 5.1V5s0-1-1-1zm0 2.5a3.5 3.5 0 110 7 3.5 3.5 0 110-7z'/%3E%3Ccircle cx='10' cy='10' r='2'/%3E%3Cpath d='M14 5l1 1-9 9-1-1 9-9z' fill='red'/%3E%3C/svg%3E")
 }
 
-.mapboxgl-ctrl-icon.mapboxgl-ctrl-compass > .mapboxgl-ctrl-compass-arrow {
-    width: 20px;
-    height: 20px;
-    margin: 5px;
-    background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg'%3E %3Cpolygon fill='%23333333' points='6,9 10,1 14,9'/%3E %3Cpolygon fill='%23CCCCCC' points='6,11 10,19 14,11 '/%3E %3C/svg%3E");
-    background-repeat: no-repeat;
-    display: inline-block;
+.mapboxgl-ctrl button.mapboxgl-ctrl-geolocate.mapboxgl-ctrl-geolocate-active .mapboxgl-ctrl-icon,
+.maplibregl-ctrl button.maplibregl-ctrl-geolocate.maplibregl-ctrl-geolocate-active .maplibregl-ctrl-icon {
+    background-image:url("data:image/svg+xml;charset=utf-8,%3Csvg width='29' height='29' viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg' fill='%2333b5e5'%3E%3Cpath d='M10 4C9 4 9 5 9 5v.1A5 5 0 005.1 9H5s-1 0-1 1 1 1 1 1h.1A5 5 0 009 14.9v.1s0 1 1 1 1-1 1-1v-.1a5 5 0 003.9-3.9h.1s1 0 1-1-1-1-1-1h-.1A5 5 0 0011 5.1V5s0-1-1-1zm0 2.5a3.5 3.5 0 110 7 3.5 3.5 0 110-7z'/%3E%3Ccircle cx='10' cy='10' r='2'/%3E%3C/svg%3E")
 }
 
-a.mapboxgl-ctrl-logo {
-    width: 85px;
-    height: 21px;
-    margin: 0 0 -3px -3px;
-    display: block;
-    background-repeat: no-repeat;
-    cursor: pointer;
-    background-image: url("data:image/svg+xml;charset=utf-8,%3C?xml version='1.0' encoding='utf-8'?%3E%3Csvg version='1.1' id='Layer_1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' x='0px' y='0px' viewBox='0 0 84.49 21' style='enable-background:new 0 0 84.49 21;' xml:space='preserve'%3E%3Cg%3E %3Cpath class='st0' style='opacity:0.9; fill: %23FFFFFF; enable-background: new;' d='M83.25,14.26c0,0.12-0.09,0.21-0.21,0.21h-1.61c-0.13,0-0.24-0.06-0.3-0.17l-1.44-2.39l-1.44,2.39 c-0.06,0.11-0.18,0.17-0.3,0.17h-1.61c-0.04,0-0.08-0.01-0.12-0.03c-0.09-0.06-0.13-0.19-0.06-0.28l0,0l2.43-3.68L76.2,6.84 c-0.02-0.03-0.03-0.07-0.03-0.12c0-0.12,0.09-0.21,0.21-0.21h1.61c0.13,0,0.24,0.06,0.3,0.17l1.41,2.36l1.4-2.35 c0.06-0.11,0.18-0.17,0.3-0.17H83c0.04,0,0.08,0.01,0.12,0.03c0.09,0.06,0.13,0.19,0.06,0.28l0,0l-2.37,3.63l2.43,3.67 C83.24,14.18,83.25,14.22,83.25,14.26z'/%3E %3Cpath class='st0' style='opacity:0.9; fill: %23FFFFFF; enable-background: new;' d='M66.24,9.59c-0.39-1.88-1.96-3.28-3.84-3.28c-1.03,0-2.03,0.42-2.73,1.18V3.51c0-0.13-0.1-0.23-0.23-0.23h-1.4 c-0.13,0-0.23,0.11-0.23,0.23v10.72c0,0.13,0.1,0.23,0.23,0.23h1.4c0.13,0,0.23-0.11,0.23-0.23V13.5c0.71,0.75,1.7,1.18,2.73,1.18 c1.88,0,3.45-1.41,3.84-3.29C66.37,10.79,66.37,10.18,66.24,9.59L66.24,9.59z M62.08,13c-1.32,0-2.39-1.11-2.41-2.48v-0.06 c0.02-1.38,1.09-2.48,2.41-2.48s2.42,1.12,2.42,2.51S63.41,13,62.08,13z'/%3E %3Cpath class='st0' style='opacity:0.9; fill: %23FFFFFF; enable-background: new;' d='M71.67,6.32c-1.98-0.01-3.72,1.35-4.16,3.29c-0.13,0.59-0.13,1.19,0,1.77c0.44,1.94,2.17,3.32,4.17,3.3 c2.35,0,4.26-1.87,4.26-4.19S74.04,6.32,71.67,6.32z M71.65,13.01c-1.33,0-2.42-1.12-2.42-2.51s1.08-2.52,2.42-2.52 c1.33,0,2.42,1.12,2.42,2.51S72.99,13,71.65,13.01L71.65,13.01z'/%3E %3Cpath class='st1' style='opacity:0.35; enable-background:new;' d='M62.08,7.98c-1.32,0-2.39,1.11-2.41,2.48v0.06C59.68,11.9,60.75,13,62.08,13s2.42-1.12,2.42-2.51 S63.41,7.98,62.08,7.98z M62.08,11.76c-0.63,0-1.14-0.56-1.17-1.25v-0.04c0.01-0.69,0.54-1.25,1.17-1.25 c0.63,0,1.17,0.57,1.17,1.27C63.24,11.2,62.73,11.76,62.08,11.76z'/%3E %3Cpath class='st1' style='opacity:0.35; enable-background:new;' d='M71.65,7.98c-1.33,0-2.42,1.12-2.42,2.51S70.32,13,71.65,13s2.42-1.12,2.42-2.51S72.99,7.98,71.65,7.98z M71.65,11.76c-0.64,0-1.17-0.57-1.17-1.27c0-0.7,0.53-1.26,1.17-1.26s1.17,0.57,1.17,1.27C72.82,11.21,72.29,11.76,71.65,11.76z'/%3E %3Cpath class='st0' style='opacity:0.9; fill: %23FFFFFF; enable-background: new;' d='M45.74,6.53h-1.4c-0.13,0-0.23,0.11-0.23,0.23v0.73c-0.71-0.75-1.7-1.18-2.73-1.18 c-2.17,0-3.94,1.87-3.94,4.19s1.77,4.19,3.94,4.19c1.04,0,2.03-0.43,2.73-1.19v0.73c0,0.13,0.1,0.23,0.23,0.23h1.4 c0.13,0,0.23-0.11,0.23-0.23V6.74c0-0.12-0.09-0.22-0.22-0.22C45.75,6.53,45.75,6.53,45.74,6.53z M44.12,10.53 C44.11,11.9,43.03,13,41.71,13s-2.42-1.12-2.42-2.51s1.08-2.52,2.4-2.52c1.33,0,2.39,1.11,2.41,2.48L44.12,10.53z'/%3E %3Cpath class='st1' style='opacity:0.35; enable-background:new;' d='M41.71,7.98c-1.33,0-2.42,1.12-2.42,2.51S40.37,13,41.71,13s2.39-1.11,2.41-2.48v-0.06 C44.1,9.09,43.03,7.98,41.71,7.98z M40.55,10.49c0-0.7,0.52-1.27,1.17-1.27c0.64,0,1.14,0.56,1.17,1.25v0.04 c-0.01,0.68-0.53,1.24-1.17,1.24C41.08,11.75,40.55,11.19,40.55,10.49z'/%3E %3Cpath class='st0' style='opacity:0.9; fill: %23FFFFFF; enable-background: new;' d='M52.41,6.32c-1.03,0-2.03,0.42-2.73,1.18V6.75c0-0.13-0.1-0.23-0.23-0.23h-1.4c-0.13,0-0.23,0.11-0.23,0.23 v10.72c0,0.13,0.1,0.23,0.23,0.23h1.4c0.13,0,0.23-0.1,0.23-0.23V13.5c0.71,0.75,1.7,1.18,2.74,1.18c2.17,0,3.94-1.87,3.94-4.19 S54.58,6.32,52.41,6.32z M52.08,13.01c-1.32,0-2.39-1.11-2.42-2.48v-0.07c0.02-1.38,1.09-2.49,2.4-2.49c1.32,0,2.41,1.12,2.41,2.51 S53.4,13,52.08,13.01L52.08,13.01z'/%3E %3Cpath class='st1' style='opacity:0.35; enable-background:new;' d='M52.08,7.98c-1.32,0-2.39,1.11-2.42,2.48v0.06c0.03,1.38,1.1,2.48,2.42,2.48s2.41-1.12,2.41-2.51 S53.4,7.98,52.08,7.98z M52.08,11.76c-0.63,0-1.14-0.56-1.17-1.25v-0.04c0.01-0.69,0.54-1.25,1.17-1.25c0.63,0,1.17,0.58,1.17,1.27 S52.72,11.76,52.08,11.76z'/%3E %3Cpath class='st0' style='opacity:0.9; fill: %23FFFFFF; enable-background: new;' d='M36.08,14.24c0,0.13-0.1,0.23-0.23,0.23h-1.41c-0.13,0-0.23-0.11-0.23-0.23V9.68c0-0.98-0.74-1.71-1.62-1.71 c-0.8,0-1.46,0.7-1.59,1.62l0.01,4.66c0,0.13-0.11,0.23-0.23,0.23h-1.41c-0.13,0-0.23-0.11-0.23-0.23V9.68 c0-0.98-0.74-1.71-1.62-1.71c-0.85,0-1.54,0.79-1.6,1.8v4.48c0,0.13-0.1,0.23-0.23,0.23h-1.4c-0.13,0-0.23-0.11-0.23-0.23V6.74 c0.01-0.13,0.1-0.22,0.23-0.22h1.4c0.13,0,0.22,0.11,0.23,0.22V7.4c0.5-0.68,1.3-1.09,2.16-1.1h0.03c1.09,0,2.09,0.6,2.6,1.55 c0.45-0.95,1.4-1.55,2.44-1.56c1.62,0,2.93,1.25,2.9,2.78L36.08,14.24z'/%3E %3Cpath class='st1' style='opacity:0.35; enable-background:new;' d='M84.34,13.59l-0.07-0.13l-1.96-2.99l1.94-2.95c0.44-0.67,0.26-1.56-0.41-2.02c-0.02,0-0.03,0-0.04-0.01 c-0.23-0.15-0.5-0.22-0.78-0.22h-1.61c-0.56,0-1.08,0.29-1.37,0.78L79.72,6.6l-0.34-0.56C79.09,5.56,78.57,5.27,78,5.27h-1.6 c-0.6,0-1.13,0.37-1.35,0.92c-2.19-1.66-5.28-1.47-7.26,0.45c-0.35,0.34-0.65,0.72-0.89,1.14c-0.9-1.62-2.58-2.72-4.5-2.72 c-0.5,0-1.01,0.07-1.48,0.23V3.51c0-0.82-0.66-1.48-1.47-1.48h-1.4c-0.81,0-1.47,0.66-1.47,1.47v3.75 c-0.95-1.36-2.5-2.18-4.17-2.19c-0.74,0-1.46,0.16-2.12,0.47c-0.24-0.17-0.54-0.26-0.84-0.26h-1.4c-0.45,0-0.87,0.21-1.15,0.56 c-0.02-0.03-0.04-0.05-0.07-0.08c-0.28-0.3-0.68-0.47-1.09-0.47h-1.39c-0.3,0-0.6,0.09-0.84,0.26c-0.67-0.3-1.39-0.46-2.12-0.46 c-1.83,0-3.43,1-4.37,2.5c-0.2-0.46-0.48-0.89-0.83-1.25c-0.8-0.81-1.89-1.25-3.02-1.25h-0.01c-0.89,0.01-1.75,0.33-2.46,0.88 c-0.74-0.57-1.64-0.88-2.57-0.88H28.1c-0.29,0-0.58,0.03-0.86,0.11c-0.28,0.06-0.56,0.16-0.82,0.28c-0.21-0.12-0.45-0.18-0.7-0.18 h-1.4c-0.82,0-1.47,0.66-1.47,1.47v7.5c0,0.82,0.66,1.47,1.47,1.47h1.4c0.82,0,1.48-0.66,1.48-1.48l0,0V9.79 c0.03-0.36,0.23-0.59,0.36-0.59c0.18,0,0.38,0.18,0.38,0.47v4.57c0,0.82,0.66,1.47,1.47,1.47h1.41c0.82,0,1.47-0.66,1.47-1.47 l-0.01-4.57c0.06-0.32,0.25-0.47,0.35-0.47c0.18,0,0.38,0.18,0.38,0.47v4.57c0,0.82,0.66,1.47,1.47,1.47h1.41 c0.82,0,1.47-0.66,1.47-1.47v-0.38c0.96,1.29,2.46,2.06,4.06,2.06c0.74,0,1.46-0.16,2.12-0.47c0.24,0.17,0.54,0.26,0.84,0.26h1.39 c0.3,0,0.6-0.09,0.84-0.26v2.01c0,0.82,0.66,1.47,1.47,1.47h1.4c0.82,0,1.47-0.66,1.47-1.47v-1.77c0.48,0.15,0.99,0.23,1.49,0.22 c1.7,0,3.22-0.87,4.17-2.2v0.52c0,0.82,0.66,1.47,1.47,1.47h1.4c0.3,0,0.6-0.09,0.84-0.26c0.66,0.31,1.39,0.47,2.12,0.47 c1.92,0,3.6-1.1,4.49-2.73c1.54,2.65,4.95,3.53,7.58,1.98c0.18-0.11,0.36-0.22,0.53-0.36c0.22,0.55,0.76,0.91,1.35,0.9H78 c0.56,0,1.08-0.29,1.37-0.78l0.37-0.61l0.37,0.61c0.29,0.48,0.81,0.78,1.38,0.78h1.6c0.81,0,1.46-0.66,1.45-1.46 C84.49,14.02,84.44,13.8,84.34,13.59L84.34,13.59z M35.86,14.47h-1.41c-0.13,0-0.23-0.11-0.23-0.23V9.68 c0-0.98-0.74-1.71-1.62-1.71c-0.8,0-1.46,0.7-1.59,1.62l0.01,4.66c0,0.13-0.1,0.23-0.23,0.23h-1.41c-0.13,0-0.23-0.11-0.23-0.23 V9.68c0-0.98-0.74-1.71-1.62-1.71c-0.85,0-1.54,0.79-1.6,1.8v4.48c0,0.13-0.1,0.23-0.23,0.23h-1.4c-0.13,0-0.23-0.11-0.23-0.23 V6.74c0.01-0.13,0.11-0.22,0.23-0.22h1.4c0.13,0,0.22,0.11,0.23,0.22V7.4c0.5-0.68,1.3-1.09,2.16-1.1h0.03 c1.09,0,2.09,0.6,2.6,1.55c0.45-0.95,1.4-1.55,2.44-1.56c1.62,0,2.93,1.25,2.9,2.78l0.01,5.16C36.09,14.36,35.98,14.46,35.86,14.47 L35.86,14.47z M45.97,14.24c0,0.13-0.1,0.23-0.23,0.23h-1.4c-0.13,0-0.23-0.11-0.23-0.23V13.5c-0.7,0.76-1.69,1.18-2.72,1.18 c-2.17,0-3.94-1.87-3.94-4.19s1.77-4.19,3.94-4.19c1.03,0,2.02,0.43,2.73,1.18V6.74c0-0.13,0.1-0.23,0.23-0.23h1.4 c0.12-0.01,0.22,0.08,0.23,0.21c0,0.01,0,0.01,0,0.02v7.51h-0.01V14.24z M52.41,14.67c-1.03,0-2.02-0.43-2.73-1.18v3.97 c0,0.13-0.1,0.23-0.23,0.23h-1.4c-0.13,0-0.23-0.1-0.23-0.23V6.75c0-0.13,0.1-0.22,0.23-0.22h1.4c0.13,0,0.23,0.11,0.23,0.23v0.73 c0.71-0.76,1.7-1.18,2.73-1.18c2.17,0,3.94,1.86,3.94,4.18S54.58,14.67,52.41,14.67z M66.24,11.39c-0.39,1.87-1.96,3.29-3.84,3.29 c-1.03,0-2.02-0.43-2.73-1.18v0.73c0,0.13-0.1,0.23-0.23,0.23h-1.4c-0.13,0-0.23-0.11-0.23-0.23V3.51c0-0.13,0.1-0.23,0.23-0.23 h1.4c0.13,0,0.23,0.11,0.23,0.23v3.97c0.71-0.75,1.7-1.18,2.73-1.17c1.88,0,3.45,1.4,3.84,3.28C66.37,10.19,66.37,10.8,66.24,11.39 L66.24,11.39L66.24,11.39z M71.67,14.68c-2,0.01-3.73-1.35-4.17-3.3c-0.13-0.59-0.13-1.19,0-1.77c0.44-1.94,2.17-3.31,4.17-3.3 c2.36,0,4.26,1.87,4.26,4.19S74.03,14.68,71.67,14.68L71.67,14.68z M83.04,14.47h-1.61c-0.13,0-0.24-0.06-0.3-0.17l-1.44-2.39 l-1.44,2.39c-0.06,0.11-0.18,0.17-0.3,0.17h-1.61c-0.04,0-0.08-0.01-0.12-0.03c-0.09-0.06-0.13-0.19-0.06-0.28l0,0l2.43-3.68 L76.2,6.84c-0.02-0.03-0.03-0.07-0.03-0.12c0-0.12,0.09-0.21,0.21-0.21h1.61c0.13,0,0.24,0.06,0.3,0.17l1.41,2.36l1.41-2.36 c0.06-0.11,0.18-0.17,0.3-0.17h1.61c0.04,0,0.08,0.01,0.12,0.03c0.09,0.06,0.13,0.19,0.06,0.28l0,0l-2.38,3.64l2.43,3.67 c0.02,0.03,0.03,0.07,0.03,0.12C83.25,14.38,83.16,14.47,83.04,14.47L83.04,14.47L83.04,14.47z'/%3E %3Cpath class='st0' style='opacity:0.9; fill: %23FFFFFF; enable-background: new;' d='M10.5,1.24c-5.11,0-9.25,4.15-9.25,9.25s4.15,9.25,9.25,9.25s9.25-4.15,9.25-9.25 C19.75,5.38,15.61,1.24,10.5,1.24z M14.89,12.77c-1.93,1.93-4.78,2.31-6.7,2.31c-0.7,0-1.41-0.05-2.1-0.16c0,0-1.02-5.64,2.14-8.81 c0.83-0.83,1.95-1.28,3.13-1.28c1.27,0,2.49,0.51,3.39,1.42C16.59,8.09,16.64,11,14.89,12.77z'/%3E %3Cpath class='st1' style='opacity:0.35; enable-background:new;' d='M10.5-0.01C4.7-0.01,0,4.7,0,10.49s4.7,10.5,10.5,10.5S21,16.29,21,10.49C20.99,4.7,16.3-0.01,10.5-0.01z M10.5,19.74c-5.11,0-9.25-4.15-9.25-9.25s4.14-9.26,9.25-9.26s9.25,4.15,9.25,9.25C19.75,15.61,15.61,19.74,10.5,19.74z'/%3E %3Cpath class='st1' style='opacity:0.35; enable-background:new;' d='M14.74,6.25C12.9,4.41,9.98,4.35,8.23,6.1c-3.16,3.17-2.14,8.81-2.14,8.81s5.64,1.02,8.81-2.14 C16.64,11,16.59,8.09,14.74,6.25z M12.47,10.34l-0.91,1.87l-0.9-1.87L8.8,9.43l1.86-0.9l0.9-1.87l0.91,1.87l1.86,0.9L12.47,10.34z'/%3E %3Cpolygon class='st0' style='opacity:0.9; fill: %23FFFFFF; enable-background: new;' points='14.33,9.43 12.47,10.34 11.56,12.21 10.66,10.34 8.8,9.43 10.66,8.53 11.56,6.66 12.47,8.53 '/%3E%3C/g%3E%3C/svg%3E");
+.mapboxgl-ctrl button.mapboxgl-ctrl-geolocate.mapboxgl-ctrl-geolocate-active-error .mapboxgl-ctrl-icon,
+.maplibregl-ctrl button.maplibregl-ctrl-geolocate.maplibregl-ctrl-geolocate-active-error .maplibregl-ctrl-icon {
+    background-image:url("data:image/svg+xml;charset=utf-8,%3Csvg width='29' height='29' viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg' fill='%23e58978'%3E%3Cpath d='M10 4C9 4 9 5 9 5v.1A5 5 0 005.1 9H5s-1 0-1 1 1 1 1 1h.1A5 5 0 009 14.9v.1s0 1 1 1 1-1 1-1v-.1a5 5 0 003.9-3.9h.1s1 0 1-1-1-1-1-1h-.1A5 5 0 0011 5.1V5s0-1-1-1zm0 2.5a3.5 3.5 0 110 7 3.5 3.5 0 110-7z'/%3E%3Ccircle cx='10' cy='10' r='2'/%3E%3C/svg%3E")
 }
 
-a.mapboxgl-ctrl-logo.mapboxgl-compact {
-    width: 21px;
-    height: 21px;
-    background-image: url("data:image/svg+xml;charset=utf-8,%3C?xml version='1.0' encoding='utf-8'?%3E %3Csvg version='1.1' id='Layer_1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' x='0px' y='0px' viewBox='0 0 21 21' style='enable-background:new 0 0 21 21;' xml:space='preserve'%3E%3Cg transform='translate(0,0.01)'%3E%3Cpath d='m 10.5,1.24 c -5.11,0 -9.25,4.15 -9.25,9.25 0,5.1 4.15,9.25 9.25,9.25 5.1,0 9.25,-4.15 9.25,-9.25 0,-5.11 -4.14,-9.25 -9.25,-9.25 z m 4.39,11.53 c -1.93,1.93 -4.78,2.31 -6.7,2.31 -0.7,0 -1.41,-0.05 -2.1,-0.16 0,0 -1.02,-5.64 2.14,-8.81 0.83,-0.83 1.95,-1.28 3.13,-1.28 1.27,0 2.49,0.51 3.39,1.42 1.84,1.84 1.89,4.75 0.14,6.52 z' style='opacity:0.9;fill:%23ffffff;enable-background:new' class='st0'/%3E%3Cpath d='M 10.5,-0.01 C 4.7,-0.01 0,4.7 0,10.49 c 0,5.79 4.7,10.5 10.5,10.5 5.8,0 10.5,-4.7 10.5,-10.5 C 20.99,4.7 16.3,-0.01 10.5,-0.01 Z m 0,19.75 c -5.11,0 -9.25,-4.15 -9.25,-9.25 0,-5.1 4.14,-9.26 9.25,-9.26 5.11,0 9.25,4.15 9.25,9.25 0,5.13 -4.14,9.26 -9.25,9.26 z' style='opacity:0.35;enable-background:new' class='st1'/%3E%3Cpath d='M 14.74,6.25 C 12.9,4.41 9.98,4.35 8.23,6.1 5.07,9.27 6.09,14.91 6.09,14.91 c 0,0 5.64,1.02 8.81,-2.14 C 16.64,11 16.59,8.09 14.74,6.25 Z m -2.27,4.09 -0.91,1.87 -0.9,-1.87 -1.86,-0.91 1.86,-0.9 0.9,-1.87 0.91,1.87 1.86,0.9 z' style='opacity:0.35;enable-background:new' class='st1'/%3E%3Cpolygon points='11.56,12.21 10.66,10.34 8.8,9.43 10.66,8.53 11.56,6.66 12.47,8.53 14.33,9.43 12.47,10.34 ' style='opacity:0.9;fill:%23ffffff;enable-background:new' class='st0'/%3E%3C/g%3E%3C/svg%3E");
+.mapboxgl-ctrl button.mapboxgl-ctrl-geolocate.mapboxgl-ctrl-geolocate-background .mapboxgl-ctrl-icon,
+.maplibregl-ctrl button.maplibregl-ctrl-geolocate.maplibregl-ctrl-geolocate-background .maplibregl-ctrl-icon {
+    background-image:url("data:image/svg+xml;charset=utf-8,%3Csvg width='29' height='29' viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg' fill='%2333b5e5'%3E%3Cpath d='M10 4C9 4 9 5 9 5v.1A5 5 0 005.1 9H5s-1 0-1 1 1 1 1 1h.1A5 5 0 009 14.9v.1s0 1 1 1 1-1 1-1v-.1a5 5 0 003.9-3.9h.1s1 0 1-1-1-1-1-1h-.1A5 5 0 0011 5.1V5s0-1-1-1zm0 2.5a3.5 3.5 0 110 7 3.5 3.5 0 110-7z'/%3E%3C/svg%3E")
 }
 
-.mapboxgl-ctrl.mapboxgl-ctrl-attrib {
-    padding: 0 5px;
-    background-color: rgba(255, 255, 255, 0.5);
-    margin: 0;
+.mapboxgl-ctrl button.mapboxgl-ctrl-geolocate.mapboxgl-ctrl-geolocate-background-error .mapboxgl-ctrl-icon,
+.maplibregl-ctrl button.maplibregl-ctrl-geolocate.maplibregl-ctrl-geolocate-background-error .maplibregl-ctrl-icon {
+    background-image:url("data:image/svg+xml;charset=utf-8,%3Csvg width='29' height='29' viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg' fill='%23e54e33'%3E%3Cpath d='M10 4C9 4 9 5 9 5v.1A5 5 0 005.1 9H5s-1 0-1 1 1 1 1 1h.1A5 5 0 009 14.9v.1s0 1 1 1 1-1 1-1v-.1a5 5 0 003.9-3.9h.1s1 0 1-1-1-1-1-1h-.1A5 5 0 0011 5.1V5s0-1-1-1zm0 2.5a3.5 3.5 0 110 7 3.5 3.5 0 110-7z'/%3E%3C/svg%3E")
+}
+
+.mapboxgl-ctrl button.mapboxgl-ctrl-geolocate.mapboxgl-ctrl-geolocate-waiting .mapboxgl-ctrl-icon,
+.maplibregl-ctrl button.maplibregl-ctrl-geolocate.maplibregl-ctrl-geolocate-waiting .maplibregl-ctrl-icon {
+    -webkit-animation:maplibregl-spin 2s linear infinite;
+    -moz-animation:maplibregl-spin 2s infinite linear;
+    -o-animation:maplibregl-spin 2s infinite linear;
+    -ms-animation:maplibregl-spin 2s infinite linear;
+    animation:maplibregl-spin 2s linear infinite
+}
+
+@media (-ms-high-contrast:active) {
+    .mapboxgl-ctrl button.mapboxgl-ctrl-geolocate .mapboxgl-ctrl-icon,
+    .maplibregl-ctrl button.maplibregl-ctrl-geolocate .maplibregl-ctrl-icon {
+        background-image:url("data:image/svg+xml;charset=utf-8,%3Csvg width='29' height='29' viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg' fill='%23fff'%3E%3Cpath d='M10 4C9 4 9 5 9 5v.1A5 5 0 005.1 9H5s-1 0-1 1 1 1 1 1h.1A5 5 0 009 14.9v.1s0 1 1 1 1-1 1-1v-.1a5 5 0 003.9-3.9h.1s1 0 1-1-1-1-1-1h-.1A5 5 0 0011 5.1V5s0-1-1-1zm0 2.5a3.5 3.5 0 110 7 3.5 3.5 0 110-7z'/%3E%3Ccircle cx='10' cy='10' r='2'/%3E%3C/svg%3E")
+    }
+    
+    .mapboxgl-ctrl button.mapboxgl-ctrl-geolocate:disabled .mapboxgl-ctrl-icon,
+    .maplibregl-ctrl button.maplibregl-ctrl-geolocate:disabled .maplibregl-ctrl-icon {
+        background-image:url("data:image/svg+xml;charset=utf-8,%3Csvg width='29' height='29' viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg' fill='%23999'%3E%3Cpath d='M10 4C9 4 9 5 9 5v.1A5 5 0 005.1 9H5s-1 0-1 1 1 1 1 1h.1A5 5 0 009 14.9v.1s0 1 1 1 1-1 1-1v-.1a5 5 0 003.9-3.9h.1s1 0 1-1-1-1-1-1h-.1A5 5 0 0011 5.1V5s0-1-1-1zm0 2.5a3.5 3.5 0 110 7 3.5 3.5 0 110-7z'/%3E%3Ccircle cx='10' cy='10' r='2'/%3E%3Cpath d='M14 5l1 1-9 9-1-1 9-9z' fill='red'/%3E%3C/svg%3E")
+    }
+    
+    .mapboxgl-ctrl button.mapboxgl-ctrl-geolocate.mapboxgl-ctrl-geolocate-active .mapboxgl-ctrl-icon,
+    .maplibregl-ctrl button.maplibregl-ctrl-geolocate.maplibregl-ctrl-geolocate-active .maplibregl-ctrl-icon {
+        background-image:url("data:image/svg+xml;charset=utf-8,%3Csvg width='29' height='29' viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg' fill='%2333b5e5'%3E%3Cpath d='M10 4C9 4 9 5 9 5v.1A5 5 0 005.1 9H5s-1 0-1 1 1 1 1 1h.1A5 5 0 009 14.9v.1s0 1 1 1 1-1 1-1v-.1a5 5 0 003.9-3.9h.1s1 0 1-1-1-1-1-1h-.1A5 5 0 0011 5.1V5s0-1-1-1zm0 2.5a3.5 3.5 0 110 7 3.5 3.5 0 110-7z'/%3E%3Ccircle cx='10' cy='10' r='2'/%3E%3C/svg%3E")
+    }
+    
+    .mapboxgl-ctrl button.mapboxgl-ctrl-geolocate.mapboxgl-ctrl-geolocate-active-error .mapboxgl-ctrl-icon,
+    .maplibregl-ctrl button.maplibregl-ctrl-geolocate.maplibregl-ctrl-geolocate-active-error .maplibregl-ctrl-icon {
+        background-image:url("data:image/svg+xml;charset=utf-8,%3Csvg width='29' height='29' viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg' fill='%23e58978'%3E%3Cpath d='M10 4C9 4 9 5 9 5v.1A5 5 0 005.1 9H5s-1 0-1 1 1 1 1 1h.1A5 5 0 009 14.9v.1s0 1 1 1 1-1 1-1v-.1a5 5 0 003.9-3.9h.1s1 0 1-1-1-1-1-1h-.1A5 5 0 0011 5.1V5s0-1-1-1zm0 2.5a3.5 3.5 0 110 7 3.5 3.5 0 110-7z'/%3E%3Ccircle cx='10' cy='10' r='2'/%3E%3C/svg%3E")
+    }
+    
+    .mapboxgl-ctrl button.mapboxgl-ctrl-geolocate.mapboxgl-ctrl-geolocate-background .mapboxgl-ctrl-icon,
+    .maplibregl-ctrl button.maplibregl-ctrl-geolocate.maplibregl-ctrl-geolocate-background .maplibregl-ctrl-icon {
+        background-image:url("data:image/svg+xml;charset=utf-8,%3Csvg width='29' height='29' viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg' fill='%2333b5e5'%3E%3Cpath d='M10 4C9 4 9 5 9 5v.1A5 5 0 005.1 9H5s-1 0-1 1 1 1 1 1h.1A5 5 0 009 14.9v.1s0 1 1 1 1-1 1-1v-.1a5 5 0 003.9-3.9h.1s1 0 1-1-1-1-1-1h-.1A5 5 0 0011 5.1V5s0-1-1-1zm0 2.5a3.5 3.5 0 110 7 3.5 3.5 0 110-7z'/%3E%3C/svg%3E")
+    }
+    
+    .mapboxgl-ctrl button.mapboxgl-ctrl-geolocate.mapboxgl-ctrl-geolocate-background-error .mapboxgl-ctrl-icon,
+    .maplibregl-ctrl button.maplibregl-ctrl-geolocate.maplibregl-ctrl-geolocate-background-error .maplibregl-ctrl-icon {
+        background-image:url("data:image/svg+xml;charset=utf-8,%3Csvg width='29' height='29' viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg' fill='%23e54e33'%3E%3Cpath d='M10 4C9 4 9 5 9 5v.1A5 5 0 005.1 9H5s-1 0-1 1 1 1 1 1h.1A5 5 0 009 14.9v.1s0 1 1 1 1-1 1-1v-.1a5 5 0 003.9-3.9h.1s1 0 1-1-1-1-1-1h-.1A5 5 0 0011 5.1V5s0-1-1-1zm0 2.5a3.5 3.5 0 110 7 3.5 3.5 0 110-7z'/%3E%3C/svg%3E")
+    }
+}
+
+@media (-ms-high-contrast:black-on-white) {
+    .mapboxgl-ctrl button.mapboxgl-ctrl-geolocate .mapboxgl-ctrl-icon,
+    .maplibregl-ctrl button.maplibregl-ctrl-geolocate .maplibregl-ctrl-icon {
+        background-image:url("data:image/svg+xml;charset=utf-8,%3Csvg width='29' height='29' viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M10 4C9 4 9 5 9 5v.1A5 5 0 005.1 9H5s-1 0-1 1 1 1 1 1h.1A5 5 0 009 14.9v.1s0 1 1 1 1-1 1-1v-.1a5 5 0 003.9-3.9h.1s1 0 1-1-1-1-1-1h-.1A5 5 0 0011 5.1V5s0-1-1-1zm0 2.5a3.5 3.5 0 110 7 3.5 3.5 0 110-7z'/%3E%3Ccircle cx='10' cy='10' r='2'/%3E%3C/svg%3E")
+    }
+    
+    .mapboxgl-ctrl button.mapboxgl-ctrl-geolocate:disabled .mapboxgl-ctrl-icon,
+    .maplibregl-ctrl button.maplibregl-ctrl-geolocate:disabled .maplibregl-ctrl-icon {
+        background-image:url("data:image/svg+xml;charset=utf-8,%3Csvg width='29' height='29' viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg' fill='%23666'%3E%3Cpath d='M10 4C9 4 9 5 9 5v.1A5 5 0 005.1 9H5s-1 0-1 1 1 1 1 1h.1A5 5 0 009 14.9v.1s0 1 1 1 1-1 1-1v-.1a5 5 0 003.9-3.9h.1s1 0 1-1-1-1-1-1h-.1A5 5 0 0011 5.1V5s0-1-1-1zm0 2.5a3.5 3.5 0 110 7 3.5 3.5 0 110-7z'/%3E%3Ccircle cx='10' cy='10' r='2'/%3E%3Cpath d='M14 5l1 1-9 9-1-1 9-9z' fill='red'/%3E%3C/svg%3E")
+    }
+}
+
+@-webkit-keyframes maplibregl-spin {
+    0% { -webkit-transform:rotate(0deg) }
+    to { -webkit-transform:rotate(1turn) }
+}
+
+@-moz-keyframes maplibregl-spin {
+    0% { -moz-transform:rotate(0deg) }
+    to { -moz-transform:rotate(1turn) }
+}
+
+@-o-keyframes maplibregl-spin {
+    0% { -o-transform:rotate(0deg) }
+    to { -o-transform:rotate(1turn) }
+}
+
+@-ms-keyframes maplibregl-spin {
+    0% { -ms-transform:rotate(0deg) }
+    to { -ms-transform:rotate(1turn) }
+}
+
+@keyframes maplibregl-spin {
+    0% { transform:rotate(0deg) }
+    to { transform:rotate(1turn) }
+}
+
+a.mapboxgl-ctrl-logo,
+a.maplibregl-ctrl-logo {
+    width:88px;
+    height:23px;
+    margin:0 0 -4px -4px;
+    display:block;
+    background-repeat:no-repeat;
+    cursor:pointer;
+    overflow:hidden;
+    background-image:url(
+        "data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='88' height='23' fill='none'%3E%3Cpath d='M17.408 16.796h-1.827l2.501-12.095h.198l3.324 6.533.988 2.19.988-2.19 3.258-6.533h.181l2.6 12.095h-1.81l-1.218-5.644-.362-1.71-.658 1.71-2.929 5.644h-.098l-2.914-5.644-.757-1.71-.345 1.71zm1.958-3.42l-.726 3.663a1.255 1.255 0 01-1.232 1.011h-1.827a1.255 1.255 0 01-1.229-1.509l2.501-12.095a1.255 1.255 0 011.23-1.001h.197a1.255 1.255 0 011.12.685l3.19 6.273 3.125-6.263a1.255 1.255 0 011.123-.695h.181a1.255 1.255 0 011.227.991l1.443 6.71a5.11 5.11 0 01.314-.787l.009-.016a4.623 4.623 0 011.777-1.887c.782-.46 1.668-.667 2.611-.667a4.548 4.548 0 011.7.32l.306.134c.21-.16.474-.256.759-.256h1.694a1.255 1.255 0 011.212.925 1.255 1.255 0 011.212-.925h1.711c.284 0 .545.094.755.252.613-.3 1.312-.45 2.075-.45 1.356 0 2.557.445 3.482 1.4.314.319.566.676.763 1.064V4.701a1.255 1.255 0 011.255-1.255h1.86A1.255 1.255 0 0154.44 4.7v9.194h2.217c.19 0 .37.043.532.118v-4.77c0-.356.147-.678.385-.906a2.416 2.416 0 01-.682-1.71c0-.665.267-1.253.735-1.7a2.448 2.448 0 011.722-.674 2.43 2.43 0 011.705.675c.211.2.381.43.504.683V4.7a1.255 1.255 0 011.255-1.255h1.744A1.255 1.255 0 0165.812 4.7v3.335a4.76 4.76 0 011.526-.246c.938 0 1.817.214 2.59.69a4.47 4.47 0 011.67 1.743v-.98a1.255 1.255 0 011.256-1.256h1.777c.233 0 .451.064.639.174a3.407 3.407 0 011.567-.372c.346 0 .861.02 1.285.232a1.255 1.255 0 01.689 1.004 4.73 4.73 0 01.853-.588c.795-.44 1.675-.647 2.61-.647 1.385 0 2.65.39 3.525 1.396.836.938 1.168 2.173 1.168 3.528 0 .343-.02.694-.056 1.051a1.255 1.255 0 01-.947 1.09l.408.952a1.255 1.255 0 01-.477 1.552c-.418.268-.92.463-1.458.612-.613.171-1.304.244-2.049.244-1.06 0-2.043-.207-2.886-.698l-.015-.008c-.798-.48-1.419-1.135-1.818-1.963l-.004-.008a5.815 5.815 0 01-.548-2.512c0-.286.017-.567.053-.843a1.255 1.255 0 01-.333-.086l-.166-.004c-.223 0-.426.062-.643.228-.03.024-.142.139-.142.59v3.883a1.255 1.255 0 01-1.256 1.256h-1.777a1.255 1.255 0 01-1.256-1.256V15.69l-.032.057a4.778 4.778 0 01-1.86 1.833 5.04 5.04 0 01-2.484.634 4.47 4.47 0 01-1.935-.424 1.252 1.252 0 01-.764.258h-1.71a1.255 1.255 0 01-1.256-1.255V7.687a2.402 2.402 0 01-.428.625c.253.23.412.561.412.93v7.553a1.255 1.255 0 01-1.256 1.255h-1.843a1.25 1.25 0 01-.894-.373c-.228.23-.544.373-.894.373H51.32a1.255 1.255 0 01-1.256-1.255v-1.251l-.061.117a4.703 4.703 0 01-1.782 1.884 4.767 4.767 0 01-2.485.67 5.6 5.6 0 01-1.485-.188l.009 2.764a1.255 1.255 0 01-1.255 1.259h-1.729a1.255 1.255 0 01-1.255-1.255v-3.537a1.255 1.255 0 01-1.167.793h-1.679a1.25 1.25 0 01-.77-.263 4.47 4.47 0 01-1.945.429c-.885 0-1.724-.21-2.495-.632l-.017-.01a4.983 4.983 0 01-1.081-.836 1.255 1.255 0 01-1.254 1.312h-1.81a1.255 1.255 0 01-1.228-.99l-.782-3.625-2.044 3.939a1.255 1.255 0 01-1.115.676h-.098a1.255 1.255 0 01-1.116-.68l-2.061-3.994zM35.92 16.63l.207-.114.223-.15c.329-.237.574-.499.735-.785l.061-.118.033 1.332h1.678V9.242h-1.694l-.033 1.267c-.088-.22-.264-.438-.526-.658l-.032-.028a3.16 3.16 0 00-.668-.428l-.27-.12a3.293 3.293 0 00-1.235-.23c-.757 0-1.415.163-1.974.493a3.36 3.36 0 00-1.3 1.382c-.297.593-.444 1.284-.444 2.074 0 .8.17 1.503.51 2.107a3.795 3.795 0 001.382 1.381 3.883 3.883 0 001.893.477c.53 0 1.015-.11 1.455-.33zm-2.789-5.38c-.384.45-.575 1.038-.575 1.762 0 .735.186 1.332.559 1.794.384.45.933.675 1.645.675a2.25 2.25 0 00.934-.19 2.17 2.17 0 00.468-.29l.178-.161a2.163 2.163 0 00.397-.561c.163-.333.244-.717.244-1.15v-.115c0-.472-.098-.894-.296-1.267l-.043-.077a2.211 2.211 0 00-.633-.709l-.13-.086-.047-.028a2.099 2.099 0 00-1.073-.285c-.702 0-1.244.231-1.629.692zm2.316 2.706c.163-.17.28-.407.28-.83v-.114c0-.292-.06-.508-.15-.68a.958.958 0 00-.353-.389.851.851 0 00-.464-.127c-.4 0-.56.114-.664.239l-.01.012c-.148.174-.275.45-.275.945 0 .506.122.801.27.99.097.11.266.224.68.224.303 0 .504-.09.687-.269zm7.545 1.705a2.626 2.626 0 00.331.423c.213.22.464.402.755.548l.173.074c.433.17.93.255 1.49.255.68 0 1.295-.165 1.844-.493a3.447 3.447 0 001.316-1.4c.329-.603.493-1.299.493-2.089 0-1.273-.33-2.243-.988-2.913-.658-.68-1.52-1.02-2.584-1.02-.598 0-1.124.115-1.575.347a2.807 2.807 0 00-.415.262l-.199.166a3.35 3.35 0 00-.64.82V9.242h-1.712v11.553h1.729l-.017-5.134zm.53-1.138c.137.193.297.36.48.5l.155.11.053.034c.34.197.713.297 1.119.297.714 0 1.262-.225 1.645-.675.385-.46.576-1.048.576-1.762 0-.746-.192-1.338-.576-1.777-.372-.45-.92-.675-1.645-.675-.29 0-.569.053-.835.16a2.366 2.366 0 00-.284.136 1.99 1.99 0 00-.363.254 2.237 2.237 0 00-.46.569l-.082.162a2.56 2.56 0 00-.213 1.072v.115c0 .471.098.894.296 1.267l.135.211zm.964-.818a1.11 1.11 0 00.367.385.937.937 0 00.476.118c.423 0 .59-.117.687-.23.159-.194.28-.478.28-.95 0-.53-.133-.8-.266-.952l-.021-.025c-.078-.094-.231-.221-.68-.221a.995.995 0 00-.503.135l-.012.007a.859.859 0 00-.335.343c-.073.133-.132.324-.132.614v.115a1.43 1.43 0 00.14.66zm15.7-6.222c.232-.23.346-.516.346-.856a1.053 1.053 0 00-.345-.79 1.175 1.175 0 00-.84-.329c-.34 0-.625.11-.855.33a1.053 1.053 0 00-.346.79c0 .34.115.625.346.855.23.23.516.346.856.346.34 0 .62-.115.839-.346zm4.337 9.314l.033-1.332c.128.269.324.518.59.747l.098.081a3.727 3.727 0 00.316.224l.223.122a3.21 3.21 0 001.44.322 3.785 3.785 0 001.875-.477 3.52 3.52 0 001.382-1.366c.352-.593.526-1.29.526-2.09 0-.79-.147-1.48-.444-2.073a3.235 3.235 0 00-1.283-1.399c-.549-.34-1.195-.51-1.942-.51a3.476 3.476 0 00-1.527.344l-.086.043-.165.09a3.412 3.412 0 00-.33.214c-.288.21-.507.446-.656.707a1.893 1.893 0 00-.099.198l.082-1.283V4.701h-1.744v12.095zm.473-2.509a2.482 2.482 0 00.566.7c.078.065.159.125.245.18l.144.08a2.105 2.105 0 00.975.232c.713 0 1.262-.225 1.645-.675.384-.46.576-1.053.576-1.778 0-.734-.192-1.327-.576-1.777-.373-.46-.921-.692-1.645-.692a2.18 2.18 0 00-1.015.235c-.147.075-.285.17-.415.282l-.15.142a2.086 2.086 0 00-.42.594c-.149.32-.223.685-.223 1.1v.115c0 .47.097.89.293 1.26zm2.616-.293c.157-.191.28-.479.28-.967 0-.51-.13-.79-.276-.961l-.021-.026c-.082-.1-.232-.225-.67-.225a.868.868 0 00-.681.279l-.012.011c-.154.155-.274.38-.274.807v.115c0 .285.057.499.144.669a1.13 1.13 0 00.367.405c.137.082.28.123.455.123.423 0 .59-.118.686-.23zm8.266-3.013c.23-.087.472-.134.724-.14l.069-.002c.329 0 .542.033.642.099l.247-1.794c-.13-.066-.37-.099-.717-.099a2.3 2.3 0 00-.545.063 2.086 2.086 0 00-.411.148 2.18 2.18 0 00-.4.249 2.482 2.482 0 00-.485.499 2.659 2.659 0 00-.32.581l-.05.137v-1.48h-1.778v7.553h1.777v-3.884c0-.364.053-.678.159-.943a1.49 1.49 0 01.466-.636 2.52 2.52 0 01.399-.253 2.19 2.19 0 01.224-.099zm9.784 2.656l.05-.922c0-1.162-.285-2.062-.856-2.698-.559-.647-1.42-.97-2.584-.97-.746 0-1.415.163-2.007.493a3.462 3.462 0 00-1.4 1.382c-.329.604-.493 1.306-.493 2.106 0 .714.143 1.371.428 1.975.285.593.73 1.07 1.332 1.432.604.351 1.355.526 2.255.526.649 0 1.204-.062 1.668-.185l.044-.012.135-.04c.409-.122.736-.263.984-.421l-.542-1.267c-.2.108-.415.199-.642.274l-.297.087c-.34.088-.773.131-1.3.131-.636 0-1.135-.147-1.497-.444a1.573 1.573 0 01-.192-.193c-.244-.294-.415-.705-.512-1.234l-.004-.021h5.43zm-5.427-1.256l-.003.022h3.752v-.138c-.007-.485-.104-.857-.288-1.118a1.056 1.056 0 00-.156-.176c-.307-.285-.746-.428-1.316-.428-.657 0-1.155.202-1.494.604-.253.3-.417.712-.494 1.234zm-27.053 2.77V4.7h-1.86v12.095h5.333V15.15zm7.103-5.908v7.553h-1.843V9.242h1.843z' fill='%23000' fill-opacity='.4' fill-rule='evenodd'/%3E%3Cpath d='M19.63 11.151l-.757-1.71-.345 1.71-1.12 5.644h-1.827L18.083 4.7h.197l3.325 6.533.988 2.19.988-2.19L26.839 4.7h.181l2.6 12.095h-1.81l-1.218-5.644-.362-1.71-.658 1.71-2.93 5.644h-.098l-2.913-5.644zm14.836 5.81c-.68 0-1.311-.16-1.893-.478a3.795 3.795 0 01-1.381-1.382c-.34-.604-.51-1.306-.51-2.106 0-.79.147-1.482.444-2.074a3.364 3.364 0 011.3-1.382c.559-.33 1.217-.494 1.974-.494a3.293 3.293 0 011.234.231 3.341 3.341 0 01.97.575c.264.22.44.439.527.659l.033-1.267h1.694v7.553H37.18l-.033-1.332c-.186.395-.526.746-1.02 1.053a3.167 3.167 0 01-1.662.444zm.296-1.482c.626 0 1.152-.214 1.58-.642.428-.44.642-1.01.642-1.711v-.115c0-.472-.098-.894-.296-1.267a2.211 2.211 0 00-.807-.872 2.098 2.098 0 00-1.119-.313c-.702 0-1.245.231-1.629.692-.384.45-.575 1.037-.575 1.76 0 .736.186 1.333.559 1.795.384.45.933.675 1.645.675zm6.521-6.237h1.711v1.4c.604-1.065 1.547-1.597 2.83-1.597 1.064 0 1.926.34 2.584 1.02.659.67.988 1.641.988 2.914 0 .79-.164 1.487-.493 2.09a3.456 3.456 0 01-1.316 1.399 3.51 3.51 0 01-1.844.493c-.636 0-1.19-.11-1.662-.329a2.665 2.665 0 01-1.086-.97l.017 5.134h-1.728V9.242zm4.048 6.22c.714 0 1.262-.224 1.645-.674.385-.46.576-1.048.576-1.762 0-.746-.192-1.338-.576-1.777-.372-.45-.92-.675-1.645-.675-.395 0-.768.098-1.12.296-.34.187-.613.46-.822.823-.197.351-.296.763-.296 1.234v.115c0 .472.098.894.296 1.267.209.362.483.647.823.855.34.197.713.297 1.119.297z' fill='%23fff'/%3E%3Cpath d='M51.325 4.7h1.86v10.45h3.473v1.646h-5.333zm7.12 4.542h1.843v7.553h-1.843zm.905-1.415a1.159 1.159 0 01-.856-.346 1.165 1.165 0 01-.346-.856 1.053 1.053 0 01.346-.79c.23-.219.516-.329.856-.329.329 0 .609.11.839.33a1.053 1.053 0 01.345.79 1.159 1.159 0 01-.345.855c-.22.23-.5.346-.84.346zm7.875 9.133a3.167 3.167 0 01-1.662-.444c-.482-.307-.817-.658-1.004-1.053l-.033 1.332h-1.71V4.701h1.743v4.657l-.082 1.283c.186-.438.548-.812 1.086-1.119a3.486 3.486 0 011.778-.477c.746 0 1.393.17 1.942.51a3.235 3.235 0 011.283 1.4c.297.592.444 1.282.444 2.072 0 .8-.175 1.498-.526 2.09a3.52 3.52 0 01-1.382 1.366 3.785 3.785 0 01-1.876.477zm-.296-1.481c.713 0 1.26-.225 1.645-.675.384-.46.577-1.053.577-1.778 0-.734-.193-1.327-.577-1.776-.373-.46-.921-.692-1.645-.692a2.115 2.115 0 00-1.58.659c-.428.428-.642.992-.642 1.694v.115c0 .473.098.895.296 1.267a2.385 2.385 0 00.807.872 2.1 2.1 0 001.119.313zm5.927-6.237h1.777v1.481c.176-.505.46-.91.856-1.217a2.14 2.14 0 011.349-.46c.351 0 .593.032.724.098l-.247 1.794c-.099-.066-.313-.099-.642-.099-.516 0-.988.164-1.416.494-.417.329-.626.855-.626 1.58v3.883h-1.777V9.242zm9.534 7.718c-.9 0-1.651-.175-2.255-.526-.603-.362-1.047-.84-1.332-1.432a4.567 4.567 0 01-.428-1.975c0-.8.164-1.502.493-2.106a3.462 3.462 0 011.4-1.382c.592-.33 1.262-.494 2.007-.494 1.163 0 2.024.324 2.584.97.57.637.856 1.537.856 2.7 0 .296-.017.603-.05.92h-5.43c.12.67.356 1.153.708 1.45.362.296.86.443 1.497.443.526 0 .96-.044 1.3-.131a4.123 4.123 0 00.938-.362l.542 1.267c-.274.175-.647.329-1.119.46-.472.132-1.042.197-1.711.197zm1.596-4.558c.01-.68-.137-1.158-.444-1.432-.307-.285-.746-.428-1.316-.428-1.152 0-1.815.62-1.991 1.86h3.752z' fill='%23e1e3e9'/%3E%3Cg fill-rule='evenodd' stroke-width='1.036'%3E%3Cpath d='M8.166 16.146l-.002.002a1.54 1.54 0 01-2.009 0l-.002-.002-.043-.034-.002-.002-.199-.162H4.377a.657.657 0 00-.659.659v1.84a.657.657 0 00.659.659h5.565a.657.657 0 00.659-.659v-1.84a.657.657 0 00-.659-.659H8.411l-.202.164zm-1.121-.905a.29.29 0 00.113.023.286.286 0 00.189-.07l.077-.063c.634-.508 4.672-3.743 4.672-7.575 0-2.55-2.215-4.625-4.938-4.625S2.221 5.006 2.221 7.556c0 3.225 2.86 6.027 4.144 7.137h.004l.04.038.484.4.077.063a.628.628 0 00.074.047zm-2.52-.548a16.898 16.898 0 01-1.183-1.315C2.187 11.942.967 9.897.967 7.555c0-3.319 2.855-5.88 6.192-5.88 3.338 0 6.193 2.561 6.193 5.881 0 2.34-1.22 4.387-2.376 5.822a16.898 16.898 0 01-1.182 1.315h.15a1.912 1.912 0 011.914 1.914v1.84a1.912 1.912 0 01-1.914 1.914H4.377a1.912 1.912 0 01-1.914-1.914v-1.84a1.912 1.912 0 011.914-1.914zm3.82-6.935c0 .692-.55 1.222-1.187 1.222s-1.185-.529-1.185-1.222.548-1.222 1.185-1.222c.638 0 1.186.529 1.186 1.222zm-1.186 2.477c1.348 0 2.442-1.11 2.442-2.478S8.507 5.28 7.159 5.28 4.72 6.39 4.72 7.758s1.092 2.477 2.44 2.477zm2.048 7.71H5.114v-.838h4.093z' fill='%23000' fill-opacity='.4'/%3E%3Cpath d='M2.222 7.555c0-2.55 2.214-4.625 4.937-4.625 2.723 0 4.938 2.075 4.938 4.625 0 3.832-4.038 7.068-4.672 7.575l-.077.063a.286.286 0 01-.189.07.286.286 0 01-.188-.07l-.077-.063c-.634-.507-4.672-3.743-4.672-7.575zm4.937 2.68c1.348 0 2.442-1.11 2.442-2.478S8.507 5.28 7.159 5.28 4.72 6.39 4.72 7.758s1.092 2.477 2.44 2.477z' fill='%23e1e3e9'/%3E%3Cpath d='M4.377 15.948a.657.657 0 00-.659.659v1.84a.657.657 0 00.659.659h5.565a.657.657 0 00.659-.659v-1.84a.657.657 0 00-.659-.659zm4.83 1.16H5.114v.838h4.093z' fill='%23fff'/%3E%3C/g%3E%3C/svg%3E")
+}
+
+a.mapboxgl-ctrl-logo.mapboxgl-compact,
+a.maplibregl-ctrl-logo.maplibregl-compact{
+    width:14px
+}
+
+@media (-ms-high-contrast:active) {
+    a.mapboxgl-ctrl-logo,
+    a.maplibregl-ctrl-logo {
+        background-color:transparent;
+        background-image:url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='88' height='23' fill='none'%3E%3Cpath d='M17.408 16.796h-1.827l2.501-12.095h.198l3.324 6.533.988 2.19.988-2.19 3.258-6.533h.181l2.6 12.095h-1.81l-1.218-5.644-.362-1.71-.658 1.71-2.929 5.644h-.098l-2.914-5.644-.757-1.71-.345 1.71zm1.958-3.42l-.726 3.663a1.255 1.255 0 01-1.232 1.011h-1.827a1.255 1.255 0 01-1.229-1.509l2.501-12.095a1.255 1.255 0 011.23-1.001h.197a1.255 1.255 0 011.12.685l3.19 6.273 3.125-6.263a1.255 1.255 0 011.123-.695h.181a1.255 1.255 0 011.227.991l1.443 6.71a5.11 5.11 0 01.314-.787l.009-.016a4.623 4.623 0 011.777-1.887c.782-.46 1.668-.667 2.611-.667a4.548 4.548 0 011.7.32l.306.134c.21-.16.474-.256.759-.256h1.694a1.255 1.255 0 011.212.925 1.255 1.255 0 011.212-.925h1.711c.284 0 .545.094.755.252.613-.3 1.312-.45 2.075-.45 1.356 0 2.557.445 3.482 1.4.314.319.566.676.763 1.064V4.701a1.255 1.255 0 011.255-1.255h1.86A1.255 1.255 0 0154.44 4.7v9.194h2.217c.19 0 .37.043.532.118v-4.77c0-.356.147-.678.385-.906a2.416 2.416 0 01-.682-1.71c0-.665.267-1.253.735-1.7a2.448 2.448 0 011.722-.674 2.43 2.43 0 011.705.675c.211.2.381.43.504.683V4.7a1.255 1.255 0 011.255-1.255h1.744A1.255 1.255 0 0165.812 4.7v3.335a4.76 4.76 0 011.526-.246c.938 0 1.817.214 2.59.69a4.47 4.47 0 011.67 1.743v-.98a1.255 1.255 0 011.256-1.256h1.777c.233 0 .451.064.639.174a3.407 3.407 0 011.567-.372c.346 0 .861.02 1.285.232a1.255 1.255 0 01.689 1.004 4.73 4.73 0 01.853-.588c.795-.44 1.675-.647 2.61-.647 1.385 0 2.65.39 3.525 1.396.836.938 1.168 2.173 1.168 3.528 0 .343-.02.694-.056 1.051a1.255 1.255 0 01-.947 1.09l.408.952a1.255 1.255 0 01-.477 1.552c-.418.268-.92.463-1.458.612-.613.171-1.304.244-2.049.244-1.06 0-2.043-.207-2.886-.698l-.015-.008c-.798-.48-1.419-1.135-1.818-1.963l-.004-.008a5.815 5.815 0 01-.548-2.512c0-.286.017-.567.053-.843a1.255 1.255 0 01-.333-.086l-.166-.004c-.223 0-.426.062-.643.228-.03.024-.142.139-.142.59v3.883a1.255 1.255 0 01-1.256 1.256h-1.777a1.255 1.255 0 01-1.256-1.256V15.69l-.032.057a4.778 4.778 0 01-1.86 1.833 5.04 5.04 0 01-2.484.634 4.47 4.47 0 01-1.935-.424 1.252 1.252 0 01-.764.258h-1.71a1.255 1.255 0 01-1.256-1.255V7.687a2.402 2.402 0 01-.428.625c.253.23.412.561.412.93v7.553a1.255 1.255 0 01-1.256 1.255h-1.843a1.25 1.25 0 01-.894-.373c-.228.23-.544.373-.894.373H51.32a1.255 1.255 0 01-1.256-1.255v-1.251l-.061.117a4.703 4.703 0 01-1.782 1.884 4.767 4.767 0 01-2.485.67 5.6 5.6 0 01-1.485-.188l.009 2.764a1.255 1.255 0 01-1.255 1.259h-1.729a1.255 1.255 0 01-1.255-1.255v-3.537a1.255 1.255 0 01-1.167.793h-1.679a1.25 1.25 0 01-.77-.263 4.47 4.47 0 01-1.945.429c-.885 0-1.724-.21-2.495-.632l-.017-.01a4.983 4.983 0 01-1.081-.836 1.255 1.255 0 01-1.254 1.312h-1.81a1.255 1.255 0 01-1.228-.99l-.782-3.625-2.044 3.939a1.255 1.255 0 01-1.115.676h-.098a1.255 1.255 0 01-1.116-.68l-2.061-3.994zM35.92 16.63l.207-.114.223-.15c.329-.237.574-.499.735-.785l.061-.118.033 1.332h1.678V9.242h-1.694l-.033 1.267c-.088-.22-.264-.438-.526-.658l-.032-.028a3.16 3.16 0 00-.668-.428l-.27-.12a3.293 3.293 0 00-1.235-.23c-.757 0-1.415.163-1.974.493a3.36 3.36 0 00-1.3 1.382c-.297.593-.444 1.284-.444 2.074 0 .8.17 1.503.51 2.107a3.795 3.795 0 001.382 1.381 3.883 3.883 0 001.893.477c.53 0 1.015-.11 1.455-.33zm-2.789-5.38c-.384.45-.575 1.038-.575 1.762 0 .735.186 1.332.559 1.794.384.45.933.675 1.645.675a2.25 2.25 0 00.934-.19 2.17 2.17 0 00.468-.29l.178-.161a2.163 2.163 0 00.397-.561c.163-.333.244-.717.244-1.15v-.115c0-.472-.098-.894-.296-1.267l-.043-.077a2.211 2.211 0 00-.633-.709l-.13-.086-.047-.028a2.099 2.099 0 00-1.073-.285c-.702 0-1.244.231-1.629.692zm2.316 2.706c.163-.17.28-.407.28-.83v-.114c0-.292-.06-.508-.15-.68a.958.958 0 00-.353-.389.851.851 0 00-.464-.127c-.4 0-.56.114-.664.239l-.01.012c-.148.174-.275.45-.275.945 0 .506.122.801.27.99.097.11.266.224.68.224.303 0 .504-.09.687-.269zm7.545 1.705a2.626 2.626 0 00.331.423c.213.22.464.402.755.548l.173.074c.433.17.93.255 1.49.255.68 0 1.295-.165 1.844-.493a3.447 3.447 0 001.316-1.4c.329-.603.493-1.299.493-2.089 0-1.273-.33-2.243-.988-2.913-.658-.68-1.52-1.02-2.584-1.02-.598 0-1.124.115-1.575.347a2.807 2.807 0 00-.415.262l-.199.166a3.35 3.35 0 00-.64.82V9.242h-1.712v11.553h1.729l-.017-5.134zm.53-1.138c.137.193.297.36.48.5l.155.11.053.034c.34.197.713.297 1.119.297.714 0 1.262-.225 1.645-.675.385-.46.576-1.048.576-1.762 0-.746-.192-1.338-.576-1.777-.372-.45-.92-.675-1.645-.675-.29 0-.569.053-.835.16a2.366 2.366 0 00-.284.136 1.99 1.99 0 00-.363.254 2.237 2.237 0 00-.46.569l-.082.162a2.56 2.56 0 00-.213 1.072v.115c0 .471.098.894.296 1.267l.135.211zm.964-.818a1.11 1.11 0 00.367.385.937.937 0 00.476.118c.423 0 .59-.117.687-.23.159-.194.28-.478.28-.95 0-.53-.133-.8-.266-.952l-.021-.025c-.078-.094-.231-.221-.68-.221a.995.995 0 00-.503.135l-.012.007a.859.859 0 00-.335.343c-.073.133-.132.324-.132.614v.115a1.43 1.43 0 00.14.66zm15.7-6.222c.232-.23.346-.516.346-.856a1.053 1.053 0 00-.345-.79 1.175 1.175 0 00-.84-.329c-.34 0-.625.11-.855.33a1.053 1.053 0 00-.346.79c0 .34.115.625.346.855.23.23.516.346.856.346.34 0 .62-.115.839-.346zm4.337 9.314l.033-1.332c.128.269.324.518.59.747l.098.081a3.727 3.727 0 00.316.224l.223.122a3.21 3.21 0 001.44.322 3.785 3.785 0 001.875-.477 3.52 3.52 0 001.382-1.366c.352-.593.526-1.29.526-2.09 0-.79-.147-1.48-.444-2.073a3.235 3.235 0 00-1.283-1.399c-.549-.34-1.195-.51-1.942-.51a3.476 3.476 0 00-1.527.344l-.086.043-.165.09a3.412 3.412 0 00-.33.214c-.288.21-.507.446-.656.707a1.893 1.893 0 00-.099.198l.082-1.283V4.701h-1.744v12.095zm.473-2.509a2.482 2.482 0 00.566.7c.078.065.159.125.245.18l.144.08a2.105 2.105 0 00.975.232c.713 0 1.262-.225 1.645-.675.384-.46.576-1.053.576-1.778 0-.734-.192-1.327-.576-1.777-.373-.46-.921-.692-1.645-.692a2.18 2.18 0 00-1.015.235c-.147.075-.285.17-.415.282l-.15.142a2.086 2.086 0 00-.42.594c-.149.32-.223.685-.223 1.1v.115c0 .47.097.89.293 1.26zm2.616-.293c.157-.191.28-.479.28-.967 0-.51-.13-.79-.276-.961l-.021-.026c-.082-.1-.232-.225-.67-.225a.868.868 0 00-.681.279l-.012.011c-.154.155-.274.38-.274.807v.115c0 .285.057.499.144.669a1.13 1.13 0 00.367.405c.137.082.28.123.455.123.423 0 .59-.118.686-.23zm8.266-3.013c.23-.087.472-.134.724-.14l.069-.002c.329 0 .542.033.642.099l.247-1.794c-.13-.066-.37-.099-.717-.099a2.3 2.3 0 00-.545.063 2.086 2.086 0 00-.411.148 2.18 2.18 0 00-.4.249 2.482 2.482 0 00-.485.499 2.659 2.659 0 00-.32.581l-.05.137v-1.48h-1.778v7.553h1.777v-3.884c0-.364.053-.678.159-.943a1.49 1.49 0 01.466-.636 2.52 2.52 0 01.399-.253 2.19 2.19 0 01.224-.099zm9.784 2.656l.05-.922c0-1.162-.285-2.062-.856-2.698-.559-.647-1.42-.97-2.584-.97-.746 0-1.415.163-2.007.493a3.462 3.462 0 00-1.4 1.382c-.329.604-.493 1.306-.493 2.106 0 .714.143 1.371.428 1.975.285.593.73 1.07 1.332 1.432.604.351 1.355.526 2.255.526.649 0 1.204-.062 1.668-.185l.044-.012.135-.04c.409-.122.736-.263.984-.421l-.542-1.267c-.2.108-.415.199-.642.274l-.297.087c-.34.088-.773.131-1.3.131-.636 0-1.135-.147-1.497-.444a1.573 1.573 0 01-.192-.193c-.244-.294-.415-.705-.512-1.234l-.004-.021h5.43zm-5.427-1.256l-.003.022h3.752v-.138c-.007-.485-.104-.857-.288-1.118a1.056 1.056 0 00-.156-.176c-.307-.285-.746-.428-1.316-.428-.657 0-1.155.202-1.494.604-.253.3-.417.712-.494 1.234zm-27.053 2.77V4.7h-1.86v12.095h5.333V15.15zm7.103-5.908v7.553h-1.843V9.242h1.843z' fill='%23000' fill-opacity='.4' fill-rule='evenodd'/%3E%3Cpath d='M19.63 11.151l-.757-1.71-.345 1.71-1.12 5.644h-1.827L18.083 4.7h.197l3.325 6.533.988 2.19.988-2.19L26.839 4.7h.181l2.6 12.095h-1.81l-1.218-5.644-.362-1.71-.658 1.71-2.93 5.644h-.098l-2.913-5.644zm14.836 5.81c-.68 0-1.311-.16-1.893-.478a3.795 3.795 0 01-1.381-1.382c-.34-.604-.51-1.306-.51-2.106 0-.79.147-1.482.444-2.074a3.364 3.364 0 011.3-1.382c.559-.33 1.217-.494 1.974-.494a3.293 3.293 0 011.234.231 3.341 3.341 0 01.97.575c.264.22.44.439.527.659l.033-1.267h1.694v7.553H37.18l-.033-1.332c-.186.395-.526.746-1.02 1.053a3.167 3.167 0 01-1.662.444zm.296-1.482c.626 0 1.152-.214 1.58-.642.428-.44.642-1.01.642-1.711v-.115c0-.472-.098-.894-.296-1.267a2.211 2.211 0 00-.807-.872 2.098 2.098 0 00-1.119-.313c-.702 0-1.245.231-1.629.692-.384.45-.575 1.037-.575 1.76 0 .736.186 1.333.559 1.795.384.45.933.675 1.645.675zm6.521-6.237h1.711v1.4c.604-1.065 1.547-1.597 2.83-1.597 1.064 0 1.926.34 2.584 1.02.659.67.988 1.641.988 2.914 0 .79-.164 1.487-.493 2.09a3.456 3.456 0 01-1.316 1.399 3.51 3.51 0 01-1.844.493c-.636 0-1.19-.11-1.662-.329a2.665 2.665 0 01-1.086-.97l.017 5.134h-1.728V9.242zm4.048 6.22c.714 0 1.262-.224 1.645-.674.385-.46.576-1.048.576-1.762 0-.746-.192-1.338-.576-1.777-.372-.45-.92-.675-1.645-.675-.395 0-.768.098-1.12.296-.34.187-.613.46-.822.823-.197.351-.296.763-.296 1.234v.115c0 .472.098.894.296 1.267.209.362.483.647.823.855.34.197.713.297 1.119.297z' fill='%23fff'/%3E%3Cpath d='M51.325 4.7h1.86v10.45h3.473v1.646h-5.333zm7.12 4.542h1.843v7.553h-1.843zm.905-1.415a1.159 1.159 0 01-.856-.346 1.165 1.165 0 01-.346-.856 1.053 1.053 0 01.346-.79c.23-.219.516-.329.856-.329.329 0 .609.11.839.33a1.053 1.053 0 01.345.79 1.159 1.159 0 01-.345.855c-.22.23-.5.346-.84.346zm7.875 9.133a3.167 3.167 0 01-1.662-.444c-.482-.307-.817-.658-1.004-1.053l-.033 1.332h-1.71V4.701h1.743v4.657l-.082 1.283c.186-.438.548-.812 1.086-1.119a3.486 3.486 0 011.778-.477c.746 0 1.393.17 1.942.51a3.235 3.235 0 011.283 1.4c.297.592.444 1.282.444 2.072 0 .8-.175 1.498-.526 2.09a3.52 3.52 0 01-1.382 1.366 3.785 3.785 0 01-1.876.477zm-.296-1.481c.713 0 1.26-.225 1.645-.675.384-.46.577-1.053.577-1.778 0-.734-.193-1.327-.577-1.776-.373-.46-.921-.692-1.645-.692a2.115 2.115 0 00-1.58.659c-.428.428-.642.992-.642 1.694v.115c0 .473.098.895.296 1.267a2.385 2.385 0 00.807.872 2.1 2.1 0 001.119.313zm5.927-6.237h1.777v1.481c.176-.505.46-.91.856-1.217a2.14 2.14 0 011.349-.46c.351 0 .593.032.724.098l-.247 1.794c-.099-.066-.313-.099-.642-.099-.516 0-.988.164-1.416.494-.417.329-.626.855-.626 1.58v3.883h-1.777V9.242zm9.534 7.718c-.9 0-1.651-.175-2.255-.526-.603-.362-1.047-.84-1.332-1.432a4.567 4.567 0 01-.428-1.975c0-.8.164-1.502.493-2.106a3.462 3.462 0 011.4-1.382c.592-.33 1.262-.494 2.007-.494 1.163 0 2.024.3242.584.97.57.637.856 1.537.856 2.7 0 .296-.017.603-.05.92h-5.43c.12.67.356 1.153.708 1.45.362.296.86.443 1.497.443.526 0 .96-.044 1.3-.131a4.123 4.123 0 00.938-.362l.542 1.267c-.274.175-.647.329-1.119.46-.472.132-1.042.197-1.711.197zm1.596-4.558c.01-.68-.137-1.158-.444-1.432-.307-.285-.746-.428-1.316-.428-1.152 0-1.815.62-1.991 1.86h3.752z' fill='%23e1e3e9'/%3E%3Cg fill-rule='evenodd' stroke-width='1.036'%3E%3Cpath d='M8.166 16.146l-.002.002a1.54 1.54 0 01-2.009 0l-.002-.002-.043-.034-.002-.002-.199-.162H4.377a.657.657 0 00-.659.659v1.84a.657.657 0 00.659.659h5.565a.657.657 0 00.659-.659v-1.84a.657.657 0 00-.659-.659H8.411l-.202.164zm-1.121-.905a.29.29 0 00.113.023.286.286 0 00.189-.07l.077-.063c.634-.508 4.672-3.743 4.672-7.575 0-2.55-2.215-4.625-4.938-4.625S2.221 5.006 2.221 7.556c0 3.225 2.86 6.027 4.144 7.137h.004l.04.038.484.4.077.063a.628.628 0 00.074.047zm-2.52-.548a16.898 16.898 0 01-1.183-1.315C2.187 11.942.967 9.897.967 7.555c0-3.319 2.855-5.88 6.192-5.88 3.338 0 6.193 2.561 6.193 5.881 0 2.34-1.22 4.387-2.376 5.822a16.898 16.898 0 01-1.182 1.315h.15a1.912 1.912 0 011.914 1.914v1.84a1.912 1.912 0 01-1.914 1.914H4.377a1.912 1.912 0 01-1.914-1.914v-1.84a1.912 1.912 0 011.914-1.914zm3.82-6.935c0 .692-.55 1.222-1.187 1.222s-1.185-.529-1.185-1.222.548-1.222 1.185-1.222c.638 0 1.186.529 1.186 1.222zm-1.186 2.477c1.348 0 2.442-1.11 2.442-2.478S8.507 5.28 7.159 5.28 4.72 6.39 4.72 7.758s1.092 2.477 2.44 2.477zm2.048 7.71H5.114v-.838h4.093z' fill='%23000' fill-opacity='.4'/%3E%3Cpath d='M2.222 7.555c0-2.55 2.214-4.625 4.937-4.625 2.723 0 4.938 2.075 4.938 4.625 0 3.832-4.038 7.068-4.672 7.575l-.077.063a.286.286 0 01-.189.07.286.286 0 01-.188-.07l-.077-.063c-.634-.507-4.672-3.743-4.672-7.575zm4.937 2.68c1.348 0 2.442-1.11 2.442-2.478S8.507 5.28 7.159 5.28 4.72 6.39 4.72 7.758s1.092 2.477 2.44 2.477z' fill='%23e1e3e9'/%3E%3Cpath d='M4.377 15.948a.657.657 0 00-.659.659v1.84a.657.657 0 00.659.659h5.565a.657.657 0 00.659-.659v-1.84a.657.657 0 00-.659-.659zm4.83 1.16H5.114v.838h4.093z' fill='%23fff'/%3E%3C/g%3E%3C/svg%3E")
+    }
+}
+
+@media (-ms-high-contrast:black-on-white) {
+    a.mapboxgl-ctrl-logo,
+    a.maplibregl-ctrl-logo {
+        background-image:url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='88' height='23' fill='none'%3E%3Cpath d='M17.408 16.796h-1.827l2.501-12.095h.198l3.324 6.533.988 2.19.988-2.19 3.258-6.533h.181l2.6 12.095h-1.81l-1.218-5.644-.362-1.71-.658 1.71-2.929 5.644h-.098l-2.914-5.644-.757-1.71-.345 1.71zm1.958-3.42l-.726 3.663a1.255 1.255 0 01-1.232 1.011h-1.827a1.255 1.255 0 01-1.229-1.509l2.501-12.095a1.255 1.255 0 011.23-1.001h.197a1.255 1.255 0 011.12.685l3.19 6.273 3.125-6.263a1.255 1.255 0 011.123-.695h.181a1.255 1.255 0 011.227.991l1.443 6.71a5.11 5.11 0 01.314-.787l.009-.016a4.623 4.623 0 011.777-1.887c.782-.46 1.668-.667 2.611-.667a4.548 4.548 0 011.7.32l.306.134c.21-.16.474-.256.759-.256h1.694a1.255 1.255 0 011.212.925 1.255 1.255 0 011.212-.925h1.711c.284 0 .545.094.755.252.613-.3 1.312-.45 2.075-.45 1.356 0 2.557.445 3.482 1.4.314.319.566.676.763 1.064V4.701a1.255 1.255 0 011.255-1.255h1.86A1.255 1.255 0 0154.44 4.7v9.194h2.217c.19 0 .37.043.532.118v-4.77c0-.356.147-.678.385-.906a2.416 2.416 0 01-.682-1.71c0-.665.267-1.253.735-1.7a2.448 2.448 0 011.722-.674 2.43 2.43 0 011.705.675c.211.2.381.43.504.683V4.7a1.255 1.255 0 011.255-1.255h1.744A1.255 1.255 0 0165.812 4.7v3.335a4.76 4.76 0 011.526-.246c.938 0 1.817.214 2.59.69a4.47 4.47 0 011.67 1.743v-.98a1.255 1.255 0 011.256-1.256h1.777c.233 0 .451.064.639.174a3.407 3.407 0 011.567-.372c.346 0 .861.02 1.285.232a1.255 1.255 0 01.689 1.004 4.73 4.73 0 01.853-.588c.795-.44 1.675-.647 2.61-.647 1.385 0 2.65.39 3.525 1.396.836.938 1.168 2.173 1.168 3.528 0 .343-.02.694-.056 1.051a1.255 1.255 0 01-.947 1.09l.408.952a1.255 1.255 0 01-.477 1.552c-.418.268-.92.463-1.458.612-.613.171-1.304.244-2.049.244-1.06 0-2.043-.207-2.886-.698l-.015-.008c-.798-.48-1.419-1.135-1.818-1.963l-.004-.008a5.815 5.815 0 01-.548-2.512c0-.286.017-.567.053-.843a1.255 1.255 0 01-.333-.086l-.166-.004c-.223 0-.426.062-.643.228-.03.024-.142.139-.142.59v3.883a1.255 1.255 0 01-1.256 1.256h-1.777a1.255 1.255 0 01-1.256-1.256V15.69l-.032.057a4.778 4.778 0 01-1.86 1.833 5.04 5.04 0 01-2.484.634 4.47 4.47 0 01-1.935-.424 1.252 1.252 0 01-.764.258h-1.71a1.255 1.255 0 01-1.256-1.255V7.687a2.402 2.402 0 01-.428.625c.253.23.412.561.412.93v7.553a1.255 1.255 0 01-1.256 1.255h-1.843a1.25 1.25 0 01-.894-.373c-.228.23-.544.373-.894.373H51.32a1.255 1.255 0 01-1.256-1.255v-1.251l-.061.117a4.703 4.703 0 01-1.782 1.884 4.767 4.767 0 01-2.485.67 5.6 5.6 0 01-1.485-.188l.009 2.764a1.255 1.255 0 01-1.255 1.259h-1.729a1.255 1.255 0 01-1.255-1.255v-3.537a1.255 1.255 0 01-1.167.793h-1.679a1.25 1.25 0 01-.77-.263 4.47 4.47 0 01-1.945.429c-.885 0-1.724-.21-2.495-.632l-.017-.01a4.983 4.983 0 01-1.081-.836 1.255 1.255 0 01-1.254 1.312h-1.81a1.255 1.255 0 01-1.228-.99l-.782-3.625-2.044 3.939a1.255 1.255 0 01-1.115.676h-.098a1.255 1.255 0 01-1.116-.68l-2.061-3.994zM35.92 16.63l.207-.114.223-.15c.329-.237.574-.499.735-.785l.061-.118.033 1.332h1.678V9.242h-1.694l-.033 1.267c-.088-.22-.264-.438-.526-.658l-.032-.028a3.16 3.16 0 00-.668-.428l-.27-.12a3.293 3.293 0 00-1.235-.23c-.757 0-1.415.163-1.974.493a3.36 3.36 0 00-1.3 1.382c-.297.593-.444 1.284-.444 2.074 0 .8.17 1.503.51 2.107a3.795 3.795 0 001.382 1.381 3.883 3.883 0 001.893.477c.53 0 1.015-.11 1.455-.33zm-2.789-5.38c-.384.45-.575 1.038-.575 1.762 0 .735.186 1.332.559 1.794.384.45.933.675 1.645.675a2.25 2.25 0 00.934-.19 2.17 2.17 0 00.468-.29l.178-.161a2.163 2.163 0 00.397-.561c.163-.333.244-.717.244-1.15v-.115c0-.472-.098-.894-.296-1.267l-.043-.077a2.211 2.211 0 00-.633-.709l-.13-.086-.047-.028a2.099 2.099 0 00-1.073-.285c-.702 0-1.244.231-1.629.692zm2.316 2.706c.163-.17.28-.407.28-.83v-.114c0-.292-.06-.508-.15-.68a.958.958 0 00-.353-.389.851.851 0 00-.464-.127c-.4 0-.56.114-.664.239l-.01.012c-.148.174-.275.45-.275.945 0 .506.122.801.27.99.097.11.266.224.68.224.303 0 .504-.09.687-.269zm7.545 1.705a2.626 2.626 0 00.331.423c.213.22.464.402.755.548l.173.074c.433.17.93.255 1.49.255.68 0 1.295-.165 1.844-.493a3.447 3.447 0 001.316-1.4c.329-.603.493-1.299.493-2.089 0-1.273-.33-2.243-.988-2.913-.658-.68-1.52-1.02-2.584-1.02-.598 0-1.124.115-1.575.347a2.807 2.807 0 00-.415.262l-.199.166a3.35 3.35 0 00-.64.82V9.242h-1.712v11.553h1.729l-.017-5.134zm.53-1.138c.137.193.297.36.48.5l.155.11.053.034c.34.197.713.297 1.119.297.714 0 1.262-.225 1.645-.675.385-.46.576-1.048.576-1.762 0-.746-.192-1.338-.576-1.777-.372-.45-.92-.675-1.645-.675-.29 0-.569.053-.835.16a2.366 2.366 0 00-.284.136 1.99 1.99 0 00-.363.254 2.237 2.237 0 00-.46.569l-.082.162a2.56 2.56 0 00-.213 1.072v.115c0 .471.098.894.296 1.267l.135.211zm.964-.818a1.11 1.11 0 00.367.385.937.937 0 00.476.118c.423 0 .59-.117.687-.23.159-.194.28-.478.28-.95 0-.53-.133-.8-.266-.952l-.021-.025c-.078-.094-.231-.221-.68-.221a.995.995 0 00-.503.135l-.012.007a.859.859 0 00-.335.343c-.073.133-.132.324-.132.614v.115a1.43 1.43 0 00.14.66zm15.7-6.222c.232-.23.346-.516.346-.856a1.053 1.053 0 00-.345-.79 1.175 1.175 0 00-.84-.329c-.34 0-.625.11-.855.33a1.053 1.053 0 00-.346.79c0 .34.115.625.346.855.23.23.516.346.856.346.34 0 .62-.115.839-.346zm4.337 9.314l.033-1.332c.128.269.324.518.59.747l.098.081a3.727 3.727 0 00.316.224l.223.122a3.21 3.21 0 001.44.322 3.785 3.785 0 001.875-.477 3.52 3.52 0 001.382-1.366c.352-.593.526-1.29.526-2.09 0-.79-.147-1.48-.444-2.073a3.235 3.235 0 00-1.283-1.399c-.549-.34-1.195-.51-1.942-.51a3.476 3.476 0 00-1.527.344l-.086.043-.165.09a3.412 3.412 0 00-.33.214c-.288.21-.507.446-.656.707a1.893 1.893 0 00-.099.198l.082-1.283V4.701h-1.744v12.095zm.473-2.509a2.482 2.482 0 00.566.7c.078.065.159.125.245.18l.144.08a2.105 2.105 0 00.975.232c.713 0 1.262-.225 1.645-.675.384-.46.576-1.053.576-1.778 0-.734-.192-1.327-.576-1.777-.373-.46-.921-.692-1.645-.692a2.18 2.18 0 00-1.015.235c-.147.075-.285.17-.415.282l-.15.142a2.086 2.086 0 00-.42.594c-.149.32-.223.685-.223 1.1v.115c0 .47.097.89.293 1.26zm2.616-.293c.157-.191.28-.479.28-.967 0-.51-.13-.79-.276-.961l-.021-.026c-.082-.1-.232-.225-.67-.225a.868.868 0 00-.681.279l-.012.011c-.154.155-.274.38-.274.807v.115c0 .285.057.499.144.669a1.13 1.13 0 00.367.405c.137.082.28.123.455.123.423 0 .59-.118.686-.23zm8.266-3.013c.23-.087.472-.134.724-.14l.069-.002c.329 0 .542.033.642.099l.247-1.794c-.13-.066-.37-.099-.717-.099a2.3 2.3 0 00-.545.063 2.086 2.086 0 00-.411.148 2.18 2.18 0 00-.4.249 2.482 2.482 0 00-.485.499 2.659 2.659 0 00-.32.581l-.05.137v-1.48h-1.778v7.553h1.777v-3.884c0-.364.053-.678.159-.943a1.49 1.49 0 01.466-.636 2.52 2.52 0 01.399-.253 2.19 2.19 0 01.224-.099zm9.784 2.656l.05-.922c0-1.162-.285-2.062-.856-2.698-.559-.647-1.42-.97-2.584-.97-.746 0-1.415.163-2.007.493a3.462 3.462 0 00-1.4 1.382c-.329.604-.493 1.306-.493 2.106 0 .714.143 1.371.428 1.975.285.593.73 1.07 1.332 1.432.604.351 1.355.526 2.255.526.649 0 1.204-.062 1.668-.185l.044-.012.135-.04c.409-.122.736-.263.984-.421l-.542-1.267c-.2.108-.415.199-.642.274l-.297.087c-.34.088-.773.131-1.3.131-.636 0-1.135-.147-1.497-.444a1.573 1.573 0 01-.192-.193c-.244-.294-.415-.705-.512-1.234l-.004-.021h5.43zm-5.427-1.256l-.003.022h3.752v-.138c-.007-.485-.104-.857-.288-1.118a1.056 1.056 0 00-.156-.176c-.307-.285-.746-.428-1.316-.428-.657 0-1.155.202-1.494.604-.253.3-.417.712-.494 1.234zm-27.053 2.77V4.7h-1.86v12.095h5.333V15.15zm7.103-5.908v7.553h-1.843V9.242h1.843z' fill='%23000' fill-opacity='.4' fill-rule='evenodd'/%3E%3Cpath d='M19.63 11.151l-.757-1.71-.345 1.71-1.12 5.644h-1.827L18.083 4.7h.197l3.325 6.533.988 2.19.988-2.19L26.839 4.7h.181l2.6 12.095h-1.81l-1.218-5.644-.362-1.71-.658 1.71-2.93 5.644h-.098l-2.913-5.644zm14.836 5.81c-.68 0-1.311-.16-1.893-.478a3.795 3.795 0 01-1.381-1.382c-.34-.604-.51-1.306-.51-2.106 0-.79.147-1.482.444-2.074a3.364 3.364 0 011.3-1.382c.559-.33 1.217-.494 1.974-.494a3.293 3.293 0 011.234.231 3.341 3.341 0 01.97.575c.264.22.44.439.527.659l.033-1.267h1.694v7.553H37.18l-.033-1.332c-.186.395-.526.746-1.02 1.053a3.167 3.167 0 01-1.662.444zm.296-1.482c.626 0 1.152-.214 1.58-.642.428-.44.642-1.01.642-1.711v-.115c0-.472-.098-.894-.296-1.267a2.211 2.211 0 00-.807-.872 2.098 2.098 0 00-1.119-.313c-.702 0-1.245.231-1.629.692-.384.45-.575 1.037-.575 1.76 0 .736.186 1.333.559 1.795.384.45.933.675 1.645.675zm6.521-6.237h1.711v1.4c.604-1.065 1.547-1.597 2.83-1.597 1.064 0 1.926.34 2.584 1.02.659.67.988 1.641.988 2.914 0 .79-.164 1.487-.493 2.09a3.456 3.456 0 01-1.316 1.399 3.51 3.51 0 01-1.844.493c-.636 0-1.19-.11-1.662-.329a2.665 2.665 0 01-1.086-.97l.017 5.134h-1.728V9.242zm4.048 6.22c.714 0 1.262-.224 1.645-.674.385-.46.576-1.048.576-1.762 0-.746-.192-1.338-.576-1.777-.372-.45-.92-.675-1.645-.675-.395 0-.768.098-1.12.296-.34.187-.613.46-.822.823-.197.351-.296.763-.296 1.234v.115c0 .472.098.894.296 1.267.209.362.483.647.823.855.34.197.713.297 1.119.297z' fill='%23fff'/%3E%3Cpath d='M51.325 4.7h1.86v10.45h3.473v1.646h-5.333zm7.12 4.542h1.843v7.553h-1.843zm.905-1.415a1.159 1.159 0 01-.856-.346 1.165 1.165 0 01-.346-.856 1.053 1.053 0 01.346-.79c.23-.219.516-.329.856-.329.329 0 .609.11.839.33a1.053 1.053 0 01.345.79 1.159 1.159 0 01-.345.855c-.22.23-.5.346-.84.346zm7.875 9.133a3.167 3.167 0 01-1.662-.444c-.482-.307-.817-.658-1.004-1.053l-.033 1.332h-1.71V4.701h1.743v4.657l-.082 1.283c.186-.438.548-.812 1.086-1.119a3.486 3.486 0 011.778-.477c.746 0 1.393.17 1.942.51a3.235 3.235 0 011.283 1.4c.297.592.444 1.282.444 2.072 0 .8-.175 1.498-.526 2.09a3.52 3.52 0 01-1.382 1.366 3.785 3.785 0 01-1.876.477zm-.296-1.481c.713 0 1.26-.225 1.645-.675.384-.46.577-1.053.577-1.778 0-.734-.193-1.327-.577-1.776-.373-.46-.921-.692-1.645-.692a2.115 2.115 0 00-1.58.659c-.428.428-.642.992-.642 1.694v.115c0 .473.098.895.296 1.267a2.385 2.385 0 00.807.872 2.1 2.1 0 001.119.313zm5.927-6.237h1.777v1.481c.176-.505.46-.91.856-1.217a2.14 2.14 0 011.349-.46c.351 0 .593.032.724.098l-.247 1.794c-.099-.066-.313-.099-.642-.099-.516 0-.988.164-1.416.494-.417.329-.626.855-.626 1.58v3.883h-1.777V9.242zm9.534 7.718c-.9 0-1.651-.175-2.255-.526-.603-.362-1.047-.84-1.332-1.432a4.567 4.567 0 01-.428-1.975c0-.8.164-1.502.493-2.106a3.462 3.462 0 011.4-1.382c.592-.33 1.262-.494 2.007-.494 1.163 0 2.024.324 2.584.97.57.637.856 1.537.856 2.7 0 .296-.017.603-.05.92h-5.43c.12.67.356 1.153.708 1.45.362.296.86.443 1.497.443.526 0 .96-.044 1.3-.131a4.123 4.123 0 00.938-.362l.542 1.267c-.274.175-.647.329-1.119.46-.472.132-1.042.197-1.711.197zm1.596-4.558c.01-.68-.137-1.158-.444-1.432-.307-.285-.746-.428-1.316-.428-1.152 0-1.815.62-1.991 1.86h3.752z' fill='%23e1e3e9'/%3E%3Cg fill-rule='evenodd' stroke-width='1.036'%3E%3Cpath d='M8.166 16.146l-.002.002a1.54 1.54 0 01-2.009 0l-.002-.002-.043-.034-.002-.002-.199-.162H4.377a.657.657 0 00-.659.659v1.84a.657.657 0 00.659.659h5.565a.657.657 0 00.659-.659v-1.84a.657.657 0 00-.659-.659H8.411l-.202.164zm-1.121-.905a.29.29 0 00.113.023.286.286 0 00.189-.07l.077-.063c.634-.508 4.672-3.743 4.672-7.575 0-2.55-2.215-4.625-4.938-4.625S2.221 5.006 2.221 7.556c0 3.225 2.86 6.027 4.144 7.137h.004l.04.038.484.4.077.063a.628.628 0 00.074.047zm-2.52-.548a16.898 16.898 0 01-1.183-1.315C2.187 11.942.967 9.897.967 7.555c0-3.319 2.855-5.88 6.192-5.88 3.338 0 6.193 2.561 6.193 5.881 0 2.34-1.22 4.387-2.376 5.822a16.898 16.898 0 01-1.182 1.315h.15a1.912 1.912 0 011.914 1.914v1.84a1.912 1.912 0 01-1.914 1.914H4.377a1.912 1.912 0 01-1.914-1.914v-1.84a1.912 1.912 0 011.914-1.914zm3.82-6.935c0 .692-.55 1.222-1.187 1.222s-1.185-.529-1.185-1.222.548-1.222 1.185-1.222c.638 0 1.186.529 1.186 1.222zm-1.186 2.477c1.348 0 2.442-1.11 2.442-2.478S8.507 5.28 7.159 5.28 4.72 6.39 4.72 7.758s1.092 2.477 2.44 2.477zm2.048 7.71H5.114v-.838h4.093z' fill='%23000' fill-opacity='.4'/%3E%3Cpath d='M2.222 7.555c0-2.55 2.214-4.625 4.937-4.625 2.723 0 4.938 2.075 4.938 4.625 0 3.832-4.038 7.068-4.672 7.575l-.077.063a.286.286 0 01-.189.07.286.286 0 01-.188-.07l-.077-.063c-.634-.507-4.672-3.743-4.672-7.575zm4.937 2.68c1.348 0 2.442-1.11 2.442-2.478S8.507 5.28 7.159 5.28 4.72 6.39 4.72 7.758s1.092 2.477 2.44 2.477z' fill='%23e1e3e9'/%3E%3Cpath d='M4.377 15.948a.657.657 0 00-.659.659v1.84a.657.657 0 00.659.659h5.565a.657.657 0 00.659-.659v-1.84a.657.657 0 00-.659-.659zm4.83 1.16H5.114v.838h4.093z' fill='%23fff'/%3E%3C/g%3E%3C/svg%3E")
+    }
+}
+
+.mapboxgl-ctrl.mapboxgl-ctrl-attrib,
+.maplibregl-ctrl.maplibregl-ctrl-attrib {
+    padding:0 5px;background-color:hsla(0,0%,100%,.5);
+    margin:0
 }
 
 @media screen {
-    .mapboxgl-ctrl-attrib.mapboxgl-compact {
-        min-height: 20px;
-        padding: 0;
-        margin: 10px;
-        position: relative;
-        background-color: #fff;
-        border-radius: 3px 12px 12px 3px;
+    .mapboxgl-ctrl-attrib.mapboxgl-compact,
+    .maplibregl-ctrl-attrib.maplibregl-compact {
+        min-height:20px;
+        padding:2px 24px 2px 0;
+        margin:10px;
+        position:relative;
+        background-color:#fff;border-radius:12px
     }
-
-    .mapboxgl-ctrl-attrib.mapboxgl-compact:hover {
-        padding: 2px 24px 2px 4px;
-        visibility: visible;
-        margin-top: 6px;
+    
+    .mapboxgl-ctrl-attrib.mapboxgl-compact-show,
+    .maplibregl-ctrl-attrib.maplibregl-compact-show {
+        padding:2px 28px 2px 8px;visibility:visible
     }
-
-    .mapboxgl-ctrl-top-left > .mapboxgl-ctrl-attrib.mapboxgl-compact:hover,
-    .mapboxgl-ctrl-bottom-left > .mapboxgl-ctrl-attrib.mapboxgl-compact:hover {
-        padding: 2px 4px 2px 24px;
-        border-radius: 12px 3px 3px 12px;
+    
+    .mapboxgl-ctrl-bottom-left>.mapboxgl-ctrl-attrib.mapboxgl-compact-show,
+    .mapboxgl-ctrl-top-left>.mapboxgl-ctrl-attrib.mapboxgl-compact-show,
+    .maplibregl-ctrl-bottom-left>.maplibregl-ctrl-attrib.maplibregl-compact-show,
+    .maplibregl-ctrl-top-left>.maplibregl-ctrl-attrib.maplibregl-compact-show {
+        padding:2px 8px 2px 28px;border-radius:12px
     }
-
-    .mapboxgl-ctrl-attrib.mapboxgl-compact .mapboxgl-ctrl-attrib-inner {
-        display: none;
+    .mapboxgl-ctrl-attrib.mapboxgl-compact .mapboxgl-ctrl-attrib-inner,
+    .maplibregl-ctrl-attrib.maplibregl-compact .maplibregl-ctrl-attrib-inner {
+        display:none
     }
-
-    .mapboxgl-ctrl-attrib.mapboxgl-compact:hover .mapboxgl-ctrl-attrib-inner {
-        display: block;
+    
+    .mapboxgl-ctrl-attrib-button,
+    .maplibregl-ctrl-attrib-button {
+        display:none;
+        cursor:pointer;
+        position:absolute;
+        background-image:url("data:image/svg+xml;charset=utf-8,%3Csvg width='24' height='24' viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg' fill-rule='evenodd'%3E%3Cpath d='M4 10a6 6 0 1012 0 6 6 0 10-12 0m5-3a1 1 0 102 0 1 1 0 10-2 0m0 3a1 1 0 112 0v3a1 1 0 11-2 0'/%3E%3C/svg%3E");
+        background-color:hsla(0,0%,100%,.5);
+        width:24px;
+        height:24px;
+        box-sizing:border-box;
+        border-radius:12px;
+        outline:none;
+        top:0;
+        right:0;
+        border:0
     }
-
-    .mapboxgl-ctrl-attrib.mapboxgl-compact::after {
-        content: '';
-        cursor: pointer;
-        position: absolute;
-        background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg'%3E %3Cpath fill='%23333333' fill-rule='evenodd' d='M4,10a6,6 0 1,0 12,0a6,6 0 1,0 -12,0 M9,7a1,1 0 1,0 2,0a1,1 0 1,0 -2,0 M9,10a1,1 0 1,1 2,0l0,3a1,1 0 1,1 -2,0'/%3E %3C/svg%3E");
-        background-color: rgba(255, 255, 255, 0.5);
-        width: 24px;
-        height: 24px;
-        box-sizing: border-box;
-        border-radius: 12px;
+    
+    .mapboxgl-ctrl-bottom-left .mapboxgl-ctrl-attrib-button,
+    .mapboxgl-ctrl-top-left .mapboxgl-ctrl-attrib-button,
+    .maplibregl-ctrl-bottom-left .maplibregl-ctrl-attrib-button,
+    .maplibregl-ctrl-top-left .maplibregl-ctrl-attrib-button {
+        left:0
     }
-
-    .mapboxgl-ctrl-bottom-right > .mapboxgl-ctrl-attrib.mapboxgl-compact::after {
-        bottom: 0;
-        right: 0;
+    
+    .mapboxgl-ctrl-attrib.mapboxgl-compact-show .mapboxgl-ctrl-attrib-inner,
+    .mapboxgl-ctrl-attrib.mapboxgl-compact .mapboxgl-ctrl-attrib-button,
+    .maplibregl-ctrl-attrib.maplibregl-compact-show .maplibregl-ctrl-attrib-inner,
+    .maplibregl-ctrl-attrib.maplibregl-compact .maplibregl-ctrl-attrib-button {
+        display:block
     }
-
-    .mapboxgl-ctrl-top-right > .mapboxgl-ctrl-attrib.mapboxgl-compact::after {
-        top: 0;
-        right: 0;
+    
+    .mapboxgl-ctrl-attrib.mapboxgl-compact-show .mapboxgl-ctrl-attrib-button,
+    .maplibregl-ctrl-attrib.maplibregl-compact-show .maplibregl-ctrl-attrib-button {
+        background-color:rgba(0,0,0,.05)
     }
-
-    .mapboxgl-ctrl-top-left > .mapboxgl-ctrl-attrib.mapboxgl-compact::after {
-        top: 0;
-        left: 0;
+    
+    .mapboxgl-ctrl-bottom-right>.mapboxgl-ctrl-attrib.mapboxgl-compact:after,
+    .maplibregl-ctrl-bottom-right>.maplibregl-ctrl-attrib.maplibregl-compact:after {
+        bottom:0;
+        right:0
     }
-
-    .mapboxgl-ctrl-bottom-left > .mapboxgl-ctrl-attrib.mapboxgl-compact::after {
-        bottom: 0;
-        left: 0;
+    
+    .mapboxgl-ctrl-top-right>.mapboxgl-ctrl-attrib.mapboxgl-compact:after,
+    .maplibregl-ctrl-top-right>.maplibregl-ctrl-attrib.maplibregl-compact:after {
+        top:0;
+        right:0
+    }
+    
+    .mapboxgl-ctrl-top-left>.mapboxgl-ctrl-attrib.mapboxgl-compact:after,
+    .maplibregl-ctrl-top-left>.maplibregl-ctrl-attrib.maplibregl-compact:after {
+        top:0;
+        left:0
+    }
+    
+    .mapboxgl-ctrl-bottom-left>.mapboxgl-ctrl-attrib.mapboxgl-compact:after,
+    .maplibregl-ctrl-bottom-left>.maplibregl-ctrl-attrib.maplibregl-compact:after {
+        bottom:0;
+        left:0
     }
 }
 
-.mapboxgl-ctrl-attrib a {
-    color: rgba(0, 0, 0, 0.75);
-    text-decoration: none;
+@media screen and (-ms-high-contrast:active) {
+    .mapboxgl-ctrl-attrib.mapboxgl-compact:after,
+    .maplibregl-ctrl-attrib.maplibregl-compact:after {
+        background-image:url("data:image/svg+xml;charset=utf-8,%3Csvg width='24' height='24' viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg' fill-rule='evenodd' fill='%23fff'%3E%3Cpath d='M4 10a6 6 0 1012 0 6 6 0 10-12 0m5-3a1 1 0 102 0 1 1 0 10-2 0m0 3a1 1 0 112 0v3a1 1 0 11-2 0'/%3E%3C/svg%3E")
+    }
 }
 
-.mapboxgl-ctrl-attrib a:hover {
-    color: inherit;
-    text-decoration: underline;
+@media screen and (-ms-high-contrast:black-on-white) {
+    .mapboxgl-ctrl-attrib.mapboxgl-compact:after,
+    .maplibregl-ctrl-attrib.maplibregl-compact:after {
+        background-image:url("data:image/svg+xml;charset=utf-8,%3Csvg width='24' height='24' viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg' fill-rule='evenodd'%3E%3Cpath d='M4 10a6 6 0 1012 0 6 6 0 10-12 0m5-3a1 1 0 102 0 1 1 0 10-2 0m0 3a1 1 0 112 0v3a1 1 0 11-2 0'/%3E%3C/svg%3E")
+    }
 }
 
-/* stylelint-disable-next-line selector-class-pattern */
-.mapboxgl-ctrl-attrib .mapbox-improve-map {
-    font-weight: bold;
-    margin-left: 2px;
+.mapboxgl-ctrl-attrib a,
+.maplibregl-ctrl-attrib a {
+    color:rgba(0,0,0,.75);
+    text-decoration:none
 }
 
-.mapboxgl-attrib-empty {
-    display: none;
+.mapboxgl-ctrl-attrib a:hover,
+.maplibregl-ctrl-attrib a:hover {
+    color:inherit;
+    text-decoration:underline
 }
 
-.mapboxgl-ctrl-scale {
-    background-color: rgba(255, 255, 255, 0.75);
-    font-size: 10px;
-    border-width: medium 2px 2px;
-    border-style: none solid solid;
-    border-color: #333;
-    padding: 0 5px;
-    color: #333;
-    box-sizing: border-box;
+.mapboxgl-ctrl-attrib .mapbox-improve-map,
+.maplibregl-ctrl-attrib .mapbox-improve-map {
+    font-weight:700;
+    margin-left:2px
 }
 
-.mapboxgl-popup {
-    position: absolute;
-    top: 0;
-    left: 0;
-    display: -webkit-flex;
-    display: flex;
-    will-change: transform;
-    pointer-events: none;
+.mapboxgl-attrib-empty,
+.maplibregl-attrib-empty {
+    display:none
+}
+
+.mapboxgl-ctrl-scale,
+.maplibregl-ctrl-scale {
+    background-color:hsla(0,0%,100%,.75);
+    font-size:10px;
+    border:2px solid #333;
+    border-top:#333;padding:0 5px;
+    color:#333;
+    box-sizing:border-box
+}
+
+.mapboxgl-popup,
+.maplibregl-popup {
+    position:absolute;
+    top:0;
+    left:0;
+    display:-webkit-flex;
+    display:flex;
+    will-change:transform;
+    pointer-events:none
 }
 
 .mapboxgl-popup-anchor-top,
 .mapboxgl-popup-anchor-top-left,
-.mapboxgl-popup-anchor-top-right {
-    -webkit-flex-direction: column;
-    flex-direction: column;
+.mapboxgl-popup-anchor-top-right,
+.maplibregl-popup-anchor-top,
+.maplibregl-popup-anchor-top-left,
+.maplibregl-popup-anchor-top-right { 
+    -webkit-flex-direction:column; 
+    flex-direction:column 
 }
 
 .mapboxgl-popup-anchor-bottom,
 .mapboxgl-popup-anchor-bottom-left,
-.mapboxgl-popup-anchor-bottom-right {
-    -webkit-flex-direction: column-reverse;
-    flex-direction: column-reverse;
+.mapboxgl-popup-anchor-bottom-right,
+.maplibregl-popup-anchor-bottom,
+.maplibregl-popup-anchor-bottom-left,
+.maplibregl-popup-anchor-bottom-right { 
+    -webkit-flex-direction:column-reverse; 
+    flex-direction:column-reverse 
 }
 
-.mapboxgl-popup-anchor-left {
-    -webkit-flex-direction: row;
-    flex-direction: row;
+.mapboxgl-popup-anchor-left,
+.maplibregl-popup-anchor-left { 
+    -webkit-flex-direction:row; 
+    flex-direction:row 
 }
 
-.mapboxgl-popup-anchor-right {
-    -webkit-flex-direction: row-reverse;
-    flex-direction: row-reverse;
+.mapboxgl-popup-anchor-right,
+.maplibregl-popup-anchor-right{ 
+    -webkit-flex-direction:row-reverse; 
+    flex-direction:row-reverse 
 }
 
-.mapboxgl-popup-tip {
-    width: 0;
-    height: 0;
-    border: 10px solid transparent;
-    z-index: 1;
+.mapboxgl-popup-tip,
+.maplibregl-popup-tip{ 
+    width:0;
+    height:0;
+    border:10px solid transparent;
+    z-index:1 
 }
 
-.mapboxgl-popup-anchor-top .mapboxgl-popup-tip {
-    -webkit-align-self: center;
-    align-self: center;
-    border-top: none;
-    border-bottom-color: #fff;
+.mapboxgl-popup-anchor-top 
+.mapboxgl-popup-tip,.maplibregl-popup-anchor-top 
+.maplibregl-popup-tip {
+    -webkit-align-self:center;
+    align-self:center;
+    border-top:none;
+    border-bottom-color:#fff
 }
 
-.mapboxgl-popup-anchor-top-left .mapboxgl-popup-tip {
-    -webkit-align-self: flex-start;
-    align-self: flex-start;
-    border-top: none;
-    border-left: none;
-    border-bottom-color: #fff;
+.mapboxgl-popup-anchor-top-left .mapboxgl-popup-tip,
+.maplibregl-popup-anchor-top-left .maplibregl-popup-tip {
+    -webkit-align-self:flex-start;
+    align-self:flex-start;
+    border-top:none;
+    border-left:none;
+    border-bottom-color:#fff
 }
 
-.mapboxgl-popup-anchor-top-right .mapboxgl-popup-tip {
-    -webkit-align-self: flex-end;
-    align-self: flex-end;
-    border-top: none;
-    border-right: none;
-    border-bottom-color: #fff;
+.mapboxgl-popup-anchor-top-right .mapboxgl-popup-tip,
+.maplibregl-popup-anchor-top-right .maplibregl-popup-tip {
+    -webkit-align-self:flex-end;
+    align-self:flex-end;
+    border-top:none;
+    border-right:none;
+    border-bottom-color:#fff
 }
 
-.mapboxgl-popup-anchor-bottom .mapboxgl-popup-tip {
-    -webkit-align-self: center;
-    align-self: center;
-    border-bottom: none;
-    border-top-color: #fff;
+.mapboxgl-popup-anchor-bottom .mapboxgl-popup-tip,
+.maplibregl-popup-anchor-bottom .maplibregl-popup-tip {
+    -webkit-align-self:center;
+    align-self:center;
+    border-bottom:none;
+    border-top-color:#fff
 }
 
-.mapboxgl-popup-anchor-bottom-left .mapboxgl-popup-tip {
-    -webkit-align-self: flex-start;
-    align-self: flex-start;
-    border-bottom: none;
-    border-left: none;
-    border-top-color: #fff;
+.mapboxgl-popup-anchor-bottom-left .mapboxgl-popup-tip,
+.maplibregl-popup-anchor-bottom-left .maplibregl-popup-tip {
+    -webkit-align-self:flex-start;
+    align-self:flex-start;
+    border-bottom:none;
+    border-left:none;
+    border-top-color:#fff
 }
 
-.mapboxgl-popup-anchor-bottom-right .mapboxgl-popup-tip {
-    -webkit-align-self: flex-end;
-    align-self: flex-end;
-    border-bottom: none;
-    border-right: none;
-    border-top-color: #fff;
+.mapboxgl-popup-anchor-bottom-right .mapboxgl-popup-tip,
+.maplibregl-popup-anchor-bottom-right .maplibregl-popup-tip {
+    -webkit-align-self:flex-end;
+    align-self:flex-end;
+    border-bottom:none;
+    border-right:none;
+    border-top-color:#fff
 }
 
-.mapboxgl-popup-anchor-left .mapboxgl-popup-tip {
-    -webkit-align-self: center;
-    align-self: center;
-    border-left: none;
-    border-right-color: #fff;
+.mapboxgl-popup-anchor-left .mapboxgl-popup-tip,
+.maplibregl-popup-anchor-left .maplibregl-popup-tip {
+    -webkit-align-self:center;
+    align-self:center;
+    border-left:none;
+    border-right-color:#fff
 }
 
-.mapboxgl-popup-anchor-right .mapboxgl-popup-tip {
-    -webkit-align-self: center;
-    align-self: center;
-    border-right: none;
-    border-left-color: #fff;
+.mapboxgl-popup-anchor-right .mapboxgl-popup-tip,
+.maplibregl-popup-anchor-right .maplibregl-popup-tip {
+    -webkit-align-self:center;
+    align-self:center;
+    border-right:none;
+    border-left-color:#fff
 }
 
-.mapboxgl-popup-close-button {
-    position: absolute;
-    right: 0;
-    top: 0;
-    border: 0;
-    border-radius: 0 3px 0 0;
-    cursor: pointer;
-    background-color: transparent;
+.mapboxgl-popup-close-button,
+.maplibregl-popup-close-button {
+    position:absolute;
+    right:0;
+    top:0;
+    border:0;
+    border-radius:0 3px 0 0;
+    cursor:pointer;
+    background-color:transparent
 }
 
-.mapboxgl-popup-close-button:hover {
-    background-color: rgba(0, 0, 0, 0.05);
+.mapboxgl-popup-close-button:hover,
+.maplibregl-popup-close-button:hover {
+    background-color:rgba(0,0,0,.05)
 }
 
-.mapboxgl-popup-content {
-    position: relative;
-    background: #fff;
-    border-radius: 3px;
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
-    padding: 10px 10px 15px;
-    pointer-events: auto;
+.mapboxgl-popup-content,
+.maplibregl-popup-content {
+    position:relative;
+    background:#fff;
+    border-radius:3px;
+    box-shadow:0 1px 2px rgba(0,0,0,.1);
+    padding:10px 10px 15px;
+    pointer-events:auto
 }
 
-.mapboxgl-popup-anchor-top-left .mapboxgl-popup-content {
-    border-top-left-radius: 0;
+.mapboxgl-popup-anchor-top-left .mapboxgl-popup-content,
+.maplibregl-popup-anchor-top-left .maplibregl-popup-content {
+    border-top-left-radius:0
 }
 
-.mapboxgl-popup-anchor-top-right .mapboxgl-popup-content {
-    border-top-right-radius: 0;
+.mapboxgl-popup-anchor-top-right .mapboxgl-popup-content,
+.maplibregl-popup-anchor-top-right .maplibregl-popup-content {
+    border-top-right-radius:0
 }
 
-.mapboxgl-popup-anchor-bottom-left .mapboxgl-popup-content {
-    border-bottom-left-radius: 0;
+.mapboxgl-popup-anchor-bottom-left .mapboxgl-popup-content,
+.maplibregl-popup-anchor-bottom-left .maplibregl-popup-content {
+    border-bottom-left-radius:0
 }
 
-.mapboxgl-popup-anchor-bottom-right .mapboxgl-popup-content {
-    border-bottom-right-radius: 0;
+.mapboxgl-popup-anchor-bottom-right .mapboxgl-popup-content,
+.maplibregl-popup-anchor-bottom-right .maplibregl-popup-content {
+    border-bottom-right-radius:0
 }
 
-.mapboxgl-popup-track-pointer {
-    display: none;
+.mapboxgl-popup-track-pointer,
+.maplibregl-popup-track-pointer {
+    display:none
 }
 
-.mapboxgl-popup-track-pointer * {
-    pointer-events: none;
-    user-select: none;
+.mapboxgl-popup-track-pointer *,
+.maplibregl-popup-track-pointer * {
+    pointer-events:none;
+    user-select:none
 }
 
-.mapboxgl-map:hover .mapboxgl-popup-track-pointer {
-    display: flex;
+.mapboxgl-map:hover .mapboxgl-popup-track-pointer,
+.maplibregl-map:hover .maplibregl-popup-track-pointer {
+    display:flex
 }
 
-.mapboxgl-map:active .mapboxgl-popup-track-pointer {
-    display: none;
+.mapboxgl-map:active .mapboxgl-popup-track-pointer,
+.maplibregl-map:active .maplibregl-popup-track-pointer {
+    display:none
 }
 
-.mapboxgl-marker {
-    position: absolute;
-    top: 0;
-    left: 0;
-    will-change: transform;
+.mapboxgl-marker,
+.maplibregl-marker {
+    position:absolute;
+    top:0;
+    left:0;
+    will-change:transform
 }
 
-.mapboxgl-user-location-dot {
-    background-color: #1da1f2;
-    width: 15px;
-    height: 15px;
-    border-radius: 50%;
+.mapboxgl-user-location-dot,
+.maplibregl-user-location-dot {
+    background-color:#1da1f2;
+    width:15px;
+    height:15px;
+    border-radius:50%
 }
 
-.mapboxgl-user-location-dot::before {
-    background-color: #1da1f2;
-    content: '';
-    width: 15px;
-    height: 15px;
-    border-radius: 50%;
-    position: absolute;
-    -webkit-animation: mapboxgl-user-location-dot-pulse 2s infinite;
-    -moz-animation: mapboxgl-user-location-dot-pulse 2s infinite;
-    -ms-animation: mapboxgl-user-location-dot-pulse 2s infinite;
-    animation: mapboxgl-user-location-dot-pulse 2s infinite;
+.mapboxgl-user-location-dot:before,
+.maplibregl-user-location-dot:before {
+    background-color:#1da1f2;content:"";
+    width:15px;
+    height:15px;
+    border-radius:50%;
+    position:absolute;
+    -webkit-animation:maplibregl-user-location-dot-pulse 2s infinite;
+    -moz-animation:maplibregl-user-location-dot-pulse 2s infinite;
+    -ms-animation:maplibregl-user-location-dot-pulse 2s infinite;
+    animation:maplibregl-user-location-dot-pulse 2s infinite
 }
 
-.mapboxgl-user-location-dot::after {
-    border-radius: 50%;
-    border: 2px solid #fff;
-    content: '';
-    height: 19px;
-    left: -2px;
-    position: absolute;
-    top: -2px;
-    width: 19px;
-    box-sizing: border-box;
-    box-shadow: 0 0 3px rgba(0, 0, 0, 0.35);
+.mapboxgl-user-location-dot:after,
+.maplibregl-user-location-dot:after {
+    border-radius:50%;border:2px solid #fff;
+    content:"";
+    height:19px;
+    left:-2px;
+    position:absolute;
+    top:-2px;
+    width:19px;
+    box-sizing:border-box;
+    box-shadow:0 0 3px rgba(0,0,0,.35)
 }
 
-@-webkit-keyframes mapboxgl-user-location-dot-pulse {
-    0%   { -webkit-transform: scale(1); opacity: 1; }
-    70%  { -webkit-transform: scale(3); opacity: 0; }
-    100% { -webkit-transform: scale(1); opacity: 0; }
+@-webkit-keyframes maplibregl-user-location-dot-pulse {
+    0% { -webkit-transform:scale(1); opacity:1 }
+    70% { -webkit-transform:scale(3); opacity:0 }
+    to { -webkit-transform:scale(1); opacity:0 }
 }
 
-@-ms-keyframes mapboxgl-user-location-dot-pulse {
-    0%   { -ms-transform: scale(1); opacity: 1; }
-    70%  { -ms-transform: scale(3); opacity: 0; }
-    100% { -ms-transform: scale(1); opacity: 0; }
+@-ms-keyframes maplibregl-user-location-dot-pulse {
+    0% { -ms-transform:scale(1); opacity:1 }
+    70% { -ms-transform:scale(3); opacity:0 }
+    to { -ms-transform:scale(1); opacity:0 }
 }
 
-@keyframes mapboxgl-user-location-dot-pulse {
-    0%   { transform: scale(1); opacity: 1; }
-    70%  { transform: scale(3); opacity: 0; }
-    100% { transform: scale(1); opacity: 0; }
+@keyframes maplibregl-user-location-dot-pulse {
+    0% { transform:scale(1); opacity:1 }
+    70% { transform:scale(3); opacity:0 }
+    to { transform:scale(1); opacity:0 }
 }
 
-.mapboxgl-user-location-dot-stale {
-    background-color: #aaa;
+.mapboxgl-user-location-dot-stale,
+.maplibregl-user-location-dot-stale {
+    background-color:#aaa
 }
 
-.mapboxgl-user-location-dot-stale::after {
-    display: none;
+.mapboxgl-user-location-dot-stale:after,
+.maplibregl-user-location-dot-stale:after {
+    display:none
+}
+
+.mapboxgl-user-location-accuracy-circle,
+.maplibregl-user-location-accuracy-circle {
+    background-color:rgba(29,161,242,.2);
+    width:1px;
+    height:1px;
+    border-radius:100%
 }
 
 .mapboxgl-crosshair,
 .mapboxgl-crosshair .mapboxgl-interactive,
-.mapboxgl-crosshair .mapboxgl-interactive:active {
-    cursor: crosshair;
+.mapboxgl-crosshair .mapboxgl-interactive:active,
+.maplibregl-crosshair,
+.maplibregl-crosshair .maplibregl-interactive,
+.maplibregl-crosshair .maplibregl-interactive:active {
+    cursor:crosshair
 }
 
-.mapboxgl-boxzoom {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 0;
-    height: 0;
-    background: #fff;
-    border: 2px dotted #202020;
-    opacity: 0.5;
+.mapboxgl-boxzoom,
+.maplibregl-boxzoom {
+    position:absolute;
+    top:0;
+    left:0;
+    width:0;
+    height:0;
+    background:#fff;border:2px dotted #202020;
+    opacity:.5
 }
 
 @media print {
-    /* stylelint-disable-next-line selector-class-pattern */
     .mapbox-improve-map {
-        display: none;
+        display:none
     }
 }
