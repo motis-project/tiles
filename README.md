@@ -50,6 +50,12 @@ wget https://download.geofabrik.de/europe/germany-latest.osm.pbf
 # Now, go to localhost:8888 in your browser.
 ```
 
+## Convert from osm.xml to osm.pbf
+```
+sudo apt install osmium-tool
+osmium cat -f fname.osm -o fname.osm.pbf
+```
+
 ## License
 
 MIT
