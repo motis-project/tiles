@@ -53,7 +53,7 @@ wget https://download.geofabrik.de/europe/germany-latest.osm.pbf
 ## Convert from osm.xml to osm.pbf
 ```
 sudo apt install osmium-tool
-osmium cat -f fname.osm -o fname.osm.pbf
+osmium cat fname.osm -o fname.osm.pbf -f
 ```
 
 ## License
