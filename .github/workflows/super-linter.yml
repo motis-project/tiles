@@ -4,7 +4,7 @@
 # You can adjust the behavior by modifying this file.
 # For more information, see:
 # https://github.com/github/super-linter
-name: Lint Code Base
+name: ESLint
 
 on:
   push:
@@ -29,3 +29,4 @@ jobs:
           VALIDATE_JAVASCRIPT_ES: true
           DEFAULT_BRANCH: master
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          FILTER_REGEX_INCLUDE: .*client/.*
