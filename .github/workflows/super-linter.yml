@@ -23,8 +23,6 @@ jobs:
 
       - name: Lint Code Base
         uses: github/super-linter@v4
-        with:
-          files: client/
         env:
           VALIDATE_JAVASCRIPT_ES: true
           DEFAULT_BRANCH: master
