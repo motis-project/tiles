@@ -20,6 +20,7 @@ struct script_runner {
         "pending_feature",  //
         "get_id", &pending_feature::get_id,  //
         "has_tag", &pending_feature::has_tag,  //
+        "get_tag", &pending_feature::get_tag,  //
         "has_any_tag", &pending_feature::has_any_tag,  //
         "has_any_tag", &pending_feature::has_any_tag,  //
         "set_approved_min", &pending_feature::set_approved_min,  //

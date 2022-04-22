@@ -28,6 +28,10 @@ struct pending_feature {
     return value == obj_.get_value_by_key(key.c_str(), "");
   }
 
+  std::string get_tag(std::string const& key) {
+    return obj_.get_value_by_key(key.c_str(), "");
+  }
+
   bool has_any_tag(std::string const& key, sol::variadic_args va) {
     if (std::distance(va.begin(), va.end()) == 0) {
       return obj_.get_value_by_key(key.c_str()) != nullptr;
