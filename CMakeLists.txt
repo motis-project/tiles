@@ -59,6 +59,7 @@ target_link_libraries(tiles-import-library
   geo
   lmdb
   lua
+  expat
   tiles
 )
 if(UNIX AND NOT APPLE)
