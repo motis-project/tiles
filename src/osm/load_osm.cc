@@ -7,8 +7,8 @@
 #include "osmium/area/assembler.hpp"
 #include "osmium/area/multipolygon_manager.hpp"
 #include "osmium/io/pbf_input.hpp"
-#include "osmium/io/xml_input.hpp"
 #include "osmium/io/reader_with_progress_bar.hpp"
+#include "osmium/io/xml_input.hpp"
 #include "osmium/memory/buffer.hpp"
 #include "osmium/visitor.hpp"
 
