@@ -1,7 +1,7 @@
 [catch]
   url=git@github.com:motis-project/Catch2.git
   branch=master
-  commit=e5c9a58d66ff0780e956b5447573af9d6b9b2ca3
+  commit=47d56f28a9801911c048d011b375e5631dbb658f
 [clipper]
   url=git@github.com:motis-project/clipper.git
   branch=master
