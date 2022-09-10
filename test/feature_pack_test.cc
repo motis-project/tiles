@@ -1,4 +1,4 @@
-#include "catch2/catch.hpp"
+#include "catch2/catch_all.hpp"
 
 #include "tiles/bin_utils.h"
 #include "tiles/db/feature_pack.h"

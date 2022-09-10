@@ -1,4 +1,4 @@
-#include "catch2/catch.hpp"
+#include "catch2/catch_all.hpp"
 
 #include "tiles/db/tile_index.h"
 #include "utl/erase_duplicates.h"

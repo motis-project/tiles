@@ -1,4 +1,4 @@
-#include "catch2/catch.hpp"
+#include "catch2/catch_all.hpp"
 
 #include "osmium/index/detail/tmpfile.hpp"
 #include "osmium/io/pbf_input.hpp"
@@ -403,7 +403,7 @@ TEST_CASE("hybrid_node_idx") {  // NOLINT
   }
 }
 
-TEST_CASE("hybrid_node_idx_benchmark", "[!hide]") {
+TEST_CASE("hybrid_node_idx_benchmark", "[.]") {
   tiles::t_log("start");
 
   auto const idx_fd = osmium::detail::create_tmp_file();

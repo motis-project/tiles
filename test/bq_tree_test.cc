@@ -1,4 +1,4 @@
-#include "catch2/catch.hpp"
+#include "catch2/catch_all.hpp"
 
 #include <fstream>
 
@@ -196,7 +196,7 @@ TEST_CASE("bq_tree_all_leafs") {
   }
 }
 
-TEST_CASE("bq_tree_tsv_file", "[!hide]") {
+TEST_CASE("bq_tree_tsv_file", "[hide]") {
   std::ifstream in("tiles.tsv");
 
   std::vector<geo::tile> tiles;

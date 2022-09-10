@@ -125,7 +125,7 @@ add_executable(tiles-test EXCLUDE_FROM_ALL ${tiles-test-files})
 set_property(TARGET tiles-test PROPERTY CXX_STANDARD 17)
 target_compile_options(tiles-test PRIVATE ${TILES_WARNINGS})
 target_include_directories(tiles-test PUBLIC include)
-target_link_libraries(tiles-test tiles Catch2)
+target_link_libraries(tiles-test tiles Catch2WithMain)
 
 
 # --- fuzzing

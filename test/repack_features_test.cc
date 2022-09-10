@@ -1,4 +1,4 @@
-#include "catch2/catch.hpp"
+#include "catch2/catch_all.hpp"
 
 #include <random>
 
@@ -9,7 +9,7 @@
 
 #include "test_pack_handle.h"
 
-TEST_CASE("repack_features", "[!hide]") {
+TEST_CASE("repack_features", "[.]") {
   tiles::test_pack_handle handle;
 
   std::vector<tiles::tile_record> tasks((1 << tiles::kTileDefaultIndexZoomLvl) *
