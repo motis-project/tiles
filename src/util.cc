@@ -27,7 +27,8 @@ struct regex_matcher::impl {
 
   match_result_t match(std::string_view target) const {
     std::cmatch match;
-    if (std::regex_match<char const*>(&*begin(target), &*end(target), match,
+    if (std::regex_match<char const*>(&*begin(target),
+                                      (&*begin(target)) + target.size(), match,
                                       regex_)) {
       return utl::to_vec(match, [](auto const& m) {
         return std::string_view{m.first, static_cast<size_t>(m.length())};
