@@ -26,10 +26,10 @@
   url=git@github.com:motis-project/lmdb.git
   branch=master
   commit=39d8127e5697b1323a67e61c3ad8f087384c7429
-[lua]
-  url=git@github.com:motis-project/lua.git
+[luajit]
+  url=git@github.com:motis-project/LuaJIT.git
   branch=master
-  commit=7bb93325b26f84c7e8b51fcbd857361ce7605a1d
+  commit=b4369853fcf2d2a94632a3f8a6351de5059aa5c9
 [miniz]
   url=git@github.com:motis-project/miniz.git
   branch=master
