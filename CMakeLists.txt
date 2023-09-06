@@ -60,7 +60,7 @@ target_link_libraries(tiles-import-library
   boost-filesystem
   geo
   lmdb
-  lua
+  libluajit
   expat
   tiles
 )
