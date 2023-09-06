@@ -17,6 +17,7 @@
 #include "tiles/db/tile_database.h"
 #include "tiles/osm/feature_handler.h"
 #include "tiles/osm/hybrid_node_idx.h"
+#include "tiles/osm/tmp_file.h"
 #include "tiles/util.h"
 #include "tiles/util_parallel.h"
 
@@ -28,37 +29,6 @@ namespace oio = osmium::io;
 namespace orel = osmium::relations;
 namespace om = osmium::memory;
 namespace oeb = osmium::osm_entity_bits;
-
-struct tmp_file {
-  explicit tmp_file(std::string path)
-      : path_{std::move(path)},
-#ifdef _MSC_VER
-        file_(std::fopen(path_.c_str(), "wb+"))
-#else
-        file_(std::fopen(path_.c_str(), "wb+e"))
-#endif
-  {
-    utl::verify(file_ != nullptr, "tmp_file: unable to open file {}", path_);
-  }
-
-  ~tmp_file() {
-    if (file_ != nullptr) {
-      std::fclose(file_);
-      boost::filesystem::remove(path_);
-    }
-    file_ = nullptr;
-  }
-
-  tmp_file(tmp_file const&) = default;
-  tmp_file(tmp_file&&) = default;
-  tmp_file& operator=(tmp_file const&) = default;
-  tmp_file& operator=(tmp_file&&) = default;
-
-  int fileno() const { return ::fileno(file_); }
-
-  std::string path_;
-  FILE* file_;
-};
 
 void load_osm(tile_db_handle& db_handle, feature_inserter_mt& inserter,
               std::string const& osm_fname, std::string const& osm_profile,
