@@ -144,11 +144,11 @@ void load_osm(tile_db_handle& db_handle, feature_inserter_mt& inserter,
           }
         } catch (std::exception const& e) {
           fmt::print(std::clog, "EXCEPTION CAUGHT: {} {}\n",
-                     std::this_thread::get_id(), e.what());
+                     fmt::streamed(std::this_thread::get_id()), e.what());
           has_exception = true;
         } catch (...) {
           fmt::print(std::clog, "UNKNOWN EXCEPTION CAUGHT: {} \n",
-                     std::this_thread::get_id());
+                     fmt::streamed(std::this_thread::get_id()));
           has_exception = true;
         }
       }));

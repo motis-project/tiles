@@ -19,7 +19,7 @@
 
 namespace tiles {
 template <typename... Args>
-inline void t_log(Args&&... args) {
+inline void t_log(fmt::format_string<Args...> fmt_str, Args&&... args) {
   using clock = std::chrono::system_clock;
   auto const now = clock::to_time_t(clock::now());
   struct tm tmp {};
@@ -29,7 +29,7 @@ inline void t_log(Args&&... args) {
   gmtime_r(&now, &tmp);
 #endif
   std::clog << std::put_time(&tmp, "%FT%TZ") << " | ";
-  fmt::print(std::clog, std::forward<Args>(args)...);
+  fmt::print(std::clog, fmt_str, std::forward<Args>(args)...);
   std::clog << std::endl;
 }
 
@@ -40,8 +40,9 @@ struct progress_tracker {
   progress_tracker() : ptr_{utl::get_active_progress_tracker()} {}
 #else
   progress_tracker()
-      : ptr_{std::make_shared<utl::progress_tracker>(
-            [](auto const& t) { t_log("{} : {:>3}%", t.status_, t.out_); })} {}
+      : ptr_{std::make_shared<utl::progress_tracker>([](auto const& t) {
+          t_log("{} : {:>3}%", t.status_, t.out_.load());
+        })} {}
 #endif
 
   utl::progress_tracker* operator->() const { return ptr_.get(); }
@@ -127,12 +128,12 @@ namespace fmt {
 template <>
 struct formatter<tiles::printable_num> {
   template <typename ParseContext>
-  constexpr auto parse(ParseContext& ctx) {
+  constexpr auto parse(ParseContext& ctx) const {
     return ctx.begin();
   }
 
   template <typename FormatContext>
-  auto format(tiles::printable_num const& num, FormatContext& ctx) {
+  auto format(tiles::printable_num const& num, FormatContext& ctx) const {
     auto const n = num.n_;
     auto const k = n / 1e3;
     auto const m = n / 1e6;
@@ -152,12 +153,12 @@ struct formatter<tiles::printable_num> {
 template <>
 struct formatter<tiles::printable_ns> {
   template <typename ParseContext>
-  constexpr auto parse(ParseContext& ctx) {
+  constexpr auto parse(ParseContext& ctx) const {
     return ctx.begin();
   }
 
   template <typename FormatContext>
-  auto format(tiles::printable_ns const& num, FormatContext& ctx) {
+  auto format(tiles::printable_ns const& num, FormatContext& ctx) const {
     auto const ns = num.n_;
     auto const mys = ns / 1e3;
     auto const ms = ns / 1e6;
@@ -182,7 +183,7 @@ struct formatter<tiles::printable_bytes> {
   }
 
   template <typename FormatContext>
-  auto format(tiles::printable_bytes const& bytes, FormatContext& ctx) {
+  auto format(tiles::printable_bytes const& bytes, FormatContext& ctx) const {
     auto const n = bytes.n_;
     auto const k = n / 1024;
     auto const m = n / (1024 * 1024);

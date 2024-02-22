@@ -58,7 +58,8 @@ struct coastline_stats {
   }
 
   void summary() {
-    t_log("fully:  seaside {}, dirtside {}", fully_seaside_, fully_dirtside_);
+    t_log("fully:  seaside {}, dirtside {}", fmt::streamed(fully_seaside_),
+          fmt::streamed(fully_dirtside_));
   }
 
   progress_tracker progress_;

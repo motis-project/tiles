@@ -19,7 +19,7 @@ struct tile_spec {
     auto delta_z = kMaxZoomLevel - tile.z_;
 
     utl::verify(tile.x_ < (1ULL << tile.z_) && tile.y_ < (1ULL << tile.z_),
-                "tile does not exist {}", tile);
+                "tile does not exist {}", fmt::streamed(tile));
 
     auto px_bounds = proj::tile_bounds_pixel(tile.x_, tile.y_);  // lvl z
 
