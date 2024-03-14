@@ -85,8 +85,8 @@ struct in_order_queue {
       }
 
       // process ready items
-      for (auto& t : ready) {
-        fn(std::move(t.second));
+      for (auto& x : ready) {
+        fn(std::move(x.second));
       }
 
       {  // increment next-expected

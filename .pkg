@@ -9,7 +9,7 @@
 [concurrentqueue]
   url=git@github.com:motis-project/concurrentqueue.git
   branch=master
-  commit=ef2227ada6f76cd65e517b7a6e902964443c0ffc
+  commit=54fdce755d3e52c785d6d9d7d91c94615495868c
 [conf]
   url=git@github.com:motis-project/conf.git
   branch=master
@@ -21,7 +21,7 @@
 [geo]
   url=git@github.com:motis-project/geo.git
   branch=master
-  commit=5bf5179faf5f21d543866cca85fe090fe3664cc5
+  commit=b74f5797c7f1b693b2e8d28a14c0e7836456ff7e
 [lmdb]
   url=git@github.com:motis-project/lmdb.git
   branch=master
