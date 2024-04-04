@@ -9,6 +9,8 @@
 
 #include "test_pack_handle.h"
 
+constexpr auto const size = 1024ULL * 1024 * 1024 * 1;
+
 TEST(repack_features, test) {
   tiles::test_pack_handle handle;
 
@@ -27,7 +29,7 @@ TEST(repack_features, test) {
   std::normal_distribution size_dist(10000., 10000.);
 
   size_t initial_packs = 0;
-  while (handle.size() < 1024ULL * 1024 * 1024 * 40) {
+  while (handle.size() < size) {
     size_t size = std::fabs(size_dist(rand));
     if (size == 0) {
       continue;

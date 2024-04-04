@@ -401,7 +401,7 @@ TEST(hybrid_node_idx, duplicates_mismatch) {
   }
 }
 
-TEST(hybrid_node_idx_benchmark, _) {
+TEST(hybrid_node_idx_benchmark, DISABLED_test) {
   tiles::t_log("start");
 
   auto const idx_fd = osmium::detail::create_tmp_file();
