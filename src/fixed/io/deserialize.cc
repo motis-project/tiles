@@ -63,7 +63,8 @@ struct simplifying_decoder : public default_decoder {
   template <typename Container>
   void deserialize_points(Container& out) {
     utl::verify(curr_mask_ < simplify_masks_.size(), "mask part missing");
-    geo::simplify_mask_reader reader{simplify_masks_[curr_mask_].data(), z_};
+    auto const reader =
+        geo::simplify_mask_reader{simplify_masks_[curr_mask_].data(), z_};
 
     auto const size = get_next();
     utl::verify(size == reader.size_, "simplify mask size mismatch");

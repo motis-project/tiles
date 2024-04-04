@@ -188,7 +188,7 @@ int run_tiles_server(int argc, char const** argv) {
   pack_handle pack_handle{opt.db_fname_.c_str()};
 
   auto const maybe_serve_tile = [&](auto const& req, auto& res) -> bool {
-    static regex_matcher matcher{R"(^\/(\d+)\/(\d+)\/(\d+).mvt$)"};
+    static auto const matcher = regex_matcher{R"(^\/(\d+)\/(\d+)\/(\d+).mvt$)"};
     auto const decoded_url = url_decode(req);
     auto const match = matcher.match(decoded_url);
     if (!match) {
@@ -219,7 +219,7 @@ int run_tiles_server(int argc, char const** argv) {
   };
 
   auto const maybe_serve_glyphs = [&](auto const& req, auto& res) -> bool {
-    static regex_matcher matcher{"^\\/glyphs/(.+)$"};
+    static auto const matcher = regex_matcher{"^\\/glyphs/(.+)$"};
     auto const decoded_url = url_decode(req);
     auto const match = matcher.match(decoded_url);
     if (!match) {
@@ -239,7 +239,7 @@ int run_tiles_server(int argc, char const** argv) {
   };
 
   auto const maybe_serve_file = [&](auto const& req, auto& res) -> bool {
-    static regex_matcher matcher{"^\\/(.+)$"};
+    static auto const matcher = regex_matcher{"^\\/(.+)$"};
     auto const decoded_url = url_decode(req);
     auto const match = matcher.match(decoded_url);
     if (!match && req.target() != "/") {
@@ -248,11 +248,11 @@ int run_tiles_server(int argc, char const** argv) {
     }
 
     bool found = false;
-    std::string fname(match ? match->at(1) : "index.html");
+    auto const fname = std::string{match ? match->at(1) : "index.html"};
     if (!opt.res_dname_.empty()) {
       auto p = boost::filesystem::path{opt.res_dname_} / fname;
       if (boost::filesystem::exists(p)) {
-        utl::mmap_reader mem{p.string().c_str()};
+        auto const mem = utl::mmap_reader{p.string().c_str()};
         res.body() = std::string{mem.m_.ptr(), mem.m_.size()};
         found = true;
       }

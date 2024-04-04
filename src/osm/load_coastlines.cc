@@ -49,7 +49,6 @@ struct coastline_stats {
   static constexpr uint64_t kTotal = (1 << 10) * (1 << 10);
 
   coastline_stats() : fully_dirtside_{0}, fully_seaside_{0} {
-
     progress_->status("Process Coastline").out_mod(5.F).in_high(kTotal);
   }
 
@@ -57,7 +56,7 @@ struct coastline_stats {
     progress_->increment(1ULL << (10 - z) * 1ULL << (10 - z));
   }
 
-  void summary() {
+  void summary() const {
     t_log("fully:  seaside {}, dirtside {}", fmt::streamed(fully_seaside_),
           fmt::streamed(fully_dirtside_));
   }
@@ -300,7 +299,8 @@ void load_coastlines(tile_db_handle& db_handle, feature_inserter_mt& inserter,
 
         process_coastline(
             task, geo_queue, db_queue, stats, [&](auto const& tile) {
-              std::lock_guard<std::mutex> lock(fully_seaside_mutex);
+              auto const lock =
+                  std::lock_guard<std::mutex>(fully_seaside_mutex);
               fully_seaside.push_back(tile);
             });
         geo_queue.finish();
@@ -329,7 +329,7 @@ void load_coastlines(tile_db_handle& db_handle, feature_inserter_mt& inserter,
 
   bq_tree seaside_tree;
   {
-    scoped_timer t{"seaside_tree"};
+    auto const t = scoped_timer{"seaside_tree"};
     seaside_tree = make_bq_tree(fully_seaside);
   }
   t_log("seaside_tree with {} nodes", seaside_tree.nodes_.size());

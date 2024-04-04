@@ -34,7 +34,7 @@ struct test_pack_handle {
     utl::verify(record.size_ <= size_, "test_pack_handle: request to big");
 
     check_extract(record);
-    return std::string_view{nullptr, record.size_};
+    return std::string_view{"nullptr", record.size_};
   }
 
   pack_record move(size_t offset, pack_record from_record) {

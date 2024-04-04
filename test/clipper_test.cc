@@ -1,51 +1,49 @@
-#include "catch2/catch_all.hpp"
+#include "gtest/gtest.h"
 
 #include "clipper/clipper.hpp"
 
 namespace cl = ClipperLib;
 
-TEST_CASE("clipper_simple") {
-  cl::Path subject{{0, 0}, {10, 0}, {10, 10}, {0, 10}};
+auto const subject = cl::Path{{0, 0}, {10, 0}, {10, 10}, {0, 10}};
 
-  SECTION("orientation") {
-    REQUIRE(cl::Orientation(subject));
-    auto s2 = subject;
-    cl::ReversePath(s2);
-    REQUIRE(!cl::Orientation(s2));
-  }
+TEST(clipper, orientation) {
+  ASSERT_TRUE(cl::Orientation(subject));
+  auto s2 = subject;
+  cl::ReversePath(s2);
+  ASSERT_TRUE(!cl::Orientation(s2));
+}
 
-  SECTION("in polygon") {
-    REQUIRE(cl::PointInPolygon(cl::IntPoint{5, 5}, subject) == 1);
-    REQUIRE(cl::PointInPolygon(cl::IntPoint{0, 0}, subject) == -1);
-    REQUIRE(cl::PointInPolygon(cl::IntPoint{15, 15}, subject) == 0);
-  }
+TEST(clipper, in_polygon) {
+  ASSERT_TRUE(cl::PointInPolygon(cl::IntPoint{5, 5}, subject) == 1);
+  ASSERT_TRUE(cl::PointInPolygon(cl::IntPoint{0, 0}, subject) == -1);
+  ASSERT_TRUE(cl::PointInPolygon(cl::IntPoint{15, 15}, subject) == 0);
+}
 
-  SECTION("intersection") {
-    cl::Path clip{{0, 0}, {5, 0}, {5, 5}, {0, 5}};
-    cl::Paths solution;
+TEST(clipper, intersection) {
+  auto const clip = cl::Path{{0, 0}, {5, 0}, {5, 5}, {0, 5}};
+  auto solution = cl::Paths{};
 
-    cl::Clipper clpr;
-    clpr.AddPath(subject, cl::ptSubject, true);
-    clpr.AddPath(clip, cl::ptClip, true);
-    clpr.Execute(cl::ctIntersection, solution, cl::pftEvenOdd, cl::pftEvenOdd);
+  cl::Clipper clpr;
+  clpr.AddPath(subject, cl::ptSubject, true);
+  clpr.AddPath(clip, cl::ptClip, true);
+  clpr.Execute(cl::ctIntersection, solution, cl::pftEvenOdd, cl::pftEvenOdd);
 
-    REQUIRE(solution.size() == 1);
-    REQUIRE(solution[0].size() == clip.size());
-    REQUIRE(std::all_of(
-        begin(solution[0]), end(solution[0]), [&clip](auto const& pt) {
-          return end(clip) != std::find(begin(clip), end(clip), pt);
-        }));
-  }
+  ASSERT_TRUE(solution.size() == 1);
+  ASSERT_TRUE(solution[0].size() == clip.size());
+  ASSERT_TRUE(std::all_of(
+      begin(solution[0]), end(solution[0]), [&clip](auto const& pt) {
+        return end(clip) != std::find(begin(clip), end(clip), pt);
+      }));
+}
 
-  SECTION("intersection empty") {
-    cl::Path clip{{20, 20}, {22, 20}, {22, 22}, {20, 22}};
-    cl::Paths solution;
+TEST(clipper, intersection_empty) {
+  auto const clip = cl::Path{{20, 20}, {22, 20}, {22, 22}, {20, 22}};
+  auto solution = cl::Paths{};
 
-    cl::Clipper clpr;
-    clpr.AddPath(subject, cl::ptSubject, true);
-    clpr.AddPath(clip, cl::ptClip, true);
-    clpr.Execute(cl::ctIntersection, solution, cl::pftEvenOdd, cl::pftEvenOdd);
+  cl::Clipper clpr;
+  clpr.AddPath(subject, cl::ptSubject, true);
+  clpr.AddPath(clip, cl::ptClip, true);
+  clpr.Execute(cl::ctIntersection, solution, cl::pftEvenOdd, cl::pftEvenOdd);
 
-    REQUIRE(solution.empty());
-  }
+  ASSERT_TRUE(solution.empty());
 }

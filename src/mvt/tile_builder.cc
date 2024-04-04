@@ -257,8 +257,9 @@ struct tile_builder::impl {
         feature_pb.add_packed_uint32(ttm::Feature::packed_uint32_tags, begin(t),
                                      end(t));
 
-        fixed_geometry pt = fixed_point{{min.x() + (max.x() - min.x()) / 2,
-                                         min.y() + (max.y() - min.y()) / 2}};
+        auto const pt =
+            fixed_geometry{fixed_point{{min.x() + (max.x() - min.x()) / 2,
+                                        min.y() + (max.y() - min.y()) / 2}}};
         encode_geometry(feature_pb, pt, spec_);
         lb.pb_.add_message(ttm::Layer::repeated_Feature_features, feature_buf);
       }
@@ -266,11 +267,11 @@ struct tile_builder::impl {
         std::string feature_buf;
         pbf_builder<ttm::Feature> feature_pb(feature_buf);
 
-        fixed_geometry line = fixed_polyline{{{min.x(), min.y()},
-                                              {min.x(), max.y()},
-                                              {max.x(), max.y()},
-                                              {max.x(), min.y()},
-                                              {min.x(), min.y()}}};
+        auto const line = fixed_geometry{fixed_polyline{{{min.x(), min.y()},
+                                                         {min.x(), max.y()},
+                                                         {max.x(), max.y()},
+                                                         {max.x(), min.y()},
+                                                         {min.x(), min.y()}}}};
         encode_geometry(feature_pb, line, spec_);
         lb.pb_.add_message(ttm::Layer::repeated_Feature_features, feature_buf);
       }

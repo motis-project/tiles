@@ -1,6 +1,11 @@
 Checks: "*,\
 -llvmlibc-*,\
 -abseil-*,\
+-readability-identifier-length,\
+-altera-unroll-loops,\
+-altera-id-dependent-backward-branch,\
+-bugprone-easily-swappable-parameters,\
+-bugprone-implicit-widening-of-multiplication-result,\
 -llvm-else-after-return,\
 -hicpp-named-parameter,\
 -cert-err60-cpp,\
@@ -44,7 +49,7 @@ Checks: "*,\
 -cppcoreguidelines-pro-bounds-constant-array-index,\
 -*-avoid-c-arrays,\
 -*-narrowing-conversions,\
--*-avoid-goto,
+-*-avoid-goto,\
 -hicpp-multiway-paths-covered,\
 -clang-analyzer-cplusplus.NewDeleteLeaks,\
 -clang-analyzer-cplusplus.NewDelete,\
@@ -57,10 +62,27 @@ Checks: "*,\
 -modernize-use-trailing-return-type,\
 -fuchsia-default-arguments-calls,\
 -fuchsia-default-arguments-declarations,\
--misc-no-recursion"
+-misc-no-recursion,\
+-llvmlibc-callee-namespace,\
+-llvm-else-after-return,\
+-llvm-qualified-auto,\
+-readability-qualified-auto,\
+-google-readability-avoid-underscore-in-googletest-name,\
+-readability-function-cognitive-complexity,\
+-readability-avoid-const-params-in-decls,\
+-cppcoreguidelines-avoid-const-or-ref-data-members,\
+-cppcoreguidelines-avoid-do-while,\
+-altera-struct-pack-align,\
+-bugprone-unchecked-optional-access,\
+-readability-identifier-naming,\
+-cert-dcl37-c,\
+-bugprone-reserved-identifier,\
+-cert-dcl51-cpp,\
+-misc-confusable-identifiers"
 WarningsAsErrors: '*'
-HeaderFilterRegex: '^${RELATIVE_SOURCE_DIR}(include/)'
+HeaderFilterRegex: '^${RELATIVE_SOURCE_DIR}(base|modules|test)/'
 AnalyzeTemporaryDtors: false
+UseColor: true
 User:            root
 CheckOptions:
   - key:             cert-err61-cpp.CheckThrowTemporaries
@@ -331,22 +353,8 @@ CheckOptions:
     value:           ''
   - key:             readability-identifier-naming.TemplateParameterCase
     value:           CamelCase
-  - key:             readability-identifier-naming.TemplateParameterPrefix
-    value:           ''
-  - key:             readability-identifier-naming.TemplateParameterSuffix
-    value:           ''
   - key:             readability-identifier-naming.TemplateTemplateParameterCase
     value:           CamelCase
-  - key:             readability-identifier-naming.TemplateTemplateParameterPrefix
-    value:           ''
-  - key:             readability-identifier-naming.TemplateTemplateParameterSuffix
-    value:           ''
-  - key:             readability-identifier-naming.TypeTemplateParameterCase
-    value:           CamelCase
-  - key:             readability-identifier-naming.TypeTemplateParameterPrefix
-    value:           ''
-  - key:             readability-identifier-naming.TypeTemplateParameterSuffix
-    value:           ''
   - key:             readability-identifier-naming.TypedefCase
     value:           lower_case
   - key:             readability-identifier-naming.TypedefPrefix
@@ -381,3 +389,17 @@ CheckOptions:
     value:           '0'
   - key:             readability-simplify-boolean-expr.ChainedConditionalReturn
     value:           '0'
+  - key:             performance-for-range-copy.AllowedTypes
+    value:           'offset_ptr;ptr'
+  - key:             performance-unnecessary-value-param.AllowedTypes
+    value:           'offset_ptr;ptr'
+  - key:             readability-identifier-naming.TypeTemplateParameterIgnoredRegexp
+    value:           'expr-type'
+  - key:             readability-identifier-naming.TemplateParameterIgnoredRegexp
+    value:           'expr-type'
+  - key:             readability-identifier-naming.TypeTemplateParameterIgnoredRegexp
+    value:           'expr-type'
+  - key:             readability-identifier-naming.TemplateTemplateParameterIgnoredRegexp
+    value:           'expr-type'
+  - key:             readability-identifier-naming.ValueTemplateParameterIgnoredRegexp
+    value:           'expr-type'

@@ -51,15 +51,15 @@ int run_tiles_benchmark(int argc, char const** argv) {
 
   lmdb::env db_env = make_tile_database(opt.db_fname_.c_str(), kDefaultSize);
   tile_db_handle db_handle{db_env};
-  pack_handle pack_handle{opt.db_fname_.c_str()};
+  pack_handle const pack_handle{opt.db_fname_.c_str()};
 
   auto render_ctx = make_render_ctx(db_handle);
   render_ctx.ignore_prepared_ = true;
   render_ctx.compress_result_ = opt.compress_;
 
   if (opt.tile_.empty()) {
-    geo::latlng p1{49.83, 8.55};
-    geo::latlng p2{50.13, 8.74};
+    geo::latlng const p1{49.83, 8.55};
+    geo::latlng const p2{50.13, 8.74};
 
     for (auto z = 9; z < 18; z += 2) {
       std::vector<geo::tile> tiles;
@@ -97,15 +97,15 @@ int run_tiles_benchmark(int argc, char const** argv) {
         auto const rendered_tile = get_tile(db_handle, txn, features_cursor,
                                             pack_handle, render_ctx, tile, pc);
       } catch (...) {
-        t_log("problem in tile: {}", tile);
+        t_log("problem in tile: {}", fmt::streamed(tile));
         throw;
       }
     }
     perf_report_get_tile(pc);
   } else {
     utl::verify(opt.tile_.size() == 3, "need exactly three coordinats: x y z");
-    geo::tile tile{opt.tile_[0], opt.tile_[1], opt.tile_[2]};
-    t_log("render tile: {}", tile);
+    geo::tile const tile{opt.tile_[0], opt.tile_[1], opt.tile_[2]};
+    t_log("render tile: {}", fmt::streamed(tile));
 
     auto txn = db_handle.make_txn();
     auto features_dbi = db_handle.features_dbi(txn);

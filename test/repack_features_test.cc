@@ -1,4 +1,4 @@
-#include "catch2/catch_all.hpp"
+#include "gtest/gtest.h"
 
 #include <random>
 
@@ -9,7 +9,9 @@
 
 #include "test_pack_handle.h"
 
-TEST_CASE("repack_features", "[.]") {
+constexpr auto const size = 1024ULL * 1024 * 1024 * 1;
+
+TEST(repack_features, test) {
   tiles::test_pack_handle handle;
 
   std::vector<tiles::tile_record> tasks((1 << tiles::kTileDefaultIndexZoomLvl) *
@@ -27,8 +29,8 @@ TEST_CASE("repack_features", "[.]") {
   std::normal_distribution size_dist(10000., 10000.);
 
   size_t initial_packs = 0;
-  while (handle.size() < 1024ULL * 1024 * 1024 * 40) {
-    size_t size = std::fabs(size_dist(rand));
+  while (handle.size() < size) {
+    auto const size = static_cast<std::size_t>(std::fabs(size_dist(rand)));
     if (size == 0) {
       continue;
     }
@@ -53,9 +55,9 @@ TEST_CASE("repack_features", "[.]") {
             begin(packs), end(packs), 0ULL,
             [](auto const& acc, auto const& p) { return acc + p.size(); });
         size *= std::fabs(dist(rand));
-        return std::string_view{nullptr, size};
+        return std::string_view{"nullptr", size};
       },
       [&](auto const& updates) { finished_task_count += updates.size(); });
 
-  CHECK(initial_task_count == finished_task_count);
+  EXPECT_TRUE(initial_task_count == finished_task_count);
 }

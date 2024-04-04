@@ -44,7 +44,7 @@ struct prepare_manager {
   }
 
   std::vector<prepare_task> get_batch() {
-    std::lock_guard<std::mutex> lock{mutex_};
+    auto const lock = std::lock_guard<std::mutex>{mutex_};
     // do not process all expensive low-z tiles in one thread
     auto const batch_size = 1U << 9U;
     auto const batch_inc = 1U << static_cast<uint32_t>(std::max(
@@ -73,7 +73,7 @@ struct prepare_manager {
   }
 
   void finish(geo::tile tile, uint64_t size, uint64_t dur) {
-    std::lock_guard<std::mutex> lock{mutex_};
+    auto const lock = std::lock_guard<std::mutex>{mutex_};
     auto& stats = stats_.at(tile.z_);
 
     stats.sum_size_ += size;

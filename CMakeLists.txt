@@ -118,16 +118,14 @@ target_link_libraries(tiles-benchmark
 )
 
 file(GLOB_RECURSE tiles-test-files
-  test/catch_main.cc
   test/*_test.cc
   src/osm/hybrid_node_idx.cc
 )
-
 add_executable(tiles-test EXCLUDE_FROM_ALL ${tiles-test-files})
 set_property(TARGET tiles-test PROPERTY CXX_STANDARD 17)
 target_compile_options(tiles-test PRIVATE ${TILES_WARNINGS})
 target_include_directories(tiles-test PUBLIC include)
-target_link_libraries(tiles-test tiles Catch2WithMain)
+target_link_libraries(tiles-test tiles gtest gtest_main)
 
 
 # --- fuzzing

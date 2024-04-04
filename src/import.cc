@@ -82,7 +82,7 @@ int run_tiles_import(int argc, char const** argv) {
         dbi_handle{db_handle, db_handle.features_dbi_opener()}, pack_handle};
 
     if (opt.has_any_task({"coastlines"})) {
-      scoped_timer t{"load coastlines"};
+      auto const t = scoped_timer{"load coastlines"};
       load_coastlines(db_handle, inserter, opt.coastlines_fname_);
     }
 

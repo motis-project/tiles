@@ -1,202 +1,198 @@
-#include "catch2/catch_all.hpp"
+#include "gtest/gtest.h"
 
 #include <fstream>
 
 #include "tiles/db/bq_tree.h"
 
-TEST_CASE("bq_tree_contains") {
-  SECTION("default ctor") {
-    tiles::bq_tree tree;
-    CHECK(1 == tree.nodes_.size());
-    CHECK(false == tree.contains({0, 0, 0}));
+TEST(bq_tree_contains, default_ctor) {
+  auto const tree = tiles::bq_tree{};
+  EXPECT_TRUE(1 == tree.nodes_.size());
+  EXPECT_TRUE(false == tree.contains({0, 0, 0}));
+}
+
+TEST(bq_tree_contains, root_tree) {
+  auto empty_tree = tiles::make_bq_tree({});
+  EXPECT_TRUE(1 == empty_tree.nodes_.size());
+  EXPECT_TRUE(false == empty_tree.contains({0, 0, 0}));
+
+  auto root_tree = tiles::make_bq_tree({{0, 0, 0}});
+  EXPECT_TRUE(1 == root_tree.nodes_.size());
+  EXPECT_TRUE(true == root_tree.contains({0, 0, 0}));
+}
+
+TEST(bq_tree_contains, l1_tree) {
+  auto tree = tiles::make_bq_tree({{0, 0, 1}});
+  EXPECT_TRUE(1 == tree.nodes_.size());
+
+  // self
+  EXPECT_TRUE(true == tree.contains({0, 0, 1}));
+
+  // parent
+  EXPECT_TRUE(false == tree.contains({0, 0, 0}));
+
+  // siblings
+  EXPECT_TRUE(false == tree.contains({0, 1, 1}));
+  EXPECT_TRUE(false == tree.contains({1, 0, 1}));
+  EXPECT_TRUE(false == tree.contains({1, 1, 1}));
+
+  // child
+  EXPECT_TRUE(true == tree.contains({0, 0, 2}));
+}
+
+TEST(bq_tree_contains, l2_tree) {
+  auto tree = tiles::make_bq_tree({{0, 1, 2}, {3, 3, 2}});
+
+  EXPECT_TRUE(3 == tree.nodes_.size());
+
+  // self
+  EXPECT_TRUE(true == tree.contains({0, 1, 2}));
+  EXPECT_TRUE(true == tree.contains({3, 3, 2}));
+
+  // root
+  EXPECT_TRUE(false == tree.contains({0, 0, 0}));
+
+  // parent
+  EXPECT_TRUE(false == tree.contains({0, 0, 1}));
+  EXPECT_TRUE(false == tree.contains({0, 1, 1}));
+  EXPECT_TRUE(false == tree.contains({1, 0, 1}));
+  EXPECT_TRUE(false == tree.contains({1, 1, 1}));
+
+  // sibling
+  EXPECT_TRUE(false == tree.contains({0, 0, 2}));
+  EXPECT_TRUE(false == tree.contains({42, 48, 8}));
+}
+
+TEST(bq_tree_all_leafs, default_ctor) {
+  auto const tree = tiles::bq_tree{};
+  EXPECT_TRUE(true == tree.all_leafs({0, 0, 0}).empty());
+}
+
+TEST(bq_tree_all_leafs, root_tree) {
+  auto empty_tree = tiles::make_bq_tree({});
+  EXPECT_TRUE(true == empty_tree.all_leafs({0, 0, 0}).empty());
+
+  auto root_tree = tiles::make_bq_tree({{0, 0, 0}});
+  auto root_result = root_tree.all_leafs({0, 0, 0});
+  ASSERT_TRUE(1 == root_result.size());
+  EXPECT_TRUE((geo::tile{0, 0, 0} == root_result.at(0)));
+}
+
+TEST(bq_tree_all_leafs, l1_tree) {
+  auto tree = tiles::make_bq_tree({{1, 1, 1}});
+  {  // parent
+    auto result = tree.all_leafs({0, 0, 0});
+    ASSERT_TRUE(1 == result.size());
+    EXPECT_TRUE((geo::tile{1, 1, 1} == result.at(0)));
   }
-
-  SECTION("root tree") {
-    auto empty_tree = tiles::make_bq_tree({});
-    CHECK(1 == empty_tree.nodes_.size());
-    CHECK(false == empty_tree.contains({0, 0, 0}));
-
-    auto root_tree = tiles::make_bq_tree({{0, 0, 0}});
-    CHECK(1 == root_tree.nodes_.size());
-    CHECK(true == root_tree.contains({0, 0, 0}));
+  {  // self
+    auto result = tree.all_leafs({1, 1, 1});
+    ASSERT_TRUE(1 == result.size());
+    EXPECT_TRUE((geo::tile{1, 1, 1} == result.at(0)));
   }
-
-  SECTION("l1 tree") {
-    auto tree = tiles::make_bq_tree({{0, 0, 1}});
-    CHECK(1 == tree.nodes_.size());
-
-    // self
-    CHECK(true == tree.contains({0, 0, 1}));
-
-    // parent
-    CHECK(false == tree.contains({0, 0, 0}));
-
-    // siblings
-    CHECK(false == tree.contains({0, 1, 1}));
-    CHECK(false == tree.contains({1, 0, 1}));
-    CHECK(false == tree.contains({1, 1, 1}));
-
-    // child
-    CHECK(true == tree.contains({0, 0, 2}));
+  {  // sibling
+    ASSERT_TRUE(true == tree.all_leafs({0, 0, 1}).empty());
+    ASSERT_TRUE(true == tree.all_leafs({0, 1, 1}).empty());
+    ASSERT_TRUE(true == tree.all_leafs({1, 0, 1}).empty());
   }
-
-  SECTION("l2 tree") {
-    auto tree = tiles::make_bq_tree({{0, 1, 2}, {3, 3, 2}});
-
-    CHECK(3 == tree.nodes_.size());
-
-    // self
-    CHECK(true == tree.contains({0, 1, 2}));
-    CHECK(true == tree.contains({3, 3, 2}));
-
-    // root
-    CHECK(false == tree.contains({0, 0, 0}));
-
-    // parent
-    CHECK(false == tree.contains({0, 0, 1}));
-    CHECK(false == tree.contains({0, 1, 1}));
-    CHECK(false == tree.contains({1, 0, 1}));
-    CHECK(false == tree.contains({1, 1, 1}));
-
-    // sibling
-    CHECK(false == tree.contains({0, 0, 2}));
-    CHECK(false == tree.contains({42, 48, 8}));
+  {  // self - child
+    auto result = tree.all_leafs({2, 2, 2});
+    ASSERT_TRUE(1 == result.size());
+    EXPECT_TRUE((geo::tile{2, 2, 2} == result.at(0)));
+  }
+  {  // self - child
+    ASSERT_TRUE(true == tree.all_leafs({0, 0, 2}).empty());
   }
 }
 
-TEST_CASE("bq_tree_all_leafs") {
-  SECTION("default ctor") {
-    tiles::bq_tree tree;
-    CHECK(true == tree.all_leafs({0, 0, 0}).empty());
-  }
-
-  SECTION("root tree") {
-    auto empty_tree = tiles::make_bq_tree({});
-    CHECK(true == empty_tree.all_leafs({0, 0, 0}).empty());
-
-    auto root_tree = tiles::make_bq_tree({{0, 0, 0}});
-    auto root_result = root_tree.all_leafs({0, 0, 0});
-    REQUIRE(1 == root_result.size());
-    CHECK((geo::tile{0, 0, 0} == root_result.at(0)));
-  }
-
-  SECTION("l1 tree") {
-    auto tree = tiles::make_bq_tree({{1, 1, 1}});
-    {  // parent
-      auto result = tree.all_leafs({0, 0, 0});
-      REQUIRE(1 == result.size());
-      CHECK((geo::tile{1, 1, 1} == result.at(0)));
-    }
-    {  // self
-      auto result = tree.all_leafs({1, 1, 1});
-      REQUIRE(1 == result.size());
-      CHECK((geo::tile{1, 1, 1} == result.at(0)));
-    }
-    {  // sibling
-      REQUIRE(true == tree.all_leafs({0, 0, 1}).empty());
-      REQUIRE(true == tree.all_leafs({0, 1, 1}).empty());
-      REQUIRE(true == tree.all_leafs({1, 0, 1}).empty());
-    }
-    {  // self - child
-      auto result = tree.all_leafs({2, 2, 2});
-      REQUIRE(1 == result.size());
-      CHECK((geo::tile{2, 2, 2} == result.at(0)));
-    }
-    {  // self - child
-      REQUIRE(true == tree.all_leafs({0, 0, 2}).empty());
-    }
-  }
-
-  SECTION("l2 tree") {
-    auto tree = tiles::make_bq_tree({{0, 1, 2}, {3, 3, 2}});
-    {  // root
-      auto result = tree.all_leafs({0, 0, 0});
-      std::sort(begin(result), end(result));
-      REQUIRE(2 == result.size());
-      CHECK((geo::tile{0, 1, 2} == result.at(0)));
-      CHECK((geo::tile{3, 3, 2} == result.at(1)));
-    }
-    {  // parent
-      auto result = tree.all_leafs({0, 0, 1});
-      std::sort(begin(result), end(result));
-      REQUIRE(1 == result.size());
-      CHECK((geo::tile{0, 1, 2} == result.at(0)));
-    }
-    {  // other
-      REQUIRE(true == tree.all_leafs({0, 0, 8}).empty());
-      REQUIRE(true == tree.all_leafs({42, 48, 8}).empty());
-    }
-  }
-
-  SECTION("l3 tree") {
-    std::vector<geo::tile> tiles;
-    for (auto x = 0; x < 3; ++x) {
-      for (auto y = 0; y < 3; ++y) {
-        tiles.emplace_back(x, y, 3);
-      }
-    }
-    std::sort(begin(tiles), end(tiles));
-
-    auto tree = tiles::make_bq_tree(tiles);
+TEST(bq_tree_all_leafs, l2_tree) {
+  auto tree = tiles::make_bq_tree({{0, 1, 2}, {3, 3, 2}});
+  {  // root
     auto result = tree.all_leafs({0, 0, 0});
     std::sort(begin(result), end(result));
-    CHECK(tiles == result);
+    ASSERT_TRUE(2 == result.size());
+    EXPECT_TRUE((geo::tile{0, 1, 2} == result.at(0)));
+    EXPECT_TRUE((geo::tile{3, 3, 2} == result.at(1)));
+  }
+  {  // parent
+    auto result = tree.all_leafs({0, 0, 1});
+    std::sort(begin(result), end(result));
+    ASSERT_TRUE(1 == result.size());
+    EXPECT_TRUE((geo::tile{0, 1, 2} == result.at(0)));
+  }
+  {  // other
+    ASSERT_TRUE(true == tree.all_leafs({0, 0, 8}).empty());
+    ASSERT_TRUE(true == tree.all_leafs({42, 48, 8}).empty());
+  }
+}
+
+TEST(bq_tree_all_leafs, l3_tree) {
+  std::vector<geo::tile> tiles;
+  for (auto x = 0; x < 3; ++x) {
+    for (auto y = 0; y < 3; ++y) {
+      tiles.emplace_back(x, y, 3);
+    }
+  }
+  std::sort(begin(tiles), end(tiles));
+
+  auto tree = tiles::make_bq_tree(tiles);
+  auto result = tree.all_leafs({0, 0, 0});
+  std::sort(begin(result), end(result));
+  EXPECT_TRUE(tiles == result);
+}
+
+TEST(bq_tree_all_leafs, l1_fuzzy) {
+  auto const tiles =
+      std::vector<geo::tile>{{0, 0, 1}, {0, 1, 1}, {1, 0, 1}, {1, 1, 1}};
+
+  for (auto const& tut : tiles) {
+    auto tree = tiles::make_bq_tree({tut});
+    auto result = tree.all_leafs({0, 0, 0});
+    ASSERT_TRUE(1 == result.size());
+    EXPECT_TRUE(tut == result.at(0));
   }
 
-  SECTION("l1 fuzzy") {
-    auto const tiles =
-        std::vector<geo::tile>{{0, 0, 1}, {0, 1, 1}, {1, 0, 1}, {1, 1, 1}};
+  auto const in = [](auto const& e, auto const& v) {
+    return std::find(begin(v), end(v), e) != end(v);
+  };
 
-    for (auto const& tut : tiles) {
-      auto tree = tiles::make_bq_tree({tut});
+  for (auto i = 0ULL; i < tiles.size(); ++i) {
+    for (auto j = 0ULL; j < tiles.size(); ++j) {
+      if (i == j) {
+        continue;
+      }
+      auto const& tut1 = tiles.at(i);
+      auto const& tut2 = tiles.at(j);
+
+      auto tree = tiles::make_bq_tree({tut1, tut2});
       auto result = tree.all_leafs({0, 0, 0});
-      REQUIRE(1 == result.size());
-      CHECK(tut == result.at(0));
+      ASSERT_TRUE(2 == result.size());
+      EXPECT_TRUE(true == in(tut1, result));
+      EXPECT_TRUE(true == in(tut2, result));
     }
+  }
 
-    auto const in = [](auto const& e, auto const& v) {
-      return std::find(begin(v), end(v), e) != end(v);
-    };
-
-    for (auto i = 0ULL; i < tiles.size(); ++i) {
-      for (auto j = 0ULL; j < tiles.size(); ++j) {
-        if (i == j) {
+  for (auto i = 0ULL; i < tiles.size(); ++i) {
+    for (auto j = 0ULL; j < tiles.size(); ++j) {
+      for (auto k = 0ULL; k < tiles.size(); ++k) {
+        if (i == j || i == k || j == k) {
           continue;
         }
         auto const& tut1 = tiles.at(i);
         auto const& tut2 = tiles.at(j);
+        auto const& tut3 = tiles.at(k);
 
-        auto tree = tiles::make_bq_tree({tut1, tut2});
+        auto tree = tiles::make_bq_tree({tut1, tut2, tut3});
         auto result = tree.all_leafs({0, 0, 0});
-        REQUIRE(2 == result.size());
-        CHECK(true == in(tut1, result));
-        CHECK(true == in(tut2, result));
-      }
-    }
-
-    for (auto i = 0ULL; i < tiles.size(); ++i) {
-      for (auto j = 0ULL; j < tiles.size(); ++j) {
-        for (auto k = 0ULL; k < tiles.size(); ++k) {
-          if (i == j || i == k || j == k) {
-            continue;
-          }
-          auto const& tut1 = tiles.at(i);
-          auto const& tut2 = tiles.at(j);
-          auto const& tut3 = tiles.at(k);
-
-          auto tree = tiles::make_bq_tree({tut1, tut2, tut3});
-          auto result = tree.all_leafs({0, 0, 0});
-          REQUIRE(3 == result.size());
-          CHECK(true == in(tut1, result));
-          CHECK(true == in(tut2, result));
-          CHECK(true == in(tut3, result));
-        }
+        ASSERT_TRUE(3 == result.size());
+        EXPECT_TRUE(true == in(tut1, result));
+        EXPECT_TRUE(true == in(tut2, result));
+        EXPECT_TRUE(true == in(tut3, result));
       }
     }
   }
 }
 
-TEST_CASE("bq_tree_tsv_file", "[hide]") {
+TEST(bq_tree_tsv_file, hide) {
   std::ifstream in("tiles.tsv");
 
   std::vector<geo::tile> tiles;
@@ -237,6 +233,6 @@ TEST_CASE("bq_tree_tsv_file", "[hide]") {
     auto actual = tree.all_leafs(query);
     std::sort(begin(actual), end(actual));
 
-    CHECK(expected == actual);
+    EXPECT_TRUE(expected == actual);
   }
 }
