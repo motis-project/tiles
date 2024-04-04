@@ -102,18 +102,14 @@ jobs:
           key: ${{ steps.restore-buildcache.outputs.cache-primary-key }}
 
   macos:
-    runs-on: macos-14
+    runs-on: macos-latest
     strategy:
       fail-fast: false
       matrix:
         config:
           - preset: macos-x86_64
-            cache: macos-x86_64-avx
-          - preset: macos-x86_64-noavx2
-            cache: macos-x86_64-noavx
-          - preset: macos-arm64
-            cache: macos-arm64
             tests: On
+          - preset: macos-arm64
     env:
       BUILDCACHE_COMPRESS: true
       BUILDCACHE_DIRECT_MODE: true
