@@ -102,14 +102,15 @@ jobs:
           key: ${{ steps.restore-buildcache.outputs.cache-primary-key }}
 
   macos:
-    runs-on: macos-latest
+    runs-on: ${{ matrix.config.os }}
     strategy:
       fail-fast: false
       matrix:
         config:
           - preset: macos-x86_64
-            tests: On
+            os: macos-13
           - preset: macos-arm64
+            os: macos-14
     env:
       BUILDCACHE_COMPRESS: true
       BUILDCACHE_DIRECT_MODE: true
@@ -160,7 +161,6 @@ jobs:
 
       # ==== TESTS ====
       - name: Run Tests
-        if: ${{ !matrix.config.skiptests }}
         run: ${{ matrix.config.emulator }} build/tiles-test
 
       # ==== DISTRIBUTION ====
