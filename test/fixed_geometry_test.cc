@@ -1,4 +1,4 @@
-#include "catch2/catch_all.hpp"
+#include "gtest/gtest.h"
 
 #include <random>
 
@@ -8,7 +8,7 @@
 
 using namespace tiles;
 
-TEST_CASE("fixed point io") {
+TEST(fixed_geometry_test, fixed_point_io) {
   std::vector<fixed_point> test_cases;
   test_cases.push_back({{kFixedCoordMin, kFixedCoordMin}});
   test_cases.push_back({{kFixedCoordMax, kFixedCoordMax}});
@@ -24,11 +24,11 @@ TEST_CASE("fixed point io") {
     auto const serialized = serialize(test_case);
     auto const deserialized = deserialize(serialized);
 
-    CHECK(test_case == mpark::get<fixed_point>(deserialized));
+    EXPECT_TRUE(test_case == mpark::get<fixed_point>(deserialized));
   }
 }
 
-TEST_CASE("fixed polyline io") {
+TEST(fixed_geometry_test, fixed_polyline_io) {
   std::vector<fixed_polyline> test_cases;
 
   test_cases.push_back({{{{10, 10}, {20, 20}}}});
@@ -59,6 +59,6 @@ TEST_CASE("fixed polyline io") {
     auto const serialized = serialize(test_case);
     auto const deserialized = deserialize(serialized);
 
-    CHECK(test_case == mpark::get<fixed_polyline>(deserialized));
+    EXPECT_TRUE(test_case == mpark::get<fixed_polyline>(deserialized));
   }
 }

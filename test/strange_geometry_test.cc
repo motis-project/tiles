@@ -1,4 +1,4 @@
-#include "catch2/catch_all.hpp"
+#include "gtest/gtest.h"
 
 #include <iomanip>
 #include <iostream>
@@ -11,7 +11,7 @@
 #include "tiles/fixed/convert.h"
 #include "tiles/fixed/fixed_geometry.h"
 
-TEST_CASE("at_antimeridian") {
+TEST(geometry, at_antimeridian) {
   geo::tile tile{1023, 560, 10};
 
   tiles::fixed_polyline west_coast_road{
@@ -25,5 +25,5 @@ TEST_CASE("at_antimeridian") {
   auto quick_pack = tiles::pack_features({ser});
   auto optimal_pack = tiles::pack_features(tile, {}, {quick_pack});
 
-  CHECK(!optimal_pack.empty());
+  EXPECT_TRUE(!optimal_pack.empty());
 }

@@ -1,4 +1,4 @@
-#include "catch2/catch_all.hpp"
+#include "gtest/gtest.h"
 
 #include <random>
 
