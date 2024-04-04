@@ -97,7 +97,7 @@ int run_tiles_benchmark(int argc, char const** argv) {
         auto const rendered_tile = get_tile(db_handle, txn, features_cursor,
                                             pack_handle, render_ctx, tile, pc);
       } catch (...) {
-        t_log("problem in tile: {}", tile);
+        t_log("problem in tile: {}", fmt::streamed(tile));
         throw;
       }
     }
@@ -105,7 +105,7 @@ int run_tiles_benchmark(int argc, char const** argv) {
   } else {
     utl::verify(opt.tile_.size() == 3, "need exactly three coordinats: x y z");
     geo::tile tile{opt.tile_[0], opt.tile_[1], opt.tile_[2]};
-    t_log("render tile: {}", tile);
+    t_log("render tile: {}", fmt::streamed(tile));
 
     auto txn = db_handle.make_txn();
     auto features_dbi = db_handle.features_dbi(txn);
