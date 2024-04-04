@@ -55,7 +55,7 @@ TEST(repack_features, test) {
             begin(packs), end(packs), 0ULL,
             [](auto const& acc, auto const& p) { return acc + p.size(); });
         size *= std::fabs(dist(rand));
-        return std::string_view{nullptr, size};
+        return std::string_view{"nullptr", size};
       },
       [&](auto const& updates) { finished_task_count += updates.size(); });
 
