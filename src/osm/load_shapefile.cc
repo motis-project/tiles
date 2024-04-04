@@ -104,7 +104,7 @@ void read_shapefile(utl::buffer const& buf,
 }
 
 utl::buffer load_buffer(std::string const& fname) {
-  utl::mmap_reader mem{fname.c_str()};
+  auto const mem = utl::mmap_reader{fname.c_str()};
 
   mz_zip_archive ar{};
   utl::verify(mz_zip_reader_init_mem(&ar, mem.m_.ptr(), mem.m_.size(), 0) != 0,
@@ -117,7 +117,7 @@ utl::buffer load_buffer(std::string const& fname) {
     utl::verify(mz_zip_reader_file_stat(&ar, i, &stat) != 0,
                 "shp: unable to stat zip entry");
 
-    std::string_view name{stat.m_filename};
+    auto const name = std::string_view{stat.m_filename};
     if (name.size() < 4 || name.substr(name.size() - 4) != ".shp") {
       continue;
     }

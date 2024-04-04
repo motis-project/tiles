@@ -50,7 +50,7 @@ struct script_runner {
 
 void check_profile(std::string const& osm_profile) {
   try {
-    script_runner runner{osm_profile};
+    auto const runner = script_runner{osm_profile};
   } catch (...) {
     t_log("check_profile failed [file={}]", osm_profile);
     throw;
