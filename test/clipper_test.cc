@@ -4,7 +4,7 @@
 
 namespace cl = ClipperLib;
 
-cl::Path subject{{0, 0}, {10, 0}, {10, 10}, {0, 10}};
+auto const subject = cl::Path{{0, 0}, {10, 0}, {10, 10}, {0, 10}};
 
 TEST(clipper, orientation) {
   ASSERT_TRUE(cl::Orientation(subject));
@@ -20,8 +20,8 @@ TEST(clipper, in_polygon) {
 }
 
 TEST(clipper, intersection) {
-  cl::Path clip{{0, 0}, {5, 0}, {5, 5}, {0, 5}};
-  cl::Paths solution;
+  auto const clip = cl::Path{{0, 0}, {5, 0}, {5, 5}, {0, 5}};
+  auto solution = cl::Paths{};
 
   cl::Clipper clpr;
   clpr.AddPath(subject, cl::ptSubject, true);
@@ -37,8 +37,8 @@ TEST(clipper, intersection) {
 }
 
 TEST(clipper, intersection_empty) {
-  cl::Path clip{{20, 20}, {22, 20}, {22, 22}, {20, 22}};
-  cl::Paths solution;
+  auto const clip = cl::Path{{20, 20}, {22, 20}, {22, 22}, {20, 22}};
+  auto solution = cl::Paths{};
 
   cl::Clipper clpr;
   clpr.AddPath(subject, cl::ptSubject, true);

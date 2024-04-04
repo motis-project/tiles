@@ -5,7 +5,7 @@
 using namespace tiles;
 
 TEST(clip, fixed_point_clip) {
-  fixed_box box{{10, 10}, {20, 20}};
+  auto const box = fixed_box{{10, 10}, {20, 20}};
 
   auto const null_index = fixed_geometry{fixed_null{}}.index();
   auto const point_index = fixed_geometry{fixed_point{}}.index();
@@ -37,7 +37,7 @@ TEST(clip, fixed_point_clip) {
 }
 
 TEST(clip, fixed_point_polyline) {
-  fixed_box box{{10, 10}, {20, 20}};
+  auto const box = fixed_box{{10, 10}, {20, 20}};
 
   auto const null_index = fixed_geometry{fixed_null{}}.index();
   auto const polyline_index = fixed_geometry{fixed_polyline{}}.index();
@@ -60,7 +60,7 @@ TEST(clip, fixed_point_polyline) {
     auto result = clip(input, box);
     ASSERT_TRUE(result.index() == polyline_index);
 
-    fixed_polyline expected{{{{12, 10}, {12, 12}}}};
+    auto const expected = fixed_polyline{{{{12, 10}, {12, 12}}}};
     EXPECT_TRUE(mpark::get<fixed_polyline>(result) == expected);
   }
 }

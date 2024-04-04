@@ -32,8 +32,8 @@ TEST(feature_pack, one) {
       {tiles::latlng_to_fixed({49.87805785566374, 8.654533624649048}),
        tiles::latlng_to_fixed({49.87574857815668, 8.657859563827515})}};
 
-  tiles::feature f{42ULL, 1, {0U, 20U}, {}, tuda};
-  std::string ser = tiles::serialize_feature(f);
+  auto const f = tiles::feature{42ULL, 1, {0U, 20U}, {}, tuda};
+  auto const ser = tiles::serialize_feature(f);
 
   {
     auto const pack = tiles::pack_features({ser});

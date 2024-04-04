@@ -30,7 +30,7 @@ TEST(repack_features, test) {
 
   size_t initial_packs = 0;
   while (handle.size() < size) {
-    size_t size = std::fabs(size_dist(rand));
+    auto const size = static_cast<std::size_t>(std::fabs(size_dist(rand)));
     if (size == 0) {
       continue;
     }

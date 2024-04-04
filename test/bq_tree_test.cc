@@ -5,7 +5,7 @@
 #include "tiles/db/bq_tree.h"
 
 TEST(bq_tree_contains, default_ctor) {
-  tiles::bq_tree tree;
+  auto const tree = tiles::bq_tree{};
   EXPECT_TRUE(1 == tree.nodes_.size());
   EXPECT_TRUE(false == tree.contains({0, 0, 0}));
 }
@@ -63,7 +63,7 @@ TEST(bq_tree_contains, l2_tree) {
 }
 
 TEST(bq_tree_all_leafs, default_ctor) {
-  tiles::bq_tree tree;
+  auto const tree = tiles::bq_tree{};
   EXPECT_TRUE(true == tree.all_leafs({0, 0, 0}).empty());
 }
 

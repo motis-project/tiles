@@ -38,7 +38,7 @@ std::vector<std::pair<uint32_t, uint32_t>> collect(char const* tree,
 }
 
 TEST(quad_tree, empty_tree) {
-  geo::tile root = {0, 0, 0};
+  auto const root = geo::tile{0, 0, 0};
   auto tree = tiles::make_quad_tree(root, {});
   ASSERT_TRUE(16 == tree.size());
 
@@ -47,14 +47,14 @@ TEST(quad_tree, empty_tree) {
 }
 
 TEST(quad_tree, broken_tree_input) {
-  geo::tile root{0, 0, 1};
+  auto const root = geo::tile{0, 0, 1};
   EXPECT_ANY_THROW(tiles::make_quad_tree(root, {{{0, 1, 1}, 0, 0}}));
   EXPECT_ANY_THROW(tiles::make_quad_tree(root, {{{0, 0, 0}, 0, 0}}));
   EXPECT_ANY_THROW(tiles::make_quad_tree(root, {{{2, 2, 2}, 0, 0}}));
 }
 
 TEST(quad_tree, root_tree) {
-  geo::tile root{4, 5, 6};
+  auto const root = geo::tile{4, 5, 6};
 
   auto tree = tiles::make_quad_tree(root, {{root, 42, 23}});
   ASSERT_TRUE(16 == tree.size());
@@ -89,7 +89,7 @@ TEST(quad_tree, root_tree) {
 }
 
 TEST(quad_tree, child_tree) {
-  geo::tile root{0, 0, 1};
+  auto const root = geo::tile{0, 0, 1};
 
   auto tree = tiles::make_quad_tree(
       root, {{{0, 0, 2}, 1, 3}, {{0, 2, 4}, 5, 1}, {{0, 0, 4}, 4, 1}});
@@ -147,7 +147,7 @@ TEST(quad_tree, child_tree) {
 }
 
 TEST(quad_tree_real_world, problem_1) {
-  geo::tile root{534, 362, 10};
+  auto const root = geo::tile{534, 362, 10};
 
   std::vector<tiles::quad_tree_input> input;
   input.push_back({{534, 362, 10}, 1703394, 1});
@@ -182,7 +182,7 @@ TEST(quad_tree_real_world, problem_1) {
 
   // tiles::dump_tree(tree);
 
-  geo::tile query{17097, 11585, 15};
+  auto const query = geo::tile{17097, 11585, 15};
 
   std::optional<std::pair<uint32_t, uint32_t>> result;
   tiles::walk_quad_tree(tree.data(), root, query,

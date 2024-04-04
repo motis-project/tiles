@@ -3,7 +3,7 @@
 #include "tiles/db/layer_names.h"
 
 TEST(layer_names, empty) {
-  std::vector<std::string> vec_in;
+  auto const vec_in = std::vector<std::string>{};
   auto const buf = tiles::write_layer_names(vec_in);
   auto const vec_out = tiles::read_layer_names(buf);
 
@@ -11,7 +11,7 @@ TEST(layer_names, empty) {
 }
 
 TEST(layer_names, one) {
-  std::vector<std::string> vec_in{"yolo"};
+  auto const vec_in = std::vector<std::string>{"yolo"};
   auto const buf = tiles::write_layer_names(vec_in);
   auto const vec_out = tiles::read_layer_names(buf);
 
@@ -19,7 +19,7 @@ TEST(layer_names, one) {
 }
 
 TEST(layer_names, two) {
-  std::vector<std::string> vec_in{"road", "rail"};
+  auto const vec_in = std::vector<std::string>{"road", "rail"};
   auto const buf = tiles::write_layer_names(vec_in);
   auto const vec_out = tiles::read_layer_names(buf);
 

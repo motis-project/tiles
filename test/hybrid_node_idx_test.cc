@@ -27,7 +27,7 @@ void get_coords_helper(
 }
 
 TEST(hybrid_node_idx, null) {
-  tiles::hybrid_node_idx nodes;
+  auto const nodes = tiles::hybrid_node_idx{};
   EXPECT_FALSE(get_coords(nodes, 0));
 }
 
@@ -36,11 +36,11 @@ TEST(hybrid_node_idx, empty_idx) {
   auto const dat_fd = osmium::detail::create_tmp_file();
 
   {
-    tiles::hybrid_node_idx_builder builder{idx_fd, dat_fd};
+    auto const builder = tiles::hybrid_node_idx_builder{idx_fd, dat_fd};
     builder.finish();
   }
 
-  tiles::hybrid_node_idx nodes{idx_fd, dat_fd};
+  auto const nodes = tiles::hybrid_node_idx{idx_fd, dat_fd};
   EXPECT_FALSE(get_coords(nodes, 0));
 }
 
@@ -49,12 +49,12 @@ TEST(hybrid_node_idx, entry_single) {
   auto const dat_fd = osmium::detail::create_tmp_file();
 
   {
-    tiles::hybrid_node_idx_builder builder{idx_fd, dat_fd};
+    auto const builder = tiles::hybrid_node_idx_builder{idx_fd, dat_fd};
     builder.push(42, {2, 3});
     builder.finish();
   }
 
-  tiles::hybrid_node_idx nodes{idx_fd, dat_fd};
+  auto const nodes = tiles::hybrid_node_idx{idx_fd, dat_fd};
   EXPECT_FALSE(get_coords(nodes, 0));
   EXPECT_FALSE(get_coords(nodes, 100));
 
@@ -70,14 +70,14 @@ TEST(hybrid_node_idx, entries_consecutive) {
   auto const dat_fd = osmium::detail::create_tmp_file();
 
   {
-    tiles::hybrid_node_idx_builder builder{idx_fd, dat_fd};
+    auto const builder = tiles::hybrid_node_idx_builder{idx_fd, dat_fd};
     builder.push(42, {2, 3});
     builder.push(43, {5, 6});
     builder.push(44, {8, 9});
     builder.finish();
   }
 
-  tiles::hybrid_node_idx nodes{idx_fd, dat_fd};
+  auto const nodes = tiles::hybrid_node_idx{idx_fd, dat_fd};
   EXPECT_FALSE(get_coords(nodes, 0));
   EXPECT_FALSE(get_coords(nodes, 100));
 
@@ -130,7 +130,7 @@ TEST(hybrid_node_idx, entries_gap) {
   auto const dat_fd = osmium::detail::create_tmp_file();
 
   {
-    tiles::hybrid_node_idx_builder builder{idx_fd, dat_fd};
+    auto const builder = tiles::hybrid_node_idx_builder{idx_fd, dat_fd};
     builder.push(42, {2, 3});
     builder.push(44, {8, 9});
     builder.push(45, {1, 2});
@@ -138,7 +138,7 @@ TEST(hybrid_node_idx, entries_gap) {
     builder.finish();
   }
 
-  tiles::hybrid_node_idx nodes{idx_fd, dat_fd};
+  auto const nodes = tiles::hybrid_node_idx{idx_fd, dat_fd};
   EXPECT_FALSE(get_coords(nodes, 0));
   EXPECT_FALSE(get_coords(nodes, 100));
 
@@ -196,7 +196,7 @@ TEST(hybrid_node_idx, artificial_splits) {
   auto const dat_fd = osmium::detail::create_tmp_file();
 
   {
-    tiles::hybrid_node_idx_builder builder{idx_fd, dat_fd};
+    auto const builder = tiles::hybrid_node_idx_builder{idx_fd, dat_fd};
     builder.push(42, {2, 3});
     builder.push(43, {2, 7});
     builder.push(44, {(1 << 28) + 14, (1 << 28) + 15});
@@ -206,7 +206,7 @@ TEST(hybrid_node_idx, artificial_splits) {
     EXPECT_TRUE(2 == builder.get_stat_spans());
   }
 
-  tiles::hybrid_node_idx nodes{idx_fd, dat_fd};
+  auto const nodes = tiles::hybrid_node_idx{idx_fd, dat_fd};
   EXPECT_FALSE(get_coords(nodes, 0));
   EXPECT_FALSE(get_coords(nodes, 100));
 
@@ -230,12 +230,12 @@ TEST(hybrid_node_idx, large_numbers) {
   auto const dat_fd = osmium::detail::create_tmp_file();
 
   {
-    tiles::hybrid_node_idx_builder builder{idx_fd, dat_fd};
+    auto const builder = tiles::hybrid_node_idx_builder{idx_fd, dat_fd};
     builder.push(42, {2251065056, 1454559573});
     builder.finish();
   }
 
-  tiles::hybrid_node_idx nodes{idx_fd, dat_fd};
+  auto const nodes = tiles::hybrid_node_idx{idx_fd, dat_fd};
   EXPECT_FALSE(get_coords(nodes, 0));
   EXPECT_FALSE(get_coords(nodes, 100));
 
@@ -246,7 +246,7 @@ TEST(hybrid_node_idx, large_numbers) {
 
 TEST(hybrid_node_idx, limits) {
   tiles::hybrid_node_idx nodes;
-  tiles::hybrid_node_idx_builder builder{nodes};
+  auto const builder = tiles::hybrid_node_idx_builder{nodes};
 
   EXPECT_ANY_THROW(builder.push(42, {-2, 3}));
   EXPECT_ANY_THROW(builder.push(42, {2, -3}));
@@ -264,7 +264,7 @@ TEST(hybrid_node_idx, missing_nodes) {
   auto const dat_fd = osmium::detail::create_tmp_file();
 
   {
-    tiles::hybrid_node_idx_builder builder{idx_fd, dat_fd};
+    auto const builder = tiles::hybrid_node_idx_builder{idx_fd, dat_fd};
     builder.push(42, {1, 1});
     builder.push(43, {2, 2});
     builder.push(45, {4, 4});
@@ -272,7 +272,7 @@ TEST(hybrid_node_idx, missing_nodes) {
     builder.finish();
   }
 
-  tiles::hybrid_node_idx nodes{idx_fd, dat_fd};
+  auto const nodes = tiles::hybrid_node_idx{idx_fd, dat_fd};
 
   std::vector<std::pair<osmium::object_id_type, osmium::Location>> mem;
   for (auto i = 41; i < 48; ++i) {
@@ -312,13 +312,13 @@ TEST(hybrid_node_idx, negative_nodes) {
   auto const dat_fd = osmium::detail::create_tmp_file();
 
   {
-    tiles::hybrid_node_idx_builder builder{idx_fd, dat_fd};
+    auto const builder = tiles::hybrid_node_idx_builder{idx_fd, dat_fd};
     builder.push(-42, {1, 1});
     builder.push(-43, {2, 2});
     builder.finish();
   }
 
-  tiles::hybrid_node_idx nodes{idx_fd, dat_fd};
+  auto const nodes = tiles::hybrid_node_idx{idx_fd, dat_fd};
 
   {
     osmium::Location l42;
@@ -366,7 +366,7 @@ TEST(hybrid_node_idx, duplicates) {
   auto const dat_fd = osmium::detail::create_tmp_file();
 
   {
-    tiles::hybrid_node_idx_builder builder{idx_fd, dat_fd};
+    auto const builder = tiles::hybrid_node_idx_builder{idx_fd, dat_fd};
     builder.push(-42, {1, 1});
     builder.push(-42, {1, 1});
     builder.push(42, {1, 1});
@@ -375,7 +375,7 @@ TEST(hybrid_node_idx, duplicates) {
     builder.finish();
   }
 
-  tiles::hybrid_node_idx nodes{idx_fd, dat_fd};
+  auto const nodes = tiles::hybrid_node_idx{idx_fd, dat_fd};
 
   {
     osmium::Location l42;
@@ -394,7 +394,7 @@ TEST(hybrid_node_idx, duplicates_mismatch) {
   auto const dat_fd = osmium::detail::create_tmp_file();
 
   {
-    tiles::hybrid_node_idx_builder builder{idx_fd, dat_fd};
+    auto const builder = tiles::hybrid_node_idx_builder{idx_fd, dat_fd};
     builder.push(-42, {1, 1});
     EXPECT_ANY_THROW(builder.push(-42, {2, 2}));
     EXPECT_ANY_THROW(builder.push(42, {2, 2}));
@@ -406,7 +406,7 @@ TEST(hybrid_node_idx_benchmark, DISABLED_test) {
 
   auto const idx_fd = osmium::detail::create_tmp_file();
   auto const dat_fd = osmium::detail::create_tmp_file();
-  tiles::hybrid_node_idx_builder builder{idx_fd, dat_fd};
+  auto const builder = tiles::hybrid_node_idx_builder{idx_fd, dat_fd};
 
   osmium::io::Reader reader("/data/osm/planet-latest.osm.pbf",
                             osmium::osm_entity_bits::node);
