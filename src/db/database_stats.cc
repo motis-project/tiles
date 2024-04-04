@@ -115,7 +115,8 @@ void database_stats(tile_db_handle& db_handle, pack_handle& pack_handle) {
     return;
   }
 
-  uint32_t max_prep = std::stoi(std::string{*opt_max_prep});
+  auto const max_prep =
+      static_cast<std::uint32_t>(std::stoi(std::string{*opt_max_prep}));
   std::vector<std::vector<size_t>> tile_sizes(max_prep + 1);
 
   auto tc = lmdb::cursor{txn, tiles_dbi};

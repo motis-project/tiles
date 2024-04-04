@@ -107,13 +107,13 @@ std::vector<uint8_t> quadtree_feature_packer::make_quad_key(
 
 uint32_t quadtree_feature_packer::serialize_and_append_span(
     quadtree_feature_it begin, quadtree_feature_it end) {
-  uint32_t offset = packer_.buf_.size();
+  auto const offset = packer_.buf_.size();
   for (auto it = begin; it != end; ++it) {
     packer_.append_feature(
         serialize_feature(it->feature_, metadata_coder_, false));
   }
   packer_.append_span_end();
-  return offset;
+  return static_cast<std::uint32_t>(offset);
 }
 
 void quadtree_feature_packer::finish() { packer_.finish(); }
