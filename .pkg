@@ -74,3 +74,7 @@
   url=git@github.com:motis-project/expat.git
   branch=master
   commit=b8c26c40f1900899b95c795705e0252fc0c1350c
+[mimalloc]
+  url=git@github.com:motis-project/mimalloc.git
+  branch=master
+  commit=0087f000848de31b0090cb6f282348bd2fd3a9b8
