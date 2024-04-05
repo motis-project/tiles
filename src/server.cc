@@ -150,13 +150,13 @@ void serve_forever(std::string const& address, uint16_t port, callback_t&& cb) {
 struct server_settings : public conf::configuration {
   server_settings() : configuration("tiles-server options", "") {
     param(db_fname_, "db_fname", "/path/to/tiles.mdb");
-    param(res_dname_, "res_dname", "/path/to/res");
+    param(res_dname_, "res_dname", "tiles/client");
     param(port_, "port", "the http port of the server");
   }
 
   std::string db_fname_{"tiles.mdb"};
   std::string res_dname_;
-  uint16_t port_{8888};
+  uint16_t port_{8080};
 };
 
 int run_tiles_server(int argc, char const** argv) {

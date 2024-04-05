@@ -37,7 +37,7 @@ struct import_settings : public conf::configuration {
 
   std::string db_fname_{"tiles.mdb"};
   std::string osm_fname_{"planet-latest.osm.pbf"};
-  std::string osm_profile_{"../profile/profile.lua"};
+  std::string osm_profile_{"tiles/profile/profile.lua"};
   std::string coastlines_fname_{"land-polygons-complete-4326.zip"};
   std::string tmp_dname_{"."};
   std::vector<std::string> tasks_{{"all"}};

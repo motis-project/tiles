@@ -106,8 +106,13 @@ jobs:
         if: matrix.config.mode == 'Release'
         run: |
           mkdir dist
+          mv client dist
+          mv profile dist
           mv .\build\tiles-import.exe dist
           mv .\build\tiles-server.exe dist
+          cd dist
+          7z a tiles-windows.zip *
+          mv tiles-windows.zip ..
 
       - name: Upload Distribution
         if: matrix.config.mode == 'Release'
@@ -289,6 +294,8 @@ jobs:
         if: matrix.config.artifact
         run: |
           mkdir tiles
+          mv client tiles/client
+          mv profile tiles/profile
           mv build/tiles-import tiles/tiles-import
           mv build/tiles-server tiles/tiles-server
           tar cjf tiles-${{ matrix.config.artifact }}.tar.bz2 tiles
