@@ -226,5 +226,14 @@ function process_area(area)
     area:set_approved_min_by_area(14, 1e8,
                                   12, 1e10,
                                   8, -1)
+
+  elseif area:has_tag("public_transport", "platform") or
+         area:has_tag("public_transport", "stop_area") then
+    area:set_target_layer("landuse")
+    area:add_string("landuse", "public_transport")
+    area:set_approved_min_by_area(12, 1e8,
+                                  10, 1e10,
+                                  8, -1)
+
   end
 end
