@@ -15,42 +15,53 @@ function process_node(node)
     node:add_tag_as_string("name")
     node:add_tag_as_integer("population")
 
+  elseif node:has_tag("highway", "elevator") then
+    node:set_approved_min(18)
+    node:set_target_layer("indoor")
+    node:add_string("indoor", "elevator")
+
   end
 end
 
 function process_way(way)
   if way:has_any_tag("highway") then
-    way:set_target_layer("road")
-    way:add_tag_as_string("highway")
-    way:add_tag_as_string("name")
+    if way:has_tag("highway", "elevator") then
+      way:set_approved_min(18)
+      way:set_target_layer("indoor")
+      way:add_string("indoor", "elevator")
+    else
+      way:set_target_layer("road")
+      way:add_tag_as_string("highway")
+      way:add_tag_as_string("name")
 
-    if way:has_tag("highway", "motorway") or
-       way:has_tag("highway", "trunk") then
-      way:set_approved_min(5)
-      way:add_tag_as_string("ref")
+      if way:has_tag("highway", "motorway") or
+         way:has_tag("highway", "trunk") then
+        way:set_approved_min(5)
+        way:add_tag_as_string("ref")
 
-    elseif way:has_tag("highway", "motorway_link") or
-           way:has_tag("highway", "trunk_link") or
-           way:has_tag("highway", "primary") or
-           way:has_tag("highway", "secondary") or
-           way:has_tag("highway", "tertiary") or
-           way:has_tag("highway", "aeroway") then
-      way:set_approved_min(9)
-      way:add_tag_as_string("ref")
+      elseif way:has_tag("highway", "motorway_link") or
+             way:has_tag("highway", "trunk_link") or
+             way:has_tag("highway", "primary") or
+             way:has_tag("highway", "secondary") or
+             way:has_tag("highway", "tertiary") or
+             way:has_tag("highway", "aeroway") then
+        way:set_approved_min(9)
+        way:add_tag_as_string("ref")
 
-    elseif way:has_tag("highway", "residential") or
-           way:has_tag("highway", "living_street") or
-           way:has_tag("highway", "primary_link") or
-           way:has_tag("highway", "secondary_link") or
-           way:has_tag("highway", "tertiary_link") or
-           way:has_tag("highway", "unclassified") or
-           way:has_tag("highway", "service") or
-           way:has_tag("highway", "footway") or
-           way:has_tag("highway", "track") or
-           way:has_tag("highway", "steps") or
-           way:has_tag("highway", "cycleway") or
-           way:has_tag("highway", "path") then
-      way:set_approved_min(12)
+      elseif way:has_tag("highway", "residential") or
+             way:has_tag("highway", "living_street") or
+             way:has_tag("highway", "primary_link") or
+             way:has_tag("highway", "secondary_link") or
+             way:has_tag("highway", "tertiary_link") or
+             way:has_tag("highway", "unclassified") or
+             way:has_tag("highway", "service") or
+             way:has_tag("highway", "footway") or
+             way:has_tag("highway", "track") or
+             way:has_tag("highway", "steps") or
+             way:has_tag("highway", "cycleway") or
+             way:has_tag("highway", "path") then
+        way:set_approved_min(12)
+      end
     end
 
   elseif way:has_any_tag("railway", "rail", "subway", "tram") then
@@ -231,9 +242,18 @@ function process_area(area)
          area:has_tag("public_transport", "stop_area") then
     area:set_target_layer("landuse")
     area:add_string("landuse", "public_transport")
+    area:add_tag_as_integer("level")
     area:set_approved_min_by_area(12, 1e8,
                                   10, 1e10,
                                   8, -1)
+
+  elseif area:has_any_tag("indoor") then
+    area:set_target_layer("indoor")
+    area:add_tag_as_string("indoor")
+    area:add_tag_as_string("name")
+    area:add_tag_as_string("shop")
+    area:add_tag_as_integer("level")
+    area:set_approved_min(18)
 
   end
 end
