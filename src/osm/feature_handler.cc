@@ -14,7 +14,7 @@ namespace tiles {
 struct script_runner {
   explicit script_runner(std::string const& osm_profile) {
     lua_.script_file(osm_profile);
-    lua_.open_libraries(sol::lib::base, sol::lib::package);
+    lua_.open_libraries(sol::lib::base, sol::lib::string, sol::lib::package);
 
     lua_.new_usertype<pending_feature>(  //
         "pending_feature",  //
@@ -43,9 +43,9 @@ struct script_runner {
 
   sol::state lua_;
 
-  sol::function process_node_;
-  sol::function process_way_;
-  sol::function process_area_;
+  sol::protected_function process_node_;
+  sol::protected_function process_way_;
+  sol::protected_function process_area_;
 };
 
 void check_profile(std::string const& osm_profile) {
@@ -73,9 +73,16 @@ template <typename OSMObject>
 void handle_feature(feature_inserter_mt& inserter,
                     layer_names_builder& layer_names,
                     shared_metadata_builder& shared_metadata_builder,
-                    sol::function const& process, OSMObject const& obj) {
+                    sol::protected_function const& process,
+                    OSMObject const& obj) {
   auto pf = pending_feature{obj, [&obj] { return read_osm_geometry(obj); }};
-  process(pf);
+
+  sol::protected_function_result result = process(pf);
+  if (!result.valid()) {
+    sol::error err = result;
+    std::string what = err.what();
+    std::cout << "call failed, sol::error::what() is " << what << std::endl;
+  }
 
   if (!pf.is_approved_) {
     return;
