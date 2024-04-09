@@ -1,3 +1,17 @@
+function split_level(level)
+    local from_level, to_level = level:match("(-?[%d]+);(-?[%d]+)")
+    if from_level and to_level then
+        return tonumber(from_level), tonumber(to_level)
+    else
+        local lvl = level:match("(-?[%d]+)")
+        if lvl then
+          return tonumber(lvl), tonumber(lvl)
+        else
+          return nil, nil
+        end
+    end
+end
+
 function process_node(node)
   if node:has_any_tag("place") then
     if node:has_tag("place", "city") then
@@ -20,6 +34,13 @@ function process_node(node)
     node:set_target_layer("indoor")
     node:add_string("indoor", "elevator")
 
+    if node:has_any_tag("level") then
+      local from_level, to_level = split_level(node:get_tag("level"))
+      if from_level and to_level then
+        node:add_integer("from_level", from_level)
+        node:add_integer("to_level", to_level)
+      end
+    end
   end
 end
 
@@ -29,6 +50,13 @@ function process_way(way)
       way:set_approved_min(18)
       way:set_target_layer("indoor")
       way:add_string("indoor", "elevator")
+      if way:has_any_tag("level") then
+        local from_level, to_level = split_level(way:get_tag("level"))
+        if from_level and to_level then
+          way:add_integer("from_level", from_level)
+          way:add_integer("to_level", to_level)
+        end
+      end
     else
       way:set_target_layer("road")
       way:add_tag_as_string("highway")
@@ -62,9 +90,23 @@ function process_way(way)
              way:has_tag("highway", "path") then
         way:set_approved_min(12)
       end
+
+      if way:has_tag("highway", "steps") then
+        if way:has_any_tag("level") then
+          local from_level, to_level = split_level(way:get_tag("level"))
+          if from_level and to_level then
+            way:add_integer("from_level", from_level)
+            way:add_integer("to_level", to_level)
+          end
+        end
+      elseif way:has_tag("highway", "footway") then
+        way:add_tag_as_integer("level")
+      end
     end
 
   elseif way:has_any_tag("railway", "rail", "subway", "tram") then
+    way:add_tag_as_integer("level")
+
     if way:has_tag("railway", "disused") or
        way:has_tag("railway", "abandoned") then
       way:set_target_layer("rail")
@@ -79,6 +121,7 @@ function process_way(way)
             way:has_tag("service", "spur") or
             way:has_tag("railway", "miniature") or
             way:has_tag("railway:preserved", "yes") then
+      way:add_tag_as_integer("level")
       way:set_target_layer("rail")
       way:set_approved_min(14)
       way:add_string("rail", "detail")
