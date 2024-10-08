@@ -116,7 +116,7 @@ struct dbi_handle {
              lmdb::dbi_flags flags = lmdb::dbi_flags::CREATE)
       : env_{env},
         dbi_opener_{
-            [dbiname{std::move(dbiname)}](
+            [dbiname = std::move(dbiname)](
                 lmdb::txn& txn, lmdb::dbi_flags flags = lmdb::dbi_flags::NONE) {
               return txn.dbi_open(dbiname.c_str(), flags);
             }},

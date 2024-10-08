@@ -68,7 +68,7 @@ struct feature_packer {
   void finish_header(size_t const feature_count) {
     utl::verify(feature_count <= std::numeric_limits<uint32_t>::max(),
                 "packer.finish_header: to many features to serialize");
-    tiles::append<uint32_t>(buf_, feature_count);
+    tiles::append<uint32_t>(buf_, static_cast<uint32_t>(feature_count));
     tiles::append<uint8_t>(buf_, static_cast<uint8_t>(segment_offsets_.size()));
 
     for (auto& [id, offset] : segment_offsets_) {
@@ -84,7 +84,7 @@ struct feature_packer {
 
   template <typename It>
   uint32_t append_features(It begin, It end) {
-    uint32_t offset = buf_.size();
+    auto const offset = static_cast<uint32_t>(buf_.size());
     for (auto it = begin; it != end; ++it) {
       append_feature(*it);
     }
@@ -104,7 +104,7 @@ struct feature_packer {
   }
 
   uint32_t append_packed(std::vector<uint32_t> const& vec) {
-    uint32_t offset = buf_.size();
+    auto const offset = static_cast<uint32_t>(buf_.size());
     for (auto const& e : vec) {
       protozero::write_varint(std::back_inserter(buf_), e);
     }
@@ -113,7 +113,7 @@ struct feature_packer {
 
   template <typename String>
   uint32_t append(String const& string) {
-    uint32_t offset = buf_.size();
+    auto const offset = static_cast<uint32_t>(buf_.size());
     buf_.append(string);
     return offset;
   }
@@ -155,7 +155,7 @@ size_t unpack_features(std::string_view const& string, Fn&& fn) {
     fn(std::string_view{ptr, size});
     ptr += size;
   }
-  return std::distance(string.data(), ptr);
+  return static_cast<size_t>(std::distance(string.data(), ptr));
 }
 
 template <typename Fn>

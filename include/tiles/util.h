@@ -22,7 +22,7 @@ template <typename... Args>
 inline void t_log(fmt::format_string<Args...> fmt_str, Args&&... args) {
   using clock = std::chrono::system_clock;
   auto const now = clock::to_time_t(clock::now());
-  struct tm tmp {};
+  struct tm tmp{};
 #if _MSC_VER >= 1400
   gmtime_s(&tmp, &now);
 #else
@@ -60,7 +60,9 @@ struct scoped_timer final {
     using namespace std::chrono;
 
     auto const now = steady_clock::now();
-    double dur = duration_cast<microseconds>(now - start_).count() / 1000.0;
+    double dur =
+        static_cast<double>(duration_cast<microseconds>(now - start_).count()) /
+        1000.0;
 
     std::clog << "|> done: " << label_ << " (";
     if (dur < 1000) {

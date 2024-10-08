@@ -39,7 +39,9 @@ enum class feature : protozero::pbf_tag_type {
   repeated_string_values = 5,
 
   repeated_string_simplify_masks = 6,
-  required_fixed_geometry_geometry = 7
+  required_fixed_geometry_geometry = 7,
+
+  other = 999
 };
 
 }  // namespace tags

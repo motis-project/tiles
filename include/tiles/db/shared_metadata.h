@@ -60,7 +60,8 @@ struct shared_metadata_builder {
     auto old_size = counts_.size();
     utl::concat(counts_, buf_counts);
     std::inplace_merge(
-        begin(counts_), begin(counts_) + old_size, end(counts_),
+        begin(counts_), begin(counts_) + static_cast<long>(old_size),
+        end(counts_),
         [](auto const& a, auto const& b) { return a.first < b.first; });
 
     utl::equal_ranges_linear(

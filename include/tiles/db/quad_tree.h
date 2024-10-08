@@ -47,8 +47,9 @@ namespace tiles {
 // additional information.
 
 using quad_entry_t = uint32_t;
-constexpr auto const kQuadEntryBits = sizeof(quad_entry_t) * 8;
-constexpr auto const kQuadChildOffset = kQuadEntryBits - 4;
+constexpr auto const kQuadEntryBits = sizeof(quad_entry_t) * 8U;
+constexpr auto const kQuadChildOffset =
+    static_cast<unsigned>(kQuadEntryBits - 4U);
 constexpr auto const kQuadOffsetMask =
     (static_cast<quad_entry_t>(1) << (kQuadEntryBits - 4)) - 1;
 
@@ -102,7 +103,7 @@ void walk_quad_tree(char const* base, geo::tile const& root,
   trace.push_back(root);
   std::reverse(begin(trace), end(trace));
 
-  auto offset = 0;
+  auto offset = 0U;
   for (auto it = begin(trace); it != end(trace); ++it) {
     if (*it == query) {
       // query tile found -> emit fill subtree and stop
@@ -131,7 +132,7 @@ void walk_quad_tree(char const* base, geo::tile const& root,
     }
 
     offset = curr & kQuadOffsetMask;
-    for (auto i = 0ULL; i < next_tile.quad_pos(); ++i) {
+    for (auto i = 0U; i < next_tile.quad_pos(); ++i) {
       if (bit_set(curr, kQuadChildOffset + i)) {
         offset += 4;  // four entries/children per node
       }

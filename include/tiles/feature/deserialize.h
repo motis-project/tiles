@@ -83,14 +83,16 @@ inline std::optional<feature> deserialize_feature(
       case tags::feature::packed_uint64_meta_pairs:
         utl::verify(meta.empty(),
                     "meta_pairs must come before, meta keys/values!");
-        for (auto const id : msg.get_packed_uint64()) {
-          meta.push_back(metadata_decoder.decode(id));
+        for (auto const packed_id : msg.get_packed_uint64()) {
+          meta.push_back(metadata_decoder.decode(packed_id));
         }
         meta_fill = meta.size();
         break;
+
       case tags::feature::repeated_string_keys:
         meta.emplace_back(msg.get_string(), std::string{});
         break;
+
       case tags::feature::repeated_string_values:
         utl::verify(meta_fill < meta.size(), "meta data imbalance! (a)");
         meta[meta_fill++].value_ = msg.get_string();
@@ -99,8 +101,8 @@ inline std::optional<feature> deserialize_feature(
       case tags::feature::repeated_string_simplify_masks:
         simplify_masks.emplace_back(msg.get_view());
         break;
-      case tags::feature::required_fixed_geometry_geometry: {
 
+      case tags::feature::required_fixed_geometry_geometry: {
         std::vector<std::string_view> simplify_masks_tmp;
         std::swap(simplify_masks, simplify_masks_tmp);
         if (zoom_level_hint != kInvalidZoomLevel &&
@@ -114,6 +116,7 @@ inline std::optional<feature> deserialize_feature(
           geometry = deserialize(msg.get_view());
         }
       } break;
+
       default: msg.skip();
     }
   }
