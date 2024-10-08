@@ -1,6 +1,6 @@
 #include "tiles/osm/load_osm.h"
 
-#include "boost/filesystem.hpp"
+#include <filesystem>
 
 #include "utl/verify.h"
 
@@ -49,10 +49,10 @@ void load_osm(tile_db_handle& db_handle, feature_inserter_mt& inserter,
   oa::MultipolygonManager<oa::Assembler> mp_manager{
       oa::Assembler::config_type{}};
 
-  auto const node_idx_file = tmp_file{
-      (boost::filesystem::path{tmp_dname} / "idx.bin").generic_string()};
-  auto const node_dat_file = tmp_file{
-      (boost::filesystem::path{tmp_dname} / "dat.bin").generic_string()};
+  auto const node_idx_file =
+      tmp_file{(std::filesystem::path{tmp_dname} / "idx.bin").generic_string()};
+  auto const node_dat_file =
+      tmp_file{(std::filesystem::path{tmp_dname} / "dat.bin").generic_string()};
   hybrid_node_idx node_idx{node_idx_file.fileno(), node_dat_file.fileno()};
 
   {

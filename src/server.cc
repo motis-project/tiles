@@ -1,5 +1,6 @@
 #include <cstdlib>
 #include <exception>
+#include <filesystem>
 #include <iomanip>
 #include <iostream>
 #include <memory>
@@ -10,7 +11,6 @@
 #include "boost/beast/core.hpp"
 #include "boost/beast/http.hpp"
 #include "boost/beast/version.hpp"
-#include "boost/filesystem.hpp"
 
 #include "conf/configuration.h"
 #include "conf/options_parser.h"
@@ -179,7 +179,7 @@ int run_tiles_server(int argc, char const** argv) {
     return 1;
   }
 
-  utl::verify(boost::filesystem::is_regular_file(opt.db_fname_.c_str()),
+  utl::verify(std::filesystem::is_regular_file(opt.db_fname_.c_str()),
               "tiles database file not found: {}", opt.db_fname_);
 
   lmdb::env db_env = make_tile_database(opt.db_fname_.c_str(), kDefaultSize);
@@ -250,8 +250,8 @@ int run_tiles_server(int argc, char const** argv) {
     bool found = false;
     auto const fname = std::string{match ? match->at(1) : "index.html"};
     if (!opt.res_dname_.empty()) {
-      auto p = boost::filesystem::path{opt.res_dname_} / fname;
-      if (boost::filesystem::exists(p)) {
+      auto p = std::filesystem::path{opt.res_dname_} / fname;
+      if (std::filesystem::exists(p)) {
         auto const mem = utl::mmap_reader{p.string().c_str()};
         res.body() = std::string{mem.m_.ptr(), mem.m_.size()};
         found = true;
