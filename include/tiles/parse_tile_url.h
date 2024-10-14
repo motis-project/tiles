@@ -2,26 +2,43 @@
 
 #include <optional>
 
+#include "utl/helpers/algorithm.h"
+#include "utl/parser/split.h"
+
 #include "geo/tile.h"
 
 #include "tiles/util.h"
 
 namespace tiles {
 
-template <typename RegexResult>
-geo::tile url_match_to_tile(RegexResult const& rr) {
-  utl::verify(rr.size() == 4, "url_match_to_tile: invalid input");
-  return geo::tile{stou(rr[2]), stou(rr[3]), stou(rr[1])};
-}
-
-inline std::optional<geo::tile> parse_tile_url(std::string const& url) {
-  static regex_matcher matcher{R"(.*\/(\d+)\/(\d+)\/(\d+).mvt$)"};
-  auto match = matcher.match(url);
-  if (!match) {
-    return {};
+inline std::optional<geo::tile> parse_tile_url(std::string url) {
+  std::reverse(begin(url), end(url));
+  if (!url.starts_with("tvm.")) {
+    return std::nullopt;
   }
 
-  return url_match_to_tile(*match);
+  auto const [z_rev, y_rev, x_rev] =
+      utl::split<'/', utl::cstr, utl::cstr, utl::cstr>(url);
+
+  for (auto const rev : {z_rev, y_rev, x_rev}) {
+    utl::verify(
+        rev.valid() &&
+            utl::all_of(rev, [](char const c) { return std::isdigit(c) != 0; }),
+        "invalid url");
+  }
+
+  std::reverse(const_cast<char*>(x_rev.str),
+               const_cast<char*>(x_rev.str + x_rev.len));
+  std::reverse(const_cast<char*>(y_rev.str),
+               const_cast<char*>(y_rev.str + y_rev.len));
+  std::reverse(const_cast<char*>(z_rev.str),
+               const_cast<char*>(z_rev.str + z_rev.len));
+
+  auto const x = utl::parse<std::uint32_t>(x_rev);
+  auto const y = utl::parse<std::uint32_t>(y_rev);
+  auto const z = utl::parse<std::uint32_t>(z_rev);
+
+  return geo::tile{y, z, x};
 }
 
 }  // namespace tiles

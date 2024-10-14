@@ -18,6 +18,9 @@ option(TILES_MIMALLOC "use mimalloc" OFF)
 file(GLOB_RECURSE tiles-server-res "${CMAKE_CURRENT_SOURCE_DIR}/client/*.*")
 create_resource("${CMAKE_CURRENT_SOURCE_DIR}/client/" "${tiles-server-res}" tiles_server_res)
 
+file(GLOB_RECURSE tiles-profiles-res "${CMAKE_CURRENT_SOURCE_DIR}/profile/*.*")
+create_resource("${CMAKE_CURRENT_SOURCE_DIR}/profile/" "${tiles-profiles-res}" tiles_profiles_res)
+
 include(cmake/clang-tidy.cmake)
 
 # --- tiles lib

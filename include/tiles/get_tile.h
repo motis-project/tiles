@@ -181,7 +181,7 @@ std::optional<std::string> get_tile(tile_db_handle& handle, lmdb::txn& txn,
                                     pack_handle const& pack_handle,
                                     render_ctx const& ctx,
                                     geo::tile const& tile, PerfCounter& pc) {
-  utl::verify(tile.z_ <= kMaxZoomLevel, "invalid zoom level");
+  utl::verify(tile.z_ <= kMaxZoomLevel, "invalid zoom level {}", tile.z_);
 
   auto total = scoped_perf_counter<perf_task::GET_TILE_TOTAL>(pc);
 
@@ -198,8 +198,7 @@ std::optional<std::string> get_tile(tile_db_handle& handle, lmdb::txn& txn,
     }
 
     if (ctx.seaside_tiles_.contains(tile)) {
-      return get_tile(
-          ctx, tile, [](auto&&) {}, pc);
+      return get_tile(ctx, tile, [](auto&&) {}, pc);
     }
 
     return std::nullopt;
