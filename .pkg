@@ -58,10 +58,10 @@
   url=git@github.com:motis-project/utl.git
   branch=master
   commit=67414c9175a18aafe0a5043028ee6a97ca839564
-[zlib]
-  url=git@github.com:motis-project/zlib.git
-  branch=master
-  commit=d1c943390ba4f97aa2f50bedc629b6d29027fa0e
+[zlib-ng]
+  url=git@github.com:motis-project/zlib-ng.git
+  branch=develop
+  commit=68ab3e2d80253ec5dc3c83691d9ff70477b32cd3
 [boost]
   url=git@github.com:motis-project/boost.git
   branch=master
