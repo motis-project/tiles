@@ -18,13 +18,13 @@ inline std::optional<geo::tile> parse_tile_url(std::string url) {
   }
 
   auto const [z_rev, y_rev, x_rev] =
-      utl::split<'/', utl::cstr, utl::cstr, utl::cstr>(url);
+      utl::split<'/', utl::cstr, utl::cstr, utl::cstr>(url.c_str() + 4);
 
   for (auto const rev : {z_rev, y_rev, x_rev}) {
     utl::verify(
         rev.valid() &&
             utl::all_of(rev, [](char const c) { return std::isdigit(c) != 0; }),
-        "invalid url");
+        "invalid url {}", url);
   }
 
   std::reverse(const_cast<char*>(x_rev.str),
