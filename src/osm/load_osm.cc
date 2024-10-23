@@ -32,7 +32,7 @@ namespace oeb = osmium::osm_entity_bits;
 
 void load_osm(tile_db_handle& db_handle, feature_inserter_mt& inserter,
               std::string const& osm_fname, std::string const& osm_profile,
-              std::string const& tmp_dname) {
+              std::string const& tmp_dname, size_t flush_threshold) {
   oio::File input_file;
   size_t file_size{0};
   try {
@@ -76,7 +76,7 @@ void load_osm(tile_db_handle& db_handle, feature_inserter_mt& inserter,
   }
 
   layer_names_builder names_builder;
-  shared_metadata_builder metadata_builder;
+  shared_metadata_builder metadata_builder(flush_threshold);
 
   in_order_queue<om::Buffer> mp_queue;
 
