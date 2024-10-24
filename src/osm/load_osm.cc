@@ -4,6 +4,8 @@
 
 #include "utl/verify.h"
 
+#include "oneapi/tbb/parallel_pipeline.h"
+
 #include "osmium/area/assembler.hpp"
 #include "osmium/area/multipolygon_manager.hpp"
 #include "osmium/io/pbf_input.hpp"
@@ -78,14 +80,13 @@ void load_osm(tile_db_handle& db_handle, feature_inserter_mt& inserter,
   layer_names_builder names_builder;
   shared_metadata_builder metadata_builder(flush_threshold);
 
-  in_order_queue<om::Buffer> mp_queue;
+  //  in_order_queue<om::Buffer> mp_queue;
 
   {
     reader_progress->status("Load OSM / Pass 2");
     auto const thread_count =
         std::max(2, static_cast<int>(std::thread::hardware_concurrency()));
 
-    // poor mans thread local (we dont know the threads themselves)
     std::atomic_size_t next_handlers_slot{0};
     std::vector<std::pair<std::thread::id, feature_handler>> handlers;
     handlers.reserve(thread_count);
@@ -108,58 +109,35 @@ void load_osm(tile_db_handle& db_handle, feature_inserter_mt& inserter,
       return handlers[slot].second;
     };
 
-    // pool must be destructed before handlers!
-    osmium::thread::Pool pool{thread_count,
-                              static_cast<size_t>(thread_count * 8)};
-
-    oio::Reader reader{input_file, pool};
-    sequential_until_finish<om::Buffer> seq_reader{[&] {
-      reader_progress->update(reader.file_size() + reader.offset());
-      return reader.read();
-    }};
-
-    std::atomic_bool has_exception{false};
-    std::vector<std::future<void>> workers;
-    workers.reserve(thread_count / 2);
-    for (auto i = 0; i < thread_count / 2; ++i) {
-      workers.emplace_back(pool.submit([&] {
-        try {
-          while (true) {
-            auto opt = seq_reader.process();
-            if (!opt.has_value()) {
-              break;
-            }
-
-            auto& [idx, buf] = *opt;
-            update_locations(node_idx, buf);
-            o::apply(buf, get_handler());
-
-            mp_queue.process_in_order(idx, std::move(buf), [&](auto buf2) {
-              o::apply(buf2, mp_manager.handler([&](auto&& mp_buffer) {
-                auto p = std::make_shared<om::Buffer>(
-                    std::forward<decltype(mp_buffer)>(mp_buffer));
-                pool.submit([p, &get_handler] { o::apply(*p, get_handler()); });
-              }));
-            });
-          }
-        } catch (std::exception const& e) {
-          fmt::print(std::clog, "EXCEPTION CAUGHT: {} {}\n",
-                     fmt::streamed(std::this_thread::get_id()), e.what());
-          has_exception = true;
-        } catch (...) {
-          fmt::print(std::clog, "UNKNOWN EXCEPTION CAUGHT: {} \n",
-                     fmt::streamed(std::this_thread::get_id()));
-          has_exception = true;
-        }
-      }));
-    }
-    utl::verify(!workers.empty(), "have no workers");
-    for (auto& worker : workers) {
-      worker.wait();
-    }
-
-    utl::verify(!has_exception, "load_osm: exception caught!");
-    utl::verify(mp_queue.queue_.empty(), "mp_queue not empty!");
+    auto reader = oio::Reader{input_file};
+    oneapi::tbb::parallel_pipeline(
+        thread_count * 4U,
+        oneapi::tbb::make_filter<void, om::Buffer>(
+            oneapi::tbb::filter_mode::serial_in_order,
+            [&](oneapi::tbb::flow_control& fc) {
+              auto buf = reader.read();
+              reader_progress->update(reader.file_size() + reader.offset());
+              if (!buf) {
+                fc.stop();
+              }
+              return buf;
+            }) &
+            oneapi::tbb::make_filter<om::Buffer, om::Buffer>(
+                oneapi::tbb::filter_mode::parallel,
+                [&](om::Buffer&& buf) {
+                  update_locations(node_idx, buf);
+                  o::apply(buf, get_handler());
+                  return std::move(buf);
+                }) &
+            oneapi::tbb::make_filter<om::Buffer, void>(
+                oneapi::tbb::filter_mode::serial_in_order,
+                [&](om::Buffer&& buf) {
+                  o::apply(buf, mp_manager.handler([&](auto&& mp_buffer) {
+                    auto p = std::make_shared<om::Buffer>(
+                        std::forward<decltype(mp_buffer)>(mp_buffer));
+                    o::apply(*p, get_handler());
+                  }));
+                }));
 
     reader.close();
     reader_progress->update(reader_progress->in_high_);

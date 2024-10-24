@@ -61,7 +61,7 @@ add_library(tiles-import-library EXCLUDE_FROM_ALL
 set_property(TARGET tiles-import-library PROPERTY CXX_STANDARD 17)
 target_compile_options(tiles-import-library PRIVATE ${TILES_WARNINGS})
 target_include_directories(tiles-import-library PUBLIC include)
-target_link_libraries(tiles-import-library geo lmdb libluajit expat tiles)
+target_link_libraries(tiles-import-library geo lmdb libluajit expat tiles TBB::tbb)
 if(UNIX AND NOT APPLE)
   target_link_libraries(tiles-import-library atomic)
 endif()

@@ -78,3 +78,7 @@
   url=git@github.com:motis-project/mimalloc.git
   branch=master
   commit=0087f000848de31b0090cb6f282348bd2fd3a9b8
+[oneTBB]
+  url=git@github.com:oneapi-src/oneTBB.git
+  branch=master
+  commit=377a91431ec62c5e296dbeca683c5d1e66d69f32
