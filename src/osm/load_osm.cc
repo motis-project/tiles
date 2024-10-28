@@ -132,10 +132,8 @@ void load_osm(tile_db_handle& db_handle, feature_inserter_mt& inserter,
             oneapi::tbb::make_filter<om::Buffer, void>(
                 oneapi::tbb::filter_mode::serial_in_order,
                 [&](om::Buffer&& buf) {
-                  o::apply(buf, mp_manager.handler([&](auto&& mp_buffer) {
-                    auto p = std::make_shared<om::Buffer>(
-                        std::forward<decltype(mp_buffer)>(mp_buffer));
-                    o::apply(*p, get_handler());
+                  o::apply(buf, mp_manager.handler([&](auto&& buf) {
+                    o::apply(buf, get_handler());
                   }));
                 }));
 
