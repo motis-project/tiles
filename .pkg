@@ -53,7 +53,7 @@
 [sol2]
   url=git@github.com:motis-project/sol2.git
   branch=master
-  commit=3427b4412516c776226a751c13bfb95bb57bc61a
+  commit=40c7cbc7c5cfed1e8c7f1bbe6fcbe23d7a67fc75
 [utl]
   url=git@github.com:motis-project/utl.git
   branch=master
