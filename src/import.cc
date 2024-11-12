@@ -89,7 +89,7 @@ int run_tiles_import(int argc, char const** argv) {
     if (opt.has_any_task({"features"})) {
       t_log("load features");
       load_osm(db_handle, inserter, opt.osm_fname_, opt.osm_profile_,
-               opt.tmp_dname_);
+               opt.tmp_dname_, 100'000U);
     }
   }
 

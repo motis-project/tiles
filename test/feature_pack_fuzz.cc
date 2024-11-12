@@ -121,8 +121,8 @@ extern "C" int LLVMFuzzerTestOneInput(uint8_t const* data, size_t size) {
   ctx.compress_result_ = false;
 
   tiles::null_perf_counter npc;
-  auto const opt_result = get_tile(
-      ctx, query, [&](auto cb) { cb(root, optimal_pack); }, npc);
+  auto const opt_result =
+      get_tile(ctx, query, [&](auto cb) { cb(root, optimal_pack); }, npc);
 
   auto const check_feature = [&](auto const& reader) {
     namespace pz = protozero;

@@ -188,9 +188,8 @@ int run_tiles_server(int argc, char const** argv) {
   pack_handle pack_handle{opt.db_fname_.c_str()};
 
   auto const maybe_serve_tile = [&](auto const& req, auto& res) -> bool {
-    static auto const matcher = regex_matcher{R"(^\/(\d+)\/(\d+)\/(\d+).mvt$)"};
     auto const decoded_url = url_decode(req);
-    auto const match = matcher.match(decoded_url);
+    auto const match = parse_tile_url(decoded_url);
     if (!match) {
       return false;
     }
@@ -202,7 +201,7 @@ int run_tiles_server(int argc, char const** argv) {
     }
 
     t_log("received a request: {}", req.target());
-    auto const tile = url_match_to_tile(*match);
+    auto const tile = *match;
 
     perf_counter pc;
     auto rendered_tile = get_tile(handle, pack_handle, render_ctx, tile, pc);

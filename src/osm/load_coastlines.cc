@@ -250,9 +250,8 @@ void load_coastlines(tile_db_handle& db_handle, feature_inserter_mt& inserter,
   coastline_stats stats;
 
   auto convert_path = [](auto const& in) {
-    return utl::to_vec(in, [](auto const& pt) {
-      return cl::IntPoint{pt.x(), pt.y()};
-    });
+    return utl::to_vec(
+        in, [](auto const& pt) { return cl::IntPoint{pt.x(), pt.y()}; });
   };
 
   {

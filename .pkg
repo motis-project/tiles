@@ -37,7 +37,7 @@
 [osmium]
   url=git@github.com:motis-project/libosmium.git
   branch=master
-  commit=672690671b26a38eb163c2487012f50100b7ee74
+  commit=6e6d6b3081cc8bdf25dda89730e25c36eb995516
 [pbf-sdf-fonts]
   url=git@github.com:motis-project/pbf-sdf-fonts.git
   branch=master
@@ -49,7 +49,7 @@
 [res]
   url=git@github.com:motis-project/res.git
   branch=master
-  commit=7d97784ba785ce8a2677ea77164040fde484fb04
+  commit=b759b93316afeb529b6cb5b2548b24c41e382fb0
 [sol2]
   url=git@github.com:motis-project/sol2.git
   branch=master
@@ -78,3 +78,7 @@
   url=git@github.com:motis-project/mimalloc.git
   branch=master
   commit=0087f000848de31b0090cb6f282348bd2fd3a9b8
+[oneTBB]
+  url=git@github.com:motis-project/oneTBB.git
+  branch=master
+  commit=a13f5abf5f736836b83127959bb9be62dcdebde4
