@@ -26,9 +26,8 @@ extern "C" int LLVMFuzzerTestOneInput(uint8_t const* data, size_t size) {
     ++it;
   }
 
-  auto deltas = utl::to_vec(tasks, [](auto const& tr) {
-    return delta_record{tr.tile_, 0LL};
-  });
+  auto deltas = utl::to_vec(
+      tasks, [](auto const& tr) { return delta_record{tr.tile_, 0LL}; });
 
   constexpr auto const kIncrement = 4 + 2 + 2;
   for (auto i = 0ULL; i < size; i += kIncrement) {

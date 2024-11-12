@@ -22,7 +22,7 @@ template <typename... Args>
 inline void t_log(fmt::format_string<Args...> fmt_str, Args&&... args) {
   using clock = std::chrono::system_clock;
   auto const now = clock::to_time_t(clock::now());
-  struct tm tmp{};
+  struct tm tmp {};
 #if _MSC_VER >= 1400
   gmtime_s(&tmp, &now);
 #else
