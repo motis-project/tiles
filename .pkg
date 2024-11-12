@@ -81,4 +81,4 @@
 [oneTBB]
   url=git@github.com:motis-project/oneTBB.git
   branch=master
-  commit=d1d43adf6af117d3ab4ee3a14a5fa129e0690290
+  commit=a13f5abf5f736836b83127959bb9be62dcdebde4
