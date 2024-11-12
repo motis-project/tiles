@@ -21,7 +21,7 @@
 [geo]
   url=git@github.com:motis-project/geo.git
   branch=master
-  commit=5d99aeb10674a41a82d7c78f850abfd9605bf6e1
+  commit=de5a3586871b8b76a487d42fcc673c9487a1e233
 [lmdb]
   url=git@github.com:motis-project/lmdb.git
   branch=master
@@ -65,7 +65,7 @@
 [boost]
   url=git@github.com:motis-project/boost.git
   branch=master
-  commit=c90d53bdcd7ff741a416ae122b33c9c2a96e8be7
+  commit=930f38eb0365ceb7853273e03da4d9e7787abfb9
 [variant]
   url=git@github.com:motis-project/variant.git
   branch=master
