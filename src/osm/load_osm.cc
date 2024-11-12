@@ -80,8 +80,6 @@ void load_osm(tile_db_handle& db_handle, feature_inserter_mt& inserter,
   layer_names_builder names_builder;
   shared_metadata_builder metadata_builder(flush_threshold);
 
-  //  in_order_queue<om::Buffer> mp_queue;
-
   {
     reader_progress->status("Load OSM / Pass 2");
     auto const thread_count =
