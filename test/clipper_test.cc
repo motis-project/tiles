@@ -1,5 +1,7 @@
 #include "gtest/gtest.h"
 
+#include <algorithm>
+
 #include "clipper/clipper.hpp"
 
 namespace cl = ClipperLib;
