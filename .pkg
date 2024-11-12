@@ -37,7 +37,7 @@
 [osmium]
   url=git@github.com:motis-project/libosmium.git
   branch=master
-  commit=672690671b26a38eb163c2487012f50100b7ee74
+  commit=6e6d6b3081cc8bdf25dda89730e25c36eb995516
 [pbf-sdf-fonts]
   url=git@github.com:motis-project/pbf-sdf-fonts.git
   branch=master
