@@ -62,6 +62,8 @@ std::pair<std::optional<bool>, bq_node_t> bq_tree::find_parent_leaf(
 
   std::vector<geo::tile> trace{q};
   while (!(trace.back().parent() == geo::tile{0, 0, 0})) {
+    utl::verify(trace.size() <= 22, "invalid tile z={}, y={}, y={}", q.z_, q.y_,
+                q.x_);
     trace.push_back(trace.back().parent());
   }
   std::reverse(begin(trace), end(trace));
