@@ -5,11 +5,11 @@
 [clipper]
   url=git@github.com:motis-project/clipper.git
   branch=master
-  commit=904f0e6644c7f01c176443613be8f7788d59c658
+  commit=2abf72015b85f1cfd38706b21d4f28b8c359c7d5
 [concurrentqueue]
   url=git@github.com:motis-project/concurrentqueue.git
   branch=master
-  commit=54fdce755d3e52c785d6d9d7d91c94615495868c
+  commit=ab6b0b5334a005ef6ff1365ba5af87404de39d29
 [conf]
   url=git@github.com:motis-project/conf.git
   branch=master
@@ -41,7 +41,7 @@
 [pbf-sdf-fonts]
   url=git@github.com:motis-project/pbf-sdf-fonts.git
   branch=master
-  commit=91b369e4eb8a618e0a83b0c04b1b08632ea872c4
+  commit=66f0c760272c7bdd0efeaac5aab5520b9194225e
 [protozero]
   url=git@github.com:motis-project/protozero.git
   branch=master
