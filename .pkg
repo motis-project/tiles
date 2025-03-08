@@ -28,7 +28,7 @@
   commit=39d8127e5697b1323a67e61c3ad8f087384c7429
 [luajit]
   url=git@github.com:motis-project/LuaJIT.git
-  branch=master
+  branch=v2.1
   commit=babeae2c3311bed245ee86f3e35a1f244e3da60b
 [miniz]
   url=git@github.com:motis-project/miniz.git
