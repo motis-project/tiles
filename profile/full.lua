@@ -104,7 +104,7 @@ function process_way(way)
       end
     end
 
-  elseif way:has_any_tag("railway", "rail", "subway", "tram") then
+  elseif way:has_any_tag("railway") then
     way:add_tag_as_integer("level")
 
     if way:has_tag("railway", "disused") or
