@@ -104,7 +104,7 @@ function process_way(way)
       end
     end
 
-  elseif way:has_any_tag("railway", "rail", "subway", "tram") then
+  elseif way:has_any_tag("railway") then
     way:add_tag_as_integer("level")
 
     if way:has_tag("railway", "disused") or
@@ -127,12 +127,14 @@ function process_way(way)
       way:add_string("rail", "detail")
 
     elseif way:has_tag("railway", "subway") or
-           way:has_tag("railway", "tram") then
+           way:has_tag("railway", "tram") or
+           way:has_tag("railway", "narrow_gauge") or
+           way:has_tag("railway", "light_rail") then
       way:set_target_layer("rail")
       way:set_approved_min(10)
       way:add_string("rail", "secondary")
 
-    else
+    elseif way:has_tag("railway", "rail") then
       way:set_target_layer("rail")
       way:set_approved_min(5)
       way:add_string("rail", "primary")
