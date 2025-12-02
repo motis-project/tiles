@@ -152,6 +152,10 @@ function process_way(way)
            way:has_tag("waterway", "drain") then
       way:set_approved_min(15)
     end
+
+  elseif way:has_tag("route", "ferry") then
+    way:set_approved_min(5)
+    way:set_target_layer("ferry")
   -- elseif way:has_tag("boundary", "administrative") and
   --        not way:has_tag("maritime", "yes") then
   --   if way:has_tag("admin_level", "2") then
