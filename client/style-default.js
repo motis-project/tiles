@@ -266,7 +266,7 @@ export const style = (map) => {
             "layout": {
               "symbol-placement": "line",
               "text-field": ["get", "ref"],
-              "text-font": ["Noto Sans Display Regular"],
+              "text-font": ["Noto Sans Regular"],
               "text-size": ["case", ["==", ["get", "highway"], "motorway"], 11, 10],
               "text-justify": "center",
               "text-rotation-alignment": "viewport",
@@ -289,7 +289,7 @@ export const style = (map) => {
             "layout": {
               "symbol-placement": "line",
               "text-field": ["get", "name"],
-              "text-font": ["Noto Sans Display Regular"],
+              "text-font": ["Noto Sans Regular"],
               "text-size": 9,
             },
             "paint": {
@@ -307,7 +307,7 @@ export const style = (map) => {
             "layout": {
               // "symbol-sort-key": ["get", "population"],
               "text-field": ["get", "name"],
-              "text-font": ["Noto Sans Display Regular"],
+              "text-font": ["Noto Sans Regular"],
               "text-size": 12
             },
             "paint": {
@@ -324,7 +324,7 @@ export const style = (map) => {
             "layout": {
               // "symbol-sort-key": ["get", "population"],
               "text-field": ["get", "name"],
-              "text-font": ["Noto Sans Display Bold"],
+              "text-font": ["Noto Sans Bold"],
               "text-size": 18
             },
             "paint": {

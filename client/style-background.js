@@ -228,7 +228,7 @@ export const style = (map) => {
             "layout": {
               "symbol-placement": "line",
               "text-field": ["get", "ref"],
-              "text-font": ["Noto Sans Display Regular"],
+              "text-font": ["Noto Sans Regular"],
               "text-size": 10,
               "text-rotation-alignment": "viewport"
             },
@@ -246,7 +246,7 @@ export const style = (map) => {
             "layout": {
               "symbol-placement": "line",
               "text-field": ["get", "name"],
-              "text-font": ["Noto Sans Display Regular"],
+              "text-font": ["Noto Sans Regular"],
               "text-size": 10,
             },
             "paint": {
@@ -267,7 +267,7 @@ export const style = (map) => {
             "layout": {
               "symbol-sort-key": ["-", ["coalesce", ["get", "population"], 0]],
               "text-field": ["get", "name"],
-              "text-font": ["Noto Sans Display Regular"],
+              "text-font": ["Noto Sans Regular"],
               "text-size": 12
             },
             "paint": {
@@ -284,7 +284,7 @@ export const style = (map) => {
             "layout": {
               "symbol-sort-key": ["-", ["coalesce", ["get", "population"], 0]],
               "text-field": ["get", "name"],
-              "text-font": ["Noto Sans Display Bold"],
+              "text-font": ["Noto Sans Bold"],
               "text-size": ["interpolate", ["linear"], ["zoom"],
                             6, 12,
                             9, 16],
@@ -310,7 +310,7 @@ export const style = (map) => {
         //     "source-layer": "tiles_debug_info",
         //     "layout": {
         //       "text-field": ["get", "tile_id"],
-        //       "text-font": ["Noto Sans Display Bold"],
+        //       "text-font": ["Noto Sans Bold"],
         //       "text-size": 16,
         //     },
         //     "paint": {
