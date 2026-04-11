@@ -167,6 +167,11 @@ function process_way(way)
   --     way:set_approved_full()
   --     way:add_tag_as_integer("admin_level")
   --   end
+  elseif way:has_any_tag("aerialway") then
+    if not way:has_tag("aerialway", "pylon") and not way:has_tag("aerialway", "station") then
+      way:set_approved_min(11)
+      way:set_target_layer("aerialway")
+    end
   end
 end
 

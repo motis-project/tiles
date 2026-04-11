@@ -243,6 +243,15 @@ export const style = (map) => {
                 "line-width": 1.3
             }
         }, {
+          "id": "aerialway",
+          "type": "line",
+          "source": "osm",
+          'source-layer': 'aerialway',
+          "paint": {
+            "line-color": rail,
+            "line-dasharray": [10, 2]
+          }
+        }, {
             "id": "building",
             "type": "fill",
             "source": "osm",
