@@ -5,9 +5,9 @@
 namespace tiles {
 
 struct tile_db_handle;
-struct feature_inserter_mt;
+struct feature_shard;
 
-void load_coastlines(tile_db_handle&, feature_inserter_mt&,
+void load_coastlines(tile_db_handle&, feature_shard&,
                      std::string const& fname);
 
 }  // namespace tiles

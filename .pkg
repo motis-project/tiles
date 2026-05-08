@@ -82,3 +82,7 @@
   url=git@github.com:motis-project/oneTBB.git
   branch=master
   commit=cda5d37ce8303c58ac506259387e75de4ffcf26b
+[osm]
+  url=git@github.com:motis-project/osm.git
+  branch=master
+  commit=108d86bf2fe1f7beaeaa174a21abde3e35f1d757

@@ -1,3 +1,4 @@
+#include <filesystem>
 #include <iostream>
 
 #include "conf/configuration.h"
@@ -5,8 +6,8 @@
 
 #include "tiles/db/clear_database.h"
 #include "tiles/db/database_stats.h"
-#include "tiles/db/feature_inserter_mt.h"
 #include "tiles/db/feature_pack.h"
+#include "tiles/db/feature_shard.h"
 #include "tiles/db/pack_file.h"
 #include "tiles/db/prepare_tiles.h"
 #include "tiles/db/tile_database.h"
@@ -77,19 +78,23 @@ int run_tiles_import(int argc, char const** argv) {
   tile_db_handle db_handle{db_env};
   pack_handle pack_handle{opt.db_fname_.c_str()};
 
-  {
-    feature_inserter_mt inserter{
-        dbi_handle{db_handle, db_handle.features_dbi_opener()}, pack_handle};
+  if (opt.has_any_task({"coastlines", "features"})) {
+    auto pool = shard_pool{std::filesystem::path{opt.tmp_dname_}};
 
     if (opt.has_any_task({"coastlines"})) {
       auto const t = scoped_timer{"load coastlines"};
-      load_coastlines(db_handle, inserter, opt.coastlines_fname_);
+      load_coastlines(db_handle, pool.acquire(), opt.coastlines_fname_);
     }
 
     if (opt.has_any_task({"features"})) {
       t_log("load features");
-      load_osm(db_handle, inserter, opt.osm_fname_, opt.osm_profile_,
+      load_osm(db_handle, pool, opt.osm_fname_, opt.osm_profile_,
                opt.tmp_dname_, 100'000U);
+    }
+
+    {
+      auto const t = scoped_timer{"merge shards"};
+      merge_shards(pool, db_handle, pack_handle);
     }
   }
 

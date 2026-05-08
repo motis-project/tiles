@@ -195,6 +195,7 @@ void unpack_features(geo::tile const& root, std::string_view const& string,
 struct tile_db_handle;
 struct pack_handle;
 struct shared_metadata_coder;
+struct shard_pool;
 
 // quick packing (e.g. as part of a insert flush)
 std::string pack_features(std::vector<std::string> const&);
@@ -210,5 +211,15 @@ void pack_features(tile_db_handle&, pack_handle&);
 void pack_features(
     tile_db_handle&, pack_handle&,
     std::function<std::string(geo::tile, std::vector<std::string> const&)>);
+
+// Merge per-thread shards into the final `pack_handle` + LMDB.
+//
+// Each shard's `entries()` is sorted by tile_key, then a K-way merge
+// groups all blobs for each tile across shards. For each tile the blobs
+// are run through `quadtree_feature_packer` (the same optimal packing used
+// by `pack_features`) and the resulting blob is appended to the
+// destination pack file with one LMDB record. The repack work is
+// parallelized across tiles; the final append + LMDB put is serialized.
+void merge_shards(shard_pool&, tile_db_handle&, pack_handle&);
 
 }  // namespace tiles
