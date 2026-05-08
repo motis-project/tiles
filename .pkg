@@ -85,4 +85,4 @@
 [osm]
   url=git@github.com:motis-project/osm.git
   branch=master
-  commit=108d86bf2fe1f7beaeaa174a21abde3e35f1d757
+  commit=72219b64d3b1583d6eb8e110941a06391c20b0a8
