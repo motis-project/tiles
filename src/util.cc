@@ -33,7 +33,7 @@ std::string compress_gzip(std::string const& input) {
 
   utl::verify(error == Z_OK, "deflateInit2 failed");
 
-  auto out_size = compressBound(input.size()) + 32;
+  auto out_size = deflateBound(&zs, input.size());
   std::string buffer(out_size, '\0');
 
   zs.next_in = reinterpret_cast<uint8_t*>(const_cast<char*>(input.data()));
