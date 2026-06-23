@@ -195,7 +195,7 @@ int run_tiles_server(int argc, char const** argv) {
     }
 
     if (req[http::field::accept_encoding]  //
-            .find("deflate") == std::string_view::npos) {
+            .find("gzip") == std::string_view::npos) {
       res.result(http::status::not_implemented);
       return true;
     }
@@ -209,7 +209,7 @@ int run_tiles_server(int argc, char const** argv) {
 
     if (rendered_tile) {
       res.body() = std::move(*rendered_tile);
-      res.set(http::field::content_encoding, "deflate");
+      res.set(http::field::content_encoding, "gzip");
       res.result(http::status::ok);
     } else {
       res.result(http::status::no_content);
