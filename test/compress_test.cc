@@ -17,14 +17,14 @@ std::string test_data() {
 }
 
 TEST(compress, deflate) {
-  auto test=test_data();
+  auto test = test_data();
 
   auto out = tiles::compress_deflate(test);
   EXPECT_FALSE(out.empty());
 }
 
 TEST(compress, gzip) {
-  auto test=test_data();
+  auto test = test_data();
 
   auto out = tiles::compress_gzip(test);
   EXPECT_FALSE(out.empty());
