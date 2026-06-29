@@ -22,6 +22,34 @@ std::string compress_deflate(std::string const& input) {
   return buffer;
 }
 
+std::string compress_gzip(std::string const& input) {
+  /**
+  Same as compress2, but with MAX_WBITS + 16 to indicate gzip header and trailer
+  */
+  z_stream zs{};
+
+  auto error = deflateInit2(&zs, Z_BEST_COMPRESSION, Z_DEFLATED, MAX_WBITS + 16,
+                            8, Z_DEFAULT_STRATEGY);
+
+  utl::verify(error == Z_OK, "deflateInit2 failed");
+
+  auto out_size = deflateBound(&zs, input.size());
+  std::string buffer(out_size, '\0');
+
+  zs.next_in = reinterpret_cast<uint8_t*>(const_cast<char*>(input.data()));
+  zs.avail_in = input.size();
+
+  zs.next_out = reinterpret_cast<uint8_t*>(buffer.data());
+  zs.avail_out = buffer.size();
+
+  error = deflate(&zs, Z_FINISH);
+  utl::verify(error == Z_STREAM_END, "deflate failed");
+
+  buffer.resize(zs.total_out);
+
+  deflateEnd(&zs);
+  return buffer;
+}
 struct regex_matcher::impl {
   explicit impl(std::string const& pattern) : regex_{pattern} {}
 

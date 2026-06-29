@@ -5,7 +5,7 @@
 #include "tiles/bin_utils.h"
 #include "tiles/util.h"
 
-TEST_CASE("compress_deflate") {
+std::string test_data() {
   std::string test(1024ULL * 1024, '\0');
 
   std::mt19937 gen{42};
@@ -13,7 +13,19 @@ TEST_CASE("compress_deflate") {
   for (auto i = 0ULL; i < test.size(); i += sizeof(uint64_t)) {
     tiles::write(test.data(), i, dist(gen));
   }
+  return test;
+}
+
+TEST(compress, deflate) {
+  auto test = test_data();
 
   auto out = tiles::compress_deflate(test);
-  CHECK_FALSE(out.empty());
+  EXPECT_FALSE(out.empty());
+}
+
+TEST(compress, gzip) {
+  auto test = test_data();
+
+  auto out = tiles::compress_gzip(test);
+  EXPECT_FALSE(out.empty());
 }
