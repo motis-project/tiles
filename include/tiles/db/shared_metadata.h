@@ -3,6 +3,10 @@
 #include <string>
 #include <vector>
 
+#include "ankerl/cista_adapter.h"
+
+#include "cista/hash.h"
+
 #include "protozero/pbf_reader.hpp"
 #include "protozero/pbf_writer.hpp"
 
@@ -126,25 +130,28 @@ struct shared_metadata_coder : public shared_metadata_decoder {
   shared_metadata_coder() = default;
 
   explicit shared_metadata_coder(std::vector<metadata> data)
-      : shared_metadata_decoder(std::move(data)),
-        enc_data_(
-            utl::to_vec(dec_data_, [i = uint64_t{0}](auto const& sm) mutable {
-              return std::make_pair(sm, i++);
-            })) {
-    std::sort(begin(enc_data_), end(enc_data_));
+      : shared_metadata_decoder(std::move(data)) {
+    enc_map_.reserve(dec_data_.size());
+    for (auto i = uint64_t{0}; i != dec_data_.size(); ++i) {
+      enc_map_.emplace(dec_data_[i], i);
+    }
   }
 
   std::optional<uint64_t> encode(metadata const& q) const {
-    auto const it = std::lower_bound(
-        begin(enc_data_), end(enc_data_), q,
-        [](auto const& a, auto const& b) { return a.first < b; });
-    if (it == end(enc_data_) || it->first != q) {
+    auto const it = enc_map_.find(q);
+    if (it == enc_map_.end()) {
       return std::nullopt;
     }
     return {it->second};
   }
 
-  std::vector<std::pair<metadata, uint64_t>> enc_data_;
+  struct metadata_hash {
+    std::size_t operator()(metadata const& m) const noexcept {
+      return cista::hash(std::string_view{m.value_},
+                         cista::hash(std::string_view{m.key_}));
+    }
+  };
+  cista::raw::ankerl_map<metadata, uint64_t, metadata_hash> enc_map_;
 };
 
 inline std::vector<metadata> load_shared_metadata(tile_db_handle& db_handle,

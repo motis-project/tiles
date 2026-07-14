@@ -52,6 +52,7 @@ target_link_libraries(tiles
   miniz
   zlibstatic
   mpark_variant
+  unordered_dense
 )
 
 # --- tiles-import lib

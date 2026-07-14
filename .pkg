@@ -85,7 +85,7 @@
 [osm]
   url=git@github.com:motis-project/osm.git
   branch=master
-  commit=d4ba407cb9cb5cf1ad12502fc87ad5105d72e4c2
+  commit=930ca040cb0762a53c01f4ede268105fb0a9d523
 [cista]
   url=git@github.com:felixguendling/cista.git
   branch=master

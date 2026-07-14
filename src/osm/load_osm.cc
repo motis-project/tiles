@@ -5,7 +5,10 @@
 #include <cstdint>
 #include <atomic>
 #include <filesystem>
+#include <iostream>
 #include <mutex>
+#include <optional>
+#include <ranges>
 #include <span>
 #include <string>
 #include <thread>
@@ -150,8 +153,10 @@ osmium::Area const& build_area(osmium::memory::Buffer& buf,
 }
 
 struct fiber_state {
-  feature_handler fh;
-  osmium::memory::Buffer buf{4096U, osmium::memory::Buffer::auto_grow::yes};
+  feature_handler fh_;
+  osmium::memory::Buffer buf_{4096U, osmium::memory::Buffer::auto_grow::yes};
+  std::vector<osm::way> way_buf_;
+  std::vector<std::pair<std::string_view, std::string_view>> tag_buf_;
 };
 
 }  // namespace
@@ -162,17 +167,14 @@ void load_osm(tile_db_handle& db_handle, shard_pool& pool,
   auto r = osm::raw_reader{
       .file_ = cista::mmap{osm_fname.c_str(), cista::mmap::protection::READ}};
 
-  // Both passes read the PBF strictly forward: hint the kernel to ramp up
-  // readahead and evict pages behind the cursor. On large inputs (planet
-  // ≈ 90 GB) this also frees RAM for the `dat_` index.
+  // Both passes read the PBF strictly forward:
+  // hint the kernel to ramp up readahead and evict pages behind the cursor.
   ::madvise(const_cast<std::uint8_t*>(r.file_.data()), r.file_.size(),
             MADV_SEQUENTIAL);
 
   progress_tracker reader_progress;
 
-  // Hybrid (delta-compressed) node index in two unnamed (O_TMPFILE) files
-  // under `tmp_dname`. The kernel reclaims them on close — no path on
-  // disk, no zero-fill on grow.
+  // Hybrid (delta-compressed) node index in two unnamed (O_TMPFILE) files.
   auto node_idx = osm::hybrid_node_idx{
       cista::mmap{tmp_dname.c_str(), cista::mmap::protection::TMPFILE},
       cista::mmap{tmp_dname.c_str(), cista::mmap::protection::TMPFILE}};
@@ -184,23 +186,22 @@ void load_osm(tile_db_handle& db_handle, shard_pool& pool,
   auto metadata = shared_metadata_builder{flush_threshold};
 
   // -------- Pass 1 --------
-  // Workers run a per-block `hybrid_block_encoder` (varint encoding +
-  // delta compression of node positions) entirely in parallel. The collect
-  // step calls `merger.merge` on resulting blocks in input order; that
-  // step is just a per-block memcpy + a few `idx_` pushes + one inter-block
-  // empty-span varint, so the brief mutex around it isn't a bottleneck.
   auto blocks = std::vector<osm::buf>{};
   while (auto b = r.read()) {
     blocks.emplace_back(*b);
   }
 
   struct pass1_local {
-    osm::inflate decompressor;
-    std::string out;
-    std::vector<std::string_view> strings;
+    osm::inflate decompressor_;
+    std::string out_;
+    std::vector<std::string_view> strings_;
+    std::optional<feature_handler> fh_;
+    osmium::memory::Buffer buf_{4096U, osmium::memory::Buffer::auto_grow::yes};
   };
 
   auto n_ways = std::atomic_uint64_t{0U};
+
+  auto const t_pass1_start = std::chrono::steady_clock::now();
 
   reader_progress->status("Load OSM / Pass 1")
       .out_bounds(20.F, 45.F)
@@ -209,15 +210,21 @@ void load_osm(tile_db_handle& db_handle, shard_pool& pool,
   utl::parallel_ordered_collect_threadlocal<pass1_local>(
       blocks.size(),
       [&](pass1_local& local, std::size_t const i) -> osm::hybrid_block {
+        if (!local.fh_) {
+          local.fh_.emplace(osm_profile, pool.acquire(), layer_names, metadata);
+        }
         auto const& b = blocks[i];
-        local.out.resize(b.raw_size_);
-        local.decompressor.decompress(b.compressed_, local.out);
+        local.out_.resize(b.raw_size_);
+        local.decompressor_.decompress(b.compressed_, local.out_);
         auto enc = osm::hybrid_block_encoder{};
         osm::decode_primitive(
-            local.out, local.strings,
+            local.out_, local.strings_,
             /*read_nodes=*/true, /*read_ways=*/true, /*read_relations=*/true,
-            [&](std::int64_t const id, geo::latlng const& pos, auto&&) {
+            [&](std::int64_t const id, geo::latlng const& pos, auto&& tags) {
               enc.node(osm::node{id, geo::fixed_latlng::from_latlng(pos)});
+              if (std::ranges::begin(tags) != std::ranges::end(tags)) {
+                local.fh_->node(build_node(local.buf_, id, pos, tags));
+              }
             },
             [&](std::int64_t, auto&&, auto&&) { ++n_ways; },
             [&](std::int64_t const id, auto&& members, auto&& tags) {
@@ -231,12 +238,17 @@ void load_osm(tile_db_handle& db_handle, shard_pool& pool,
       reader_progress->update_fn());
 
   node_idx_merger.finish();
-  mp_manager.reserve_way_map(n_ways.load());
+  mp_manager.index_relation_members();
   r.reset();
 
+  auto const t_pass2_start = std::chrono::steady_clock::now();
+  std::cerr << "\n###PHASE pass1 = "
+            << std::chrono::duration_cast<std::chrono::milliseconds>(
+                   t_pass2_start - t_pass1_start)
+                   .count()
+            << " ms\n";
+
   // -------- Pass 2 --------
-  // Reset `in_` so the monotonic update tracks pass 2's 0..file_size bytes
-  // (otherwise it stays pinned at file_size from pass 1).
   reader_progress->update(0);
   reader_progress->status("Load OSM / Pass 2")
       .out_bounds(45.F, 70.F)
@@ -247,42 +259,72 @@ void load_osm(tile_db_handle& db_handle, shard_pool& pool,
   auto rel_cv = bf::condition_variable{};
   auto const total_ways = n_ways.load();
 
-  // Each worker fiber lazily acquires its own shard from the pool on first
-  // call (mutex held briefly during push_back). After that, all inserts go
-  // to that shard with no synchronization.
+  auto batch_process_block_ways = [&](fiber_state& fs) {
+    if (fs.way_buf_.empty()) {
+      return;
+    }
+
+    osm::update_locations(node_idx, fs.way_buf_);
+
+    for (auto i = std::size_t{0}; i != fs.way_buf_.size(); ++i) {
+      auto& w = fs.way_buf_[i];
+      auto const& tags = fs.tag_buf_[i];
+      bool const has_tags = !tags.empty();
+
+      if (has_tags) {
+        fs.fh_.way(build_way(fs.buf_, w, tags));
+      }
+
+      auto const a = mp_manager.save_ways(std::move(w), tags);
+      if (has_tags && a && a->valid) {
+        fs.fh_.area(build_area(fs.buf_, *a, tags));
+      }
+    }
+
+    auto const n = fs.way_buf_.size();
+    fs.way_buf_.clear();
+    fs.tag_buf_.clear();
+
+    if ((ways_processed += n) >= total_ways) {
+      auto lock = std::lock_guard{rel_mtx};
+      ways_done = true;
+      rel_cv.notify_all();
+    }
+  };
+
   osm::parse_osm(
       r,
       [&] {
-        return fiber_state{.fh = feature_handler{osm_profile, pool.acquire(),
-                                                 layer_names, metadata}};
+        return fiber_state{.fh_ = feature_handler{osm_profile, pool.acquire(),
+                                                  layer_names, metadata}};
       },
-      [&](fiber_state& fs, std::int64_t const id, geo::latlng const& pos,
-          auto&& tags) { fs.fh.node(build_node(fs.buf, id, pos, tags)); },
+      osm::skip{},
       osm::way_handler{[&](fiber_state& fs, osm::way&& w, auto&& tags) {
-        osm::update_locations_of_way(node_idx, w);
-        fs.fh.way(build_way(fs.buf, w, tags));
-        if (auto a = mp_manager.save_ways(std::move(w), tags); a && a->valid) {
-          fs.fh.area(build_area(fs.buf, *a, tags));
-        }
-        if (++ways_processed >= total_ways) {
-          auto lock = std::lock_guard{rel_mtx};
-          ways_done = true;
-          rel_cv.notify_all();
+        // Store for batched coordinate lookup.
+        fs.way_buf_.emplace_back(std::move(w));
+        auto& t = fs.tag_buf_.emplace_back();
+        for (auto const& [k, v] : tags) {
+          t.emplace_back(k, v);
         }
       }},
       [&](fiber_state& fs, std::int64_t const id, auto&& members, auto&& tags) {
+        batch_process_block_ways(fs);  // Ways need coordinates for areas.
         {
           auto lock = std::unique_lock{rel_mtx};
           rel_cv.wait(lock, [&] { return ways_done; });
         }
         auto const a = mp_manager.assemble_area(id, members, tags);
         if (a.valid) {
-          fs.fh.area(build_area(fs.buf, a, tags));
+          fs.fh_.area(build_area(fs.buf_, a, tags));
         }
       },
-      reader_progress->update_fn(),
-      /*n_threads=*/std::thread::hardware_concurrency(),
-      /*n_fibers=*/std::thread::hardware_concurrency());
+      /*on_flush=*/batch_process_block_ways, reader_progress->update_fn());
+
+  std::cerr << "\n###PHASE pass2 = "
+            << std::chrono::duration_cast<std::chrono::milliseconds>(
+                   std::chrono::steady_clock::now() - t_pass2_start)
+                   .count()
+            << " ms\n";
 
   // -------- Persist --------
   auto txn = db_handle.make_txn();
