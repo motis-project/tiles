@@ -165,7 +165,7 @@ std::optional<std::string> get_tile(render_ctx const& ctx,
 
   if (ctx.compress_result_) {
     start<perf_task::GET_TILE_COMPRESS>(pc);
-    auto compressed = compress_deflate(rendered_tile);
+    auto compressed = compress_gzip(rendered_tile);
     stop<perf_task::GET_TILE_COMPRESS>(pc);
     pc.template append<perf_task::RESULT_SIZE>(compressed.size());
     return {std::move(compressed)};

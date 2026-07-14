@@ -34,6 +34,7 @@ inline void t_log(fmt::format_string<Args...> fmt_str, Args&&... args) {
 }
 
 std::string compress_deflate(std::string const&);
+std::string compress_gzip(std::string const&);
 
 struct progress_tracker {
 #ifdef TILES_GLOBAL_PROGRESS_TRACKER
