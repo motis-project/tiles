@@ -264,7 +264,7 @@ void load_osm(tile_db_handle& db_handle, shard_pool& pool,
         if (auto a = mp_manager.save_ways(std::move(w), tags); a && a->valid) {
           fs.fh.area(build_area(fs.buf, *a, tags));
         }
-        if (++ways_processed == total_ways) {
+        if (++ways_processed >= total_ways) {
           auto lock = std::lock_guard{rel_mtx};
           ways_done = true;
           rel_cv.notify_all();
