@@ -1,6 +1,8 @@
 #pragma once
 
+#ifndef _WIN32
 #include <sys/mman.h>
+#endif
 #include <cstring>
 #include <filesystem>
 #include <vector>
@@ -157,7 +159,7 @@ struct pack_handle {
     if (new_size <= dat_.size()) {
       return;
     }
-    auto const old_size = dat_.size();
+    [[maybe_unused]] auto const old_size = dat_.size();
     dat_.resize(new_size);
 #ifdef MADV_POPULATE_WRITE
     ::madvise(dat_.data() + old_size, new_size - old_size, MADV_POPULATE_WRITE);
