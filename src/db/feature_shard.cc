@@ -1,6 +1,8 @@
 #include "tiles/db/feature_shard.h"
 
+#ifndef _WIN32
 #include <sys/mman.h>
+#endif
 #include <algorithm>
 #include <cstring>
 #include <utility>
@@ -112,7 +114,7 @@ void feature_shard::grow_pack_to(std::size_t const new_size) {
   if (new_size <= pack_.size()) {
     return;
   }
-  auto const old_size = pack_.size();
+  [[maybe_unused]] auto const old_size = pack_.size();
   pack_.resize(new_size);
 #ifdef MADV_POPULATE_WRITE
   ::madvise(pack_.data() + old_size, new_size - old_size, MADV_POPULATE_WRITE);
@@ -123,7 +125,7 @@ void feature_shard::grow_idx_to(std::size_t const new_size) {
   if (new_size <= idx_.size()) {
     return;
   }
-  auto const old_size = idx_.size();
+  [[maybe_unused]] auto const old_size = idx_.size();
   idx_.resize(new_size);
 #ifdef MADV_POPULATE_WRITE
   ::madvise(idx_.data() + old_size, new_size - old_size, MADV_POPULATE_WRITE);

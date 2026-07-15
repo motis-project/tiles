@@ -1,6 +1,8 @@
 #include "tiles/osm/load_osm.h"
 
+#ifndef _WIN32
 #include <sys/mman.h>
+#endif
 #include <chrono>
 #include <cstdint>
 #include <atomic>
@@ -174,8 +176,10 @@ void load_osm(tile_db_handle& db_handle, shard_pool& pool,
 
   // Both passes read the PBF strictly forward:
   // hint the kernel to ramp up readahead and evict pages behind the cursor.
+#ifdef MADV_SEQUENTIAL
   ::madvise(const_cast<std::uint8_t*>(r.file_.data()), r.file_.size(),
             MADV_SEQUENTIAL);
+#endif
 
   progress_tracker reader_progress;
 
