@@ -153,6 +153,8 @@ osmium::Area const& build_area(osmium::memory::Buffer& buf,
 }
 
 struct fiber_state {
+  explicit fiber_state(feature_handler fh) : fh_{std::move(fh)} {}
+
   feature_handler fh_;
   osmium::memory::Buffer buf_{4096U, osmium::memory::Buffer::auto_grow::yes};
   std::vector<osm::way> way_buf_;
@@ -298,8 +300,8 @@ void load_osm(tile_db_handle& db_handle, shard_pool& pool,
   osm::parse_osm(
       r,
       [&] {
-        return fiber_state{.fh_ = feature_handler{osm_profile, pool.acquire(),
-                                                  layer_names, metadata}};
+        return fiber_state{feature_handler{osm_profile, pool.acquire(),
+                                           layer_names, metadata}};
       },
       osm::skip{},
       osm::way_handler{[&](fiber_state& fs, osm::way&& w, auto&& tags) {

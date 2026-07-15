@@ -23,6 +23,13 @@
 
 namespace tiles {
 
+struct metadata_hash {
+  std::size_t operator()(metadata const& m) const noexcept {
+    return cista::hash(std::string_view{m.value_},
+                       cista::hash(std::string_view{m.key_}));
+  }
+};
+
 struct shared_metadata_builder {
   static constexpr auto const kDefaultFlushThreshold =
       sizeof(void*) >= 8 ? 1e7 : 1e5;
@@ -54,33 +61,14 @@ struct shared_metadata_builder {
       return false;
     }
 
-    std::vector<std::pair<metadata, uint64_t>> buf_counts;
-    std::sort(begin(buf), end(buf));
-    utl::equal_ranges_linear(buf, [&](auto lb, auto ub) {
-      buf_counts.emplace_back(*lb, std::distance(lb, ub));
-    });
-
+    // Count occurrences in a hash map: O(1) amortized per entry. The old
+    // builder did a sorted `inplace_merge` of each batch into `counts_`, i.e.
+    // O(counts_) per flush -> ~O(N^2 / threshold) overall, which serializes
+    // pass 2 on planet-scale metadata (millions of unique key/value pairs).
     std::lock_guard<std::mutex> lock{mutex_};
-    auto old_size = counts_.size();
-    utl::concat(counts_, buf_counts);
-    std::inplace_merge(
-        begin(counts_), begin(counts_) + static_cast<long>(old_size),
-        end(counts_),
-        [](auto const& a, auto const& b) { return a.first < b.first; });
-
-    utl::equal_ranges_linear(
-        counts_,
-        [](auto const& a, auto const& b) { return a.first == b.first; },
-        [&](auto lb, auto ub) {
-          if (std::distance(lb, ub) == 1) {
-            return;
-          }
-          utl::verify(std::distance(lb, ub) == 2,
-                      "shared_metadata_builder: unexpected element count");
-          lb->second += std::next(lb)->second;
-          std::next(lb)->second = 0;
-        });
-    utl::erase_if(counts_, [](auto const& pair) { return pair.second == 0; });
+    for (auto& m : buf) {
+      ++counts_[std::move(m)];
+    }
 
     return true;
   }
@@ -89,16 +77,28 @@ struct shared_metadata_builder {
     while (flush(true)) {
     }
 
-    utl::erase_if(counts_, [](auto const& pair) { return pair.second == 1; });
-    std::sort(begin(counts_), end(counts_),
+    // Drop pairs seen only once, then order by frequency (descending). The old
+    // builder held `counts_` sorted by metadata and applied an unstable
+    // count-descending sort on top; sorting the extracted entries by metadata
+    // first reproduces that exact input, so the coding stays byte-identical.
+    std::vector<std::pair<metadata, uint64_t>> counts;
+    counts.reserve(counts_.size());
+    for (auto const& [m, c] : counts_) {
+      if (c != 1) {
+        counts.emplace_back(m, c);
+      }
+    }
+    std::sort(begin(counts), end(counts),
+              [](auto const& a, auto const& b) { return a.first < b.first; });
+    std::sort(begin(counts), end(counts),
               [](auto const& a, auto const& b) { return a.second > b.second; });
 
     t_log("have {} key/value pairs in shared metadata",
-          printable_num(counts_.size()));
+          printable_num(counts.size()));
 
     std::string buf;
     protozero::pbf_writer writer{buf};
-    for (auto const& meta : counts_) {
+    for (auto const& meta : counts) {
       writer.add_string(1, meta.first.key_);
       writer.add_string(1, meta.first.value_);
     }
@@ -112,7 +112,7 @@ struct shared_metadata_builder {
   queue_wrapper<metadata> queue_;
 
   std::mutex mutex_;
-  std::vector<std::pair<metadata, uint64_t>> counts_;
+  cista::raw::ankerl_map<metadata, uint64_t, metadata_hash> counts_;
 };
 
 struct shared_metadata_decoder {
@@ -144,13 +144,6 @@ struct shared_metadata_coder : public shared_metadata_decoder {
     }
     return {it->second};
   }
-
-  struct metadata_hash {
-    std::size_t operator()(metadata const& m) const noexcept {
-      return cista::hash(std::string_view{m.value_},
-                         cista::hash(std::string_view{m.key_}));
-    }
-  };
 
   cista::raw::ankerl_map<metadata, uint64_t, metadata_hash> enc_map_;
 };
