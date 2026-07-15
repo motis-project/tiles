@@ -156,7 +156,10 @@ struct fiber_state {
   feature_handler fh_;
   osmium::memory::Buffer buf_{4096U, osmium::memory::Buffer::auto_grow::yes};
   std::vector<osm::way> way_buf_;
-  std::vector<std::pair<std::string_view, std::string_view>> tag_buf_;
+  // One entry per buffered way: its tag key/value views (into the block buffer,
+  // valid until the per-block flush).
+  std::vector<std::vector<std::pair<std::string_view, std::string_view>>>
+      tag_buf_;
 };
 
 }  // namespace

@@ -151,6 +151,7 @@ struct shared_metadata_coder : public shared_metadata_decoder {
                          cista::hash(std::string_view{m.key_}));
     }
   };
+
   cista::raw::ankerl_map<metadata, uint64_t, metadata_hash> enc_map_;
 };
 
