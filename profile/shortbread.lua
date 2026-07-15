@@ -92,6 +92,26 @@ local function is_oneway(v)
   return v == "yes" or v == "1" or v == "true" or v == "-1"
 end
 
+-- OSM `level` tag -> numeric (from_level, to_level).
+-- Accepts single values ("1", "-2"), ranges ("0;2") and semicolon lists
+-- ("-1;0;2" -> min/max). Returns nil, nil if no number is present.
+-- NOTE: the level attributes MUST be emitted as integers (add_integer /
+-- add_tag_as_integer) — the MapLibre indoor overlay filters with numeric
+-- comparisons (['==', 'level', 0], ['<=', 'from_level', level]); a string
+-- "0" would never match the number 0 and the floor would stay invisible.
+-- NOTE: only string.match / tonumber may be used here — the tiles Lua sandbox
+-- does not open the `math` library. (Same approach as full.lua.)
+local function split_level(level)
+  if level == nil or level == "" then return nil, nil end
+  local from_level, to_level = level:match("(-?%d+);(-?%d+)")
+  if from_level and to_level then
+    return tonumber(from_level), tonumber(to_level)
+  end
+  local lvl = level:match("(-?%d+)")
+  if lvl then return tonumber(lvl), tonumber(lvl) end
+  return nil, nil
+end
+
 --------------------------------------------------------------------------------
 -- accepted POI values (from the Shortbread profile)
 --------------------------------------------------------------------------------
@@ -286,6 +306,21 @@ function process_node(node)
     if process_place_labels(node) then return end
   end
 
+  -- elevators (indoor overlay). A lift is a node connecting two floors;
+  -- from_level/to_level drive which levels it is shown on.
+  if node:has_tag("highway", "elevator") then
+    node:set_target_layer("indoor")
+    node:set_approved_min(17)
+    node:add_string("indoor", "elevator")
+    local from_level, to_level = split_level(node:get_tag("level"))
+    if from_level ~= nil then
+      node:add_integer("from_level", from_level)
+      node:add_integer("to_level", to_level)
+    end
+    set_names(node)
+    return
+  end
+
   -- street_labels_points (motorway junctions)
   if node:has_tag("highway", "motorway_junction") then
     node:set_target_layer("street_labels_points")
@@ -403,6 +438,19 @@ local function process_streets(way)
   -- name attributes so a style can label streets off this layer as well
   -- (Shortbread's separate street_labels line layer is not produced here).
   set_names(way)
+
+  -- level information for the indoor overlay (same idioms as full.lua):
+  -- indoor footpaths are filtered by `level`; stairs (kind=steps) connect two
+  -- floors and are filtered by from_level/to_level.
+  if kind == "steps" then
+    local from_level, to_level = split_level(way:get_tag("level"))
+    if from_level ~= nil then
+      way:add_integer("from_level", from_level)
+      way:add_integer("to_level", to_level)
+    end
+  else
+    way:add_tag_as_integer("level")
+  end
   return true
 end
 
@@ -436,6 +484,21 @@ end
 --------------------------------------------------------------------------------
 
 function process_way(way)
+  -- elevators (indoor overlay). Handled before the generic streets branch so a
+  -- highway=elevator way lands in the `indoor` layer instead of `streets`.
+  if way:has_tag("highway", "elevator") then
+    way:set_target_layer("indoor")
+    way:set_approved_min(17)
+    way:add_string("indoor", "elevator")
+    local from_level, to_level = split_level(way:get_tag("level"))
+    if from_level ~= nil then
+      way:add_integer("from_level", from_level)
+      way:add_integer("to_level", to_level)
+    end
+    set_names(way)
+    return
+  end
+
   -- streets (roads / railways / aeroways as lines)
   if way:has_any_tag("highway") or way:has_any_tag("railway") or way:has_any_tag("aeroway") then
     if process_streets(way) then return end
@@ -658,6 +721,64 @@ local function process_street_polygons(area)
 end
 
 --------------------------------------------------------------------------------
+-- indoor (MOTIS indoor overlay layer "indoor")
+-- rooms / corridors / walls / areas carrying an `indoor` tag, plus elevators
+-- (indoor=elevator or highway=elevator). Filtered by `level`; elevators by
+-- from_level/to_level.
+--------------------------------------------------------------------------------
+
+local function process_indoor(area)
+  local indoor = area:get_tag("indoor")
+  if indoor == "" and area:get_tag("highway") == "elevator" then
+    indoor = "elevator"
+  end
+  if indoor == "" or indoor == "no" then return false end
+
+  area:set_target_layer("indoor")
+  area:add_string("indoor", indoor)
+  area:add_tag_as_string("name")
+  area:add_tag_as_string("shop")
+
+  -- level info identical to full.lua: rooms carry `level`; elevators connect
+  -- floors and carry from_level/to_level.
+  if indoor == "elevator" then
+    area:set_approved_min(17)
+    local from_level, to_level = split_level(area:get_tag("level"))
+    if from_level ~= nil then
+      area:add_integer("from_level", from_level)
+      area:add_integer("to_level", to_level)
+    end
+  else
+    area:set_approved_min(18)
+    area:add_tag_as_integer("level")
+  end
+  return true
+end
+
+--------------------------------------------------------------------------------
+-- transit platforms -> `land` layer, kind=public_transport (the MOTIS indoor
+-- overlay draws these and filters them by `level`). Shortbread's own
+-- public_transport layer only carries station/stop points, not platform areas.
+--------------------------------------------------------------------------------
+
+local function process_platform(area)
+  local pt = area:get_tag("public_transport")
+  local railway = area:get_tag("railway")
+  local highway = area:get_tag("highway")
+  if pt ~= "platform" and pt ~= "stop_area" and
+     railway ~= "platform" and highway ~= "platform" then
+    return false
+  end
+
+  area:set_target_layer("land")
+  area:set_approved_min(14)
+  area:add_string("kind", "public_transport")
+  area:add_tag_as_integer("level")
+  set_names(area)
+  return true
+end
+
+--------------------------------------------------------------------------------
 -- areas
 --------------------------------------------------------------------------------
 
@@ -693,6 +814,14 @@ function process_area(area)
     area:add_string("kind", "bridge")
     return
   end
+
+  -- indoor rooms / corridors / elevators (indoor overlay). Checked before
+  -- pois/land so an indoor room tagged e.g. amenity=cafe still lands in the
+  -- `indoor` layer with its level.
+  if process_indoor(area) then return end
+
+  -- transit platforms (land kind=public_transport, carries a level)
+  if process_platform(area) then return end
 
   -- water_polygons
   if process_water_polygons(area) then return end
