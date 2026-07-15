@@ -167,7 +167,53 @@ void merge_shards(shard_pool& pool, tile_db_handle& db_handle,
     tile_key_t tile_;
     std::vector<std::string> blobs_;
   };
+
+  // Parallel repack; serial append + LMDB write.
+  auto txn = db_handle.make_txn();
+  auto feature_dbi = db_handle.features_dbi(txn);
+  std::size_t batch_count = 0;
+
+  // Stream the k-way merge in bounded batches instead of materializing every
+  // tile's blobs up front. The old code built one `tasks` vector holding a copy
+  // of *all* feature blobs on top of the shards that still held them, doubling
+  // peak memory and OOM'ing large imports (e.g. europe) on smaller boxes. A
+  // batch is only cut at a tile boundary, so a tile's blobs are never split.
+  // Processing order (tile-sorted) is unchanged, so the output is byte-identical.
+  constexpr auto kBatchBytes = std::size_t{1} << 30;  // ~1 GiB of blobs / batch
   auto tasks = std::vector<tile_task>{};
+  auto tasks_bytes = std::size_t{0};
+
+  auto packed = std::vector<std::pair<geo::tile, std::string>>{};
+  auto flush_batch = [&] {
+    if (tasks.empty()) {
+      return;
+    }
+    // Pack the batch's tiles in parallel -- each job writes its own `packed`
+    // slot, so no ordered collector (and its pending-mutex/reorder map) is
+    // needed. The pack-file append + LMDB writes then run serially on this
+    // thread: the LMDB write txn must stay on one thread, and the collect
+    // workers are spawned/joined per batch.
+    packed.assign(tasks.size(), {});
+    utl::parallel_for_run(tasks.size(), [&](std::size_t const i) {
+      auto const tile = key_to_tile(tasks[i].tile_);
+      packed[i] = {tile, pack_features(tile, metadata_coder, tasks[i].blobs_)};
+    });
+
+    for (auto& [tile, blob] : packed) {
+      auto const rec = pack_handle.append(blob);
+      txn.put(feature_dbi, tile_to_key(tile), pack_records_serialize(rec));
+      if (++batch_count >= 1024U) {
+        txn.commit();
+        batch_count = 0;
+        txn = db_handle.make_txn();
+        feature_dbi = db_handle.features_dbi(txn);
+      }
+    }
+
+    tasks.clear();
+    tasks_bytes = 0;
+  };
+
   while (!heap.empty()) {
     auto const top = heap.top();
     heap.pop();
@@ -175,41 +221,23 @@ void merge_shards(shard_pool& pool, tile_db_handle& db_handle,
     auto const& e = span[top.pos_];
 
     if (tasks.empty() || tasks.back().tile_ != e.tile_) {
+      // Starting a new tile: every buffered tile is complete, so flush the
+      // batch here (a tile boundary) if it has grown large enough.
+      if (tasks_bytes >= kBatchBytes) {
+        flush_batch();
+      }
       tasks.push_back({e.tile_, {}});
     }
-    tasks.back().blobs_.emplace_back(shards[top.shard_idx_].blob(e));
+    auto blob = shards[top.shard_idx_].blob(e);
+    tasks_bytes += blob.size();
+    tasks.back().blobs_.emplace_back(std::move(blob));
 
     auto const next = top.pos_ + 1U;
     if (next < span.size()) {
       heap.push({span[next].tile_, top.shard_idx_, next});
     }
   }
-
-  // Parallel repack; serial append + LMDB write.
-  auto txn = db_handle.make_txn();
-  auto feature_dbi = db_handle.features_dbi(txn);
-  std::size_t batch_count = 0;
-
-  utl::parallel_ordered_collect_threadlocal<std::monostate>(
-      tasks.size(),
-      [&](auto& /*local*/, std::size_t const i)
-          -> std::pair<geo::tile, std::string> {
-        auto const& t = tasks[i];
-        auto const tile = key_to_tile(t.tile_);
-        return {tile, pack_features(tile, metadata_coder, t.blobs_)};
-      },
-      [&](std::size_t /*idx*/, std::pair<geo::tile, std::string>&& result) {
-        auto const& [tile, blob] = result;
-        auto const rec = pack_handle.append(blob);
-        txn.put(feature_dbi, tile_to_key(tile), pack_records_serialize(rec));
-
-        if (++batch_count >= 1024U) {
-          txn.commit();
-          batch_count = 0;
-          txn = db_handle.make_txn();
-          feature_dbi = db_handle.features_dbi(txn);
-        }
-      });
+  flush_batch();  // final partial batch
 
   txn.commit();
 }
