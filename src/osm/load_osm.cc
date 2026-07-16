@@ -251,7 +251,7 @@ void load_osm(tile_db_handle& db_handle, shard_pool& pool,
   r.reset();
 
   auto const t_pass2_start = std::chrono::steady_clock::now();
-  std::cerr << "\n###PHASE pass1 = "
+  std::clog << "\npass1 timing = "
             << std::chrono::duration_cast<std::chrono::milliseconds>(
                    t_pass2_start - t_pass1_start)
                    .count()
@@ -329,7 +329,7 @@ void load_osm(tile_db_handle& db_handle, shard_pool& pool,
       },
       /*on_flush=*/batch_process_block_ways, reader_progress->update_fn());
 
-  std::cerr << "\n###PHASE pass2 = "
+  std::clog << "\npass2 timing = "
             << std::chrono::duration_cast<std::chrono::milliseconds>(
                    std::chrono::steady_clock::now() - t_pass2_start)
                    .count()
