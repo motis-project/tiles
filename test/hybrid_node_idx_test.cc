@@ -1,5 +1,7 @@
 #include "gtest/gtest.h"
 
+#include <filesystem>
+
 #include "cista/mmap.h"
 
 #include "osmium/io/pbf_input.hpp"
@@ -23,9 +25,10 @@
 
 namespace {
 tiles::hybrid_node_idx make_idx() {
+  auto const tmp = std::filesystem::temp_directory_path().generic_string();
   return tiles::hybrid_node_idx{
-      cista::mmap{"/tmp", cista::mmap::protection::TMPFILE},
-      cista::mmap{"/tmp", cista::mmap::protection::TMPFILE}};
+      cista::mmap{tmp.c_str(), cista::mmap::protection::TMPFILE},
+      cista::mmap{tmp.c_str(), cista::mmap::protection::TMPFILE}};
 }
 }  // namespace
 
