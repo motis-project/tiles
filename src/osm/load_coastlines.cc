@@ -10,7 +10,7 @@
 #include "utl/to_vec.h"
 
 #include "tiles/db/bq_tree.h"
-#include "tiles/db/feature_inserter_mt.h"
+#include "tiles/db/feature_shard.h"
 #include "tiles/db/layer_names.h"
 #include "tiles/db/tile_database.h"
 #include "tiles/feature/serialize.h"
@@ -243,7 +243,7 @@ void process_coastline(
   }
 }
 
-void load_coastlines(tile_db_handle& db_handle, feature_inserter_mt& inserter,
+void load_coastlines(tile_db_handle& db_handle, feature_shard& inserter,
                      std::string const& fname) {
   geo_queue_t geo_queue;
   db_queue_t db_queue;

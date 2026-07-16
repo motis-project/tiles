@@ -28,7 +28,7 @@ struct cache_bucket {
 };
 
 struct feature_inserter_mt {
-  static constexpr size_t kCacheThresholdUpper = 1024ULL * 1024 * 1024;
+  static constexpr size_t kCacheThresholdUpper = 2ULL * 1024 * 1024 * 1024;
   static constexpr size_t kCacheThresholdLower = kCacheThresholdUpper / 4 * 3;
 
   feature_inserter_mt(dbi_handle dbi_handle, pack_handle& pack_handle)
@@ -87,15 +87,28 @@ struct feature_inserter_mt {
     int64_t max_y = std::numeric_limits<int64_t>::min();
 
     std::vector<std::pair<cache_bucket*, std::vector<std::string>>> queue;
-    {  // phase 1: build queue
-      if (cache_size_ <= threshold_upper) {
+    // Single-flusher discipline: one thread at a time runs phase 1 *and*
+    // phase 2. Other workers see `flush_mutex_` is held and skip — they
+    // keep inserting while the active flusher works. Holding the lock
+    // across phase 2 also avoids N concurrent LMDB write txns serializing
+    // inside LMDB's writer lock. If the cache reaches a hard cap (2 ×
+    // threshold_upper), late callers DO block here for backpressure.
+    if (cache_size_ <= threshold_upper) {
+      return;
+    }
+    auto flush_lock =
+        std::unique_lock<std::mutex>{flush_mutex_, std::try_to_lock};
+    if (!flush_lock.owns_lock()) {
+      if (cache_size_ <= 2U * threshold_upper) {
         return;
       }
-      std::lock_guard<std::mutex> flush_lock{flush_mutex_};
-      if (cache_size_ <= threshold_upper) {
-        return;
-      }
+      flush_lock.lock();
+    }
+    if (cache_size_ <= threshold_upper) {
+      return;
+    }
 
+    {  // phase 1: build queue
       std::vector<std::pair<size_t, cache_bucket*>> buckets;
       buckets.reserve(cache_.size());
       for (auto& b : cache_) {

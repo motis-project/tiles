@@ -3,8 +3,8 @@
 #include <limits>
 #include <tuple>
 
-#include "osmium/index/detail/mmap_vector_file.hpp"
-#include "osmium/index/detail/tmpfile.hpp"
+#include "cista/containers/mmap_vec.h"
+
 #include "osmium/osm/way.hpp"
 #include "osmium/visitor.hpp"
 
@@ -16,7 +16,6 @@
 #include "tiles/util.h"
 
 namespace o = osmium;
-namespace od = osmium::detail;
 namespace pz = protozero;
 
 using pz::decode_varint;
@@ -67,10 +66,11 @@ struct id_offset {
 };
 
 struct hybrid_node_idx::impl {
-  impl(int idx_fd, int dat_fd) : idx_{idx_fd}, dat_{dat_fd} {}
+  impl(cista::mmap idx_mmap, cista::mmap dat_mmap)
+      : idx_{std::move(idx_mmap)}, dat_{std::move(dat_mmap)} {}
 
-  od::mmap_vector_file<id_offset> idx_;
-  od::mmap_vector_file<char> dat_;
+  cista::basic_mmap_vec<id_offset, std::uint64_t> idx_;
+  cista::basic_mmap_vec<char, std::uint64_t> dat_;
 };
 
 uint32_t read_fixed(char const** data) {
@@ -174,8 +174,7 @@ void get_coords(
     return std::abs(lhs.first) < std::abs(rhs.first);
   });
   auto q_it = begin(queries);
-  for (; q_it != end(queries) && std::abs(q_it->first) < idx.at(0).id_;
-       ++q_it) {
+  for (; q_it != end(queries) && std::abs(q_it->first) < idx[0].id_; ++q_it) {
     // skip missing pre
   }
 
@@ -317,11 +316,8 @@ void update_locations(hybrid_node_idx const& nodes, o::memory::Buffer& buffer) {
   }
 }
 
-hybrid_node_idx::hybrid_node_idx()
-    : impl_{std::make_unique<impl>(od::create_tmp_file(),
-                                   od::create_tmp_file())} {}
-hybrid_node_idx::hybrid_node_idx(int idx_fd, int dat_fd)
-    : impl_{std::make_unique<impl>(idx_fd, dat_fd)} {}
+hybrid_node_idx::hybrid_node_idx(cista::mmap idx_mmap, cista::mmap dat_mmap)
+    : impl_{std::make_unique<impl>(std::move(idx_mmap), std::move(dat_mmap))} {}
 hybrid_node_idx::~hybrid_node_idx() = default;
 
 void hybrid_node_idx::way(o::Way& way) const {
@@ -335,11 +331,9 @@ void hybrid_node_idx::way(o::Way& way) const {
 }
 
 struct hybrid_node_idx_builder::impl {
-  impl(od::mmap_vector_file<id_offset>& idx, od::mmap_vector_file<char>& dat)
-      : nodes_{nullptr}, idx_{idx}, dat_{dat} {}
-
-  explicit impl(std::unique_ptr<hybrid_node_idx::impl> nodes)
-      : nodes_{std::move(nodes)}, idx_{nodes_->idx_}, dat_{nodes_->dat_} {}
+  impl(cista::basic_mmap_vec<id_offset, std::uint64_t>& idx,
+       cista::basic_mmap_vec<char, std::uint64_t>& dat)
+      : idx_{idx}, dat_{dat} {}
 
   void push(osm_id_t const id, fixed_xy const& pos) {
     constexpr auto coord_min = std::numeric_limits<uint32_t>::min();
@@ -483,9 +477,8 @@ struct hybrid_node_idx_builder::impl {
     }
   }
 
-  std::unique_ptr<hybrid_node_idx::impl> nodes_;
-  od::mmap_vector_file<id_offset>& idx_;
-  od::mmap_vector_file<char>& dat_;
+  cista::basic_mmap_vec<id_offset, std::uint64_t>& idx_;
+  cista::basic_mmap_vec<char, std::uint64_t>& dat_;
 
   osm_id_t last_id_ = std::numeric_limits<osm_id_t>::min();
   fixed_xy last_pos_{0, 0};
@@ -506,10 +499,6 @@ struct hybrid_node_idx_builder::impl {
 
 hybrid_node_idx_builder::hybrid_node_idx_builder(hybrid_node_idx& nodes)
     : impl_{std::make_unique<impl>(nodes.impl_->idx_, nodes.impl_->dat_)} {}
-
-hybrid_node_idx_builder::hybrid_node_idx_builder(int idx_fd, int dat_fd)
-    : impl_{std::make_unique<impl>(
-          std::make_unique<hybrid_node_idx::impl>(idx_fd, dat_fd))} {}
 
 hybrid_node_idx_builder::~hybrid_node_idx_builder() = default;
 

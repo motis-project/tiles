@@ -17,11 +17,11 @@
 [fmt]
   url=git@github.com:motis-project/fmt.git
   branch=master
-  commit=edb385ac526c24bc917ec4a41bb0edb28f0ca59e
+  commit=34a5bee1df1f0d144de0e127807d161d08670472
 [geo]
   url=git@github.com:motis-project/geo.git
   branch=master
-  commit=16d0a6389cd5dfe7d63927ea6e0b3fcd9c92cffc
+  commit=2271af4c2dfba1067c413ff7a13e862957aaad03
 [lmdb]
   url=git@github.com:motis-project/lmdb.git
   branch=master
@@ -57,7 +57,7 @@
 [utl]
   url=git@github.com:motis-project/utl.git
   branch=master
-  commit=67414c9175a18aafe0a5043028ee6a97ca839564
+  commit=5ddd9956455b18fc96fd5f8095f7552d5be92c17
 [zlib-ng]
   url=git@github.com:motis-project/zlib-ng.git
   branch=develop
@@ -82,3 +82,15 @@
   url=git@github.com:motis-project/oneTBB.git
   branch=master
   commit=cda5d37ce8303c58ac506259387e75de4ffcf26b
+[osm]
+  url=git@github.com:motis-project/osm.git
+  branch=master
+  commit=ca1da6a727307503865eec00925e09caf291a4c4
+[cista]
+  url=git@github.com:felixguendling/cista.git
+  branch=master
+  commit=ca4d6d6da7c14637dca8c143c4a4735d6c71cbc1
+[unordered_dense]
+  url=git@github.com:motis-project/unordered_dense.git
+  branch=main
+  commit=2c7230ae7f9c30849a5b089fb4a5d11896b45dcf

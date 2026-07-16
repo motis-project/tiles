@@ -7,7 +7,7 @@
 
 namespace tiles {
 
-struct feature_inserter_mt;
+struct feature_shard;
 struct layer_names_builder;
 struct shared_metadata_builder;
 struct script_runner;
@@ -15,7 +15,7 @@ struct script_runner;
 void check_profile(std::string const& osm_profile);
 
 struct feature_handler : public osmium::handler::Handler {
-  feature_handler(std::string const& osm_profile, feature_inserter_mt&,
+  feature_handler(std::string const& osm_profile, feature_shard&,
                   layer_names_builder&, shared_metadata_builder&);
 
   feature_handler(feature_handler&&) noexcept;
@@ -32,7 +32,7 @@ struct feature_handler : public osmium::handler::Handler {
 private:
   std::unique_ptr<script_runner> runner_;
 
-  feature_inserter_mt& inserter_;
+  feature_shard& shard_;
   layer_names_builder& layer_names_builder_;
   shared_metadata_builder& shared_metadata_builder_;
 };

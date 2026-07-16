@@ -2,7 +2,7 @@
 
 #include "sol/sol.hpp"
 
-#include "tiles/db/feature_inserter_mt.h"
+#include "tiles/db/feature_shard.h"
 #include "tiles/db/layer_names.h"
 #include "tiles/db/shared_metadata.h"
 #include "tiles/fixed/fixed_geometry.h"
@@ -58,11 +58,11 @@ void check_profile(std::string const& osm_profile) {
 }
 
 feature_handler::feature_handler(
-    std::string const& osm_profile, feature_inserter_mt& inserter,
+    std::string const& osm_profile, feature_shard& shard,
     layer_names_builder& layer_names_builder,
     shared_metadata_builder& shared_metadata_builder)
     : runner_{std::make_unique<script_runner>(osm_profile)},
-      inserter_{inserter},
+      shard_{shard},
       layer_names_builder_{layer_names_builder},
       shared_metadata_builder_{shared_metadata_builder} {}
 
@@ -70,8 +70,7 @@ feature_handler::feature_handler(feature_handler&&) noexcept = default;
 feature_handler::~feature_handler() = default;
 
 template <typename OSMObject>
-void handle_feature(feature_inserter_mt& inserter,
-                    layer_names_builder& layer_names,
+void handle_feature(feature_shard& shard, layer_names_builder& layer_names,
                     shared_metadata_builder& shared_metadata_builder,
                     sol::protected_function const& process,
                     OSMObject const& obj) {
@@ -101,22 +100,22 @@ void handle_feature(feature_inserter_mt& inserter,
   pf.finish_metadata();
   shared_metadata_builder.update(pf.metadata_);
 
-  inserter.insert(feature{static_cast<uint64_t>(pf.get_id()),
-                          layer_names.get_layer_idx(pf.target_layer_),
-                          pf.zoom_levels_, std::move(pf.metadata_),
-                          std::move(*pf.geometry_)});
+  shard.insert(feature{static_cast<uint64_t>(pf.get_id()),
+                       layer_names.get_layer_idx(pf.target_layer_),
+                       pf.zoom_levels_, std::move(pf.metadata_),
+                       std::move(*pf.geometry_)});
 }
 
 void feature_handler::node(osmium::Node const& n) {
-  handle_feature(inserter_, layer_names_builder_, shared_metadata_builder_,
+  handle_feature(shard_, layer_names_builder_, shared_metadata_builder_,
                  runner_->process_node_, n);
 }
 void feature_handler::way(osmium::Way const& w) {
-  handle_feature(inserter_, layer_names_builder_, shared_metadata_builder_,
+  handle_feature(shard_, layer_names_builder_, shared_metadata_builder_,
                  runner_->process_way_, w);
 }
 void feature_handler::area(osmium::Area const& a) {
-  handle_feature(inserter_, layer_names_builder_, shared_metadata_builder_,
+  handle_feature(shard_, layer_names_builder_, shared_metadata_builder_,
                  runner_->process_area_, a);
 }
 

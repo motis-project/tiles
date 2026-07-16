@@ -53,10 +53,13 @@ namespace geometry {
 namespace model {
 namespace d2 {
 
+#ifndef BOOST_GEOMETRY_POINT_XY_LONG_EQUAL_DEFINED
+#define BOOST_GEOMETRY_POINT_XY_LONG_EQUAL_DEFINED
 inline bool operator==(point_xy<tiles::fixed_coord_t> const& lhs,
                        point_xy<tiles::fixed_coord_t> const& rhs) {
   return std::tie(lhs.x(), lhs.y()) == std::tie(rhs.x(), rhs.y());
 }
+#endif
 
 }  // namespace d2
 }  // namespace model

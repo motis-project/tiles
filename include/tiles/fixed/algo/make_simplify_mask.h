@@ -15,19 +15,17 @@ inline std::vector<std::string> make_simplify_mask(fixed_point const&) {
 
 inline std::vector<std::string> make_simplify_mask(fixed_polyline const& geo) {
   return utl::to_vec(geo, [](auto const& line) {
-    return geo::serialize_simplify_mask(geo::make_simplify_mask(line));
+    return geo::make_serialize_simplify_mask(line);
   });
 }
 
 inline std::vector<std::string> make_simplify_mask(fixed_polygon const& geo) {
   std::vector<std::string> masks;
   for (auto const& polygon : geo) {
-    masks.emplace_back(
-        geo::serialize_simplify_mask(geo::make_simplify_mask(polygon.outer())));
+    masks.emplace_back(geo::make_serialize_simplify_mask(polygon.outer()));
 
     for (auto const& inner : polygon.inners()) {
-      masks.emplace_back(
-          geo::serialize_simplify_mask(geo::make_simplify_mask(inner)));
+      masks.emplace_back(geo::make_serialize_simplify_mask(inner));
     }
   }
   return masks;

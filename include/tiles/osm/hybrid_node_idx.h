@@ -3,6 +3,8 @@
 #include <memory>
 #include <optional>
 
+#include "cista/mmap.h"
+
 #include "osmium/handler.hpp"
 #include "osmium/memory/buffer.hpp"
 #include "osmium/osm/node.hpp"
@@ -18,8 +20,7 @@ struct hybrid_node_idx : public osmium::handler::Handler {
   static constexpr auto x_offset = 180 * osmium::detail::coordinate_precision;
   static constexpr auto y_offset = 90 * osmium::detail::coordinate_precision;
 
-  hybrid_node_idx();
-  hybrid_node_idx(int idx_fd, int dat_fd);
+  hybrid_node_idx(cista::mmap idx_mmap, cista::mmap dat_mmap);
   ~hybrid_node_idx();
 
   hybrid_node_idx(hybrid_node_idx const&) = delete;
@@ -45,7 +46,6 @@ void update_locations(hybrid_node_idx const&, osmium::memory::Buffer&);
 
 struct hybrid_node_idx_builder : public osmium::handler::Handler {
   explicit hybrid_node_idx_builder(hybrid_node_idx&);
-  hybrid_node_idx_builder(int idx_fd, int dat_fd);
   ~hybrid_node_idx_builder();
 
   hybrid_node_idx_builder(hybrid_node_idx_builder const&) = delete;
