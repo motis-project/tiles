@@ -35,6 +35,7 @@
 #include "osm/hnidx/hybrid_node_index.h"
 #include "osm/inflate.h"
 #include "osm/mp_manager.h"
+#include "osm/osmium_builder.h"
 #include "osm/parse.h"
 #include "osm/raw_reader.h"
 #include "osm/types.h"
@@ -53,106 +54,6 @@ namespace tiles {
 namespace {
 
 namespace bf = boost::fibers;
-
-// `osmium::Location` is constructed `(x = lng, y = lat)` in the same
-// fixed-precision units as `geo::fixed_latlng`'s `lng_`/`lat_` members.
-inline osmium::Location to_osmium(osm::location const& l) noexcept {
-  return osmium::Location{l.lng_, l.lat_};
-}
-
-template <typename Tags>
-void add_tags(osmium::builder::Builder& parent, Tags&& tags) {
-  osmium::builder::TagListBuilder tl{parent};
-  for (auto const& [k, v] : tags) {
-    tl.add_tag(k.data(), k.size(), v.data(), v.size());
-  }
-}
-
-template <typename Tags>
-osmium::Node const& build_node(osmium::memory::Buffer& buf,
-                               std::int64_t const id, geo::latlng const& pos,
-                               Tags&& tags) {
-  buf.clear();
-  {
-    osmium::builder::NodeBuilder nb{buf};
-    nb.set_id(id);
-    nb.set_location(osmium::Location{pos.lng_, pos.lat_});
-    add_tags(nb, std::forward<Tags>(tags));
-  }
-  buf.commit();
-  return buf.get<osmium::Node>(0);
-}
-
-template <typename Tags>
-osmium::Way const& build_way(osmium::memory::Buffer& buf, osm::way const& w,
-                             Tags&& tags) {
-  buf.clear();
-  {
-    osmium::builder::WayBuilder wb{buf};
-    wb.set_id(w.id);
-    {
-      osmium::builder::WayNodeListBuilder wnl{wb};
-      for (auto const& nr : w.nodes()) {
-        wnl.add_node_ref(osmium::NodeRef{nr.ref(), to_osmium(nr.location())});
-      }
-    }
-    add_tags(wb, std::forward<Tags>(tags));
-  }
-  buf.commit();
-  return buf.get<osmium::Way>(0);
-}
-
-template <typename RingBuilder>
-void emit_ring(osmium::builder::AreaBuilder& ab,
-               std::span<osm::node_ref const> const ring) {
-  RingBuilder rb{ab};
-  for (auto const& nr : ring) {
-    rb.add_node_ref(osmium::NodeRef{nr.ref(), to_osmium(nr.location())});
-  }
-}
-
-template <typename Tags>
-osmium::Area const& build_area(osmium::memory::Buffer& buf,
-                               osm::polygon_area const& pa, Tags&& tags) {
-  buf.clear();
-  {
-    osmium::builder::AreaBuilder ab{buf};
-    // Use the original (way/relation) id directly; downstream feature_handler
-    // does not depend on osmium's area-id scheme.
-    ab.set_id(pa.origin_id);
-    add_tags(ab, std::forward<Tags>(tags));
-
-    for (auto const& ap : pa.area) {
-      if (ap.offsets.empty()) {
-        continue;
-      }
-      auto const part_size = static_cast<std::int64_t>(ap.area_part.size());
-      // outer ring
-      auto const outer_start = ap.offsets[0];
-      auto const outer_end = ap.offsets.size() > 1 ? ap.offsets[1] : part_size;
-      if (outer_end > outer_start) {
-        emit_ring<osmium::builder::OuterRingBuilder>(
-            ab, std::span<osm::node_ref const>{
-                    ap.area_part.data() + outer_start,
-                    static_cast<std::size_t>(outer_end - outer_start)});
-      }
-      // inner rings
-      for (std::size_t i = 1; i < ap.offsets.size(); ++i) {
-        auto const inner_start = ap.offsets[i];
-        auto const inner_end =
-            (i + 1 < ap.offsets.size()) ? ap.offsets[i + 1] : part_size;
-        if (inner_end > inner_start) {
-          emit_ring<osmium::builder::InnerRingBuilder>(
-              ab, std::span<osm::node_ref const>{
-                      ap.area_part.data() + inner_start,
-                      static_cast<std::size_t>(inner_end - inner_start)});
-        }
-      }
-    }
-  }
-  buf.commit();
-  return buf.get<osmium::Area>(0);
-}
 
 struct fiber_state {
   explicit fiber_state(feature_handler fh) : fh_{std::move(fh)} {}
@@ -232,7 +133,7 @@ void load_osm(tile_db_handle& db_handle, shard_pool& pool,
             [&](std::int64_t const id, geo::latlng const& pos, auto&& tags) {
               enc.node(osm::node{id, geo::fixed_latlng::from_latlng(pos)});
               if (std::ranges::begin(tags) != std::ranges::end(tags)) {
-                local.fh_->node(build_node(local.buf_, id, pos, tags));
+                local.fh_->node(osm::build_node(local.buf_, id, pos, tags));
               }
             },
             [&](std::int64_t, auto&&, auto&&) { ++n_ways; },
@@ -281,12 +182,12 @@ void load_osm(tile_db_handle& db_handle, shard_pool& pool,
       bool const has_tags = !tags.empty();
 
       if (has_tags) {
-        fs.fh_.way(build_way(fs.buf_, w, tags));
+        fs.fh_.way(osm::build_way(fs.buf_, w, tags));
       }
 
       auto const a = mp_manager.save_ways(std::move(w), tags);
       if (has_tags && a && a->valid) {
-        fs.fh_.area(build_area(fs.buf_, *a, tags));
+        fs.fh_.area(osm::build_area(fs.buf_, *a, tags));
       }
     }
 
@@ -324,7 +225,7 @@ void load_osm(tile_db_handle& db_handle, shard_pool& pool,
         }
         auto const a = mp_manager.assemble_area(id, members, tags);
         if (a.valid) {
-          fs.fh_.area(build_area(fs.buf_, a, tags));
+          fs.fh_.area(osm::build_area(fs.buf_, a, tags));
         }
       },
       /*on_flush=*/batch_process_block_ways, reader_progress->update_fn());
