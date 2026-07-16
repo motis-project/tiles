@@ -174,8 +174,7 @@ void get_coords(
     return std::abs(lhs.first) < std::abs(rhs.first);
   });
   auto q_it = begin(queries);
-  for (; q_it != end(queries) && std::abs(q_it->first) < idx[0].id_;
-       ++q_it) {
+  for (; q_it != end(queries) && std::abs(q_it->first) < idx[0].id_; ++q_it) {
     // skip missing pre
   }
 
@@ -318,8 +317,7 @@ void update_locations(hybrid_node_idx const& nodes, o::memory::Buffer& buffer) {
 }
 
 hybrid_node_idx::hybrid_node_idx(cista::mmap idx_mmap, cista::mmap dat_mmap)
-    : impl_{std::make_unique<impl>(std::move(idx_mmap),
-                                   std::move(dat_mmap))} {}
+    : impl_{std::make_unique<impl>(std::move(idx_mmap), std::move(dat_mmap))} {}
 hybrid_node_idx::~hybrid_node_idx() = default;
 
 void hybrid_node_idx::way(o::Way& way) const {

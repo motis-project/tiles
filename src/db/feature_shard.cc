@@ -3,8 +3,8 @@
 #ifndef _WIN32
 #include <sys/mman.h>
 #endif
-#include <algorithm>
 #include <cstring>
+#include <algorithm>
 #include <utility>
 
 #include "utl/verify.h"
@@ -25,11 +25,8 @@ cista::mmap make_tmp_mmap(std::filesystem::path const& tmp_dir) {
 
 }  // namespace
 
-feature_shard::feature_shard(std::filesystem::path const& tmp_dir,
-                             std::uint32_t const shard_id)
-    : shard_id_{shard_id},
-      pack_{make_tmp_mmap(tmp_dir)},
-      idx_{make_tmp_mmap(tmp_dir)} {}
+feature_shard::feature_shard(std::filesystem::path const& tmp_dir)
+    : pack_{make_tmp_mmap(tmp_dir)}, idx_{make_tmp_mmap(tmp_dir)} {}
 
 feature_shard::~feature_shard() {
   // Final drain. Mirrors `feature_inserter_mt` semantics: any throw here
@@ -105,8 +102,8 @@ void feature_shard::persist_bucket(geo::tile const tile,
 
   auto const idx_off = idx_.size();
   grow_idx_to(idx_off + sizeof(entry));
-  auto const e = entry{tile_to_key(tile), offset,
-                       static_cast<std::uint32_t>(blob.size())};
+  auto const e =
+      entry{tile_to_key(tile), offset, static_cast<std::uint32_t>(blob.size())};
   std::memcpy(idx_.data() + idx_off, &e, sizeof(entry));
 }
 
@@ -133,15 +130,13 @@ void feature_shard::grow_idx_to(std::size_t const new_size) {
 }
 
 std::span<feature_shard::entry const> feature_shard::entries() const noexcept {
-  return std::span<entry const>{
-      reinterpret_cast<entry const*>(idx_.data()),
-      idx_.size() / sizeof(entry)};
+  return std::span<entry const>{reinterpret_cast<entry const*>(idx_.data()),
+                                idx_.size() / sizeof(entry)};
 }
 
 std::string_view feature_shard::blob(entry const& e) const noexcept {
-  return std::string_view{reinterpret_cast<char const*>(pack_.data()) +
-                              e.offset_,
-                          e.size_};
+  return std::string_view{
+      reinterpret_cast<char const*>(pack_.data()) + e.offset_, e.size_};
 }
 
 }  // namespace tiles

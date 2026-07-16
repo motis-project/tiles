@@ -45,7 +45,7 @@ struct feature_shard {
   static constexpr std::size_t kCacheThresholdLower =
       kCacheThresholdUpper / 4 * 3;
 
-  feature_shard(std::filesystem::path const& tmp_dir, std::uint32_t shard_id);
+  explicit feature_shard(std::filesystem::path const& tmp_dir);
   ~feature_shard();
 
   feature_shard(feature_shard const&) = delete;
@@ -76,8 +76,6 @@ private:
   void grow_pack_to(std::size_t new_size);
   void grow_idx_to(std::size_t new_size);
 
-  std::uint32_t shard_id_;
-
   struct bucket_data {
     std::size_t mem_size_{0};
     std::vector<std::string> mem_;
@@ -106,8 +104,7 @@ struct shard_pool {
 
   feature_shard& acquire() {
     auto lock = std::lock_guard{mtx_};
-    return shards_.emplace_back(tmp_dir_,
-                                static_cast<std::uint32_t>(shards_.size()));
+    return shards_.emplace_back(tmp_dir_);
   }
 
   std::deque<feature_shard>& shards() noexcept { return shards_; }
