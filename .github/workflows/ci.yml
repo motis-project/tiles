@@ -134,15 +134,7 @@ jobs:
           asset_content_type: application/zip
 
   macos:
-    runs-on: ${{ matrix.config.os }}
-    strategy:
-      fail-fast: false
-      matrix:
-        config:
-          - preset: macos-x86_64
-            os: macos-13
-          - preset: macos-arm64
-            os: macos-14
+    runs-on: macos-latest
     env:
       BUILDCACHE_COMPRESS: true
       BUILDCACHE_DIRECT_MODE: true
@@ -157,17 +149,21 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: latest
+
       # ==== RESTORE CACHE ====
       - name: Restore buildcache Cache
         uses: actions/cache/restore@v4
         id: restore-buildcache
         with:
           path: ${{ github.workspace }}/.buildcache
-          key: buildcache-${{ matrix.config.preset }}-${{ hashFiles('.pkg') }}-${{ hashFiles('**/*.h') }}-${{ hashFiles('**/*.cc') }}
+          key: buildcache-macos-arm64-${{ hashFiles('.pkg') }}-${{ hashFiles('**/*.h') }}-${{ hashFiles('**/*.cc') }}
           restore-keys: |
-            buildcache-${{ matrix.config.preset }}-${{ hashFiles('.pkg') }}-${{ hashFiles('**/*.h') }}-
-            buildcache-${{ matrix.config.preset }}-${{ hashFiles('.pkg') }}-
-            buildcache-${{ matrix.config.preset }}-
+            buildcache-macos-arm64-${{ hashFiles('.pkg') }}-${{ hashFiles('**/*.h') }}-
+            buildcache-macos-arm64-${{ hashFiles('.pkg') }}-
+            buildcache-macos-arm64-
 
       - name: Restore Dependencies Cache
         uses: actions/cache/restore@v4
@@ -186,14 +182,14 @@ jobs:
       - name: CMake
         run: |
           git config --global --add safe.directory `pwd`
-          cmake -G Ninja -S . -B build --preset=${{ matrix.config.preset }}
+          cmake -G Ninja -S . -B build --preset=macos-arm64
 
       - name: Build
         run: cmake --build build --target tiles-import tiles-server tiles-benchmark tiles-test
 
       # ==== TESTS ====
       - name: Run Tests
-        run: ${{ matrix.config.emulator }} build/tiles-test
+        run: build/tiles-test
 
       # ==== DISTRIBUTION ====
       - name: Create Distribution
@@ -201,13 +197,13 @@ jobs:
           mkdir tiles
           mv build/tiles-import tiles/tiles-import
           mv build/tiles-server tiles/tiles-server
-          tar cjf tiles-${{ matrix.config.preset }}.tar.bz2 tiles
+          tar cjf tiles-macos-arm64.tar.bz2 tiles
 
       - name: Upload Distribution
         uses: actions/upload-artifact@v4
         with:
-          name: tiles-${{ matrix.config.preset }}
-          path: tiles-${{ matrix.config.preset }}.tar.bz2
+          name: tiles-macos-arm64
+          path: tiles-macos-arm64.tar.bz2
 
       # ==== RELEASE ====
       - name: Upload Release
@@ -217,8 +213,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ github.event.release.upload_url }}
-          asset_path: ./tiles-${{ matrix.config.preset }}.tar.bz2
-          asset_name: tiles-${{ matrix.config.preset }}.tar.bz2
+          asset_path: ./tiles-macos-arm64.tar.bz2
+          asset_name: tiles-macos-arm64.tar.bz2
           asset_content_type: application/x-tar
 
       # ==== SAVE CACHE ====
