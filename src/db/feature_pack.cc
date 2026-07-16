@@ -1,10 +1,14 @@
 #include "tiles/db/feature_pack.h"
 
+#include <condition_variable>
 #include <algorithm>
+#include <mutex>
 #include <numeric>
 #include <optional>
 #include <queue>
+#include <thread>
 #include <utility>
+#include <vector>
 
 #include "zlib.h"
 
@@ -36,9 +40,8 @@
 namespace tiles {
 
 void feature_packer::finish() {
-  auto const crc = static_cast<std::uint32_t>(
-      ::crc32_z(0UL, reinterpret_cast<unsigned char const*>(buf_.data()),
-                buf_.size()));
+  auto const crc = static_cast<std::uint32_t>(::crc32_z(
+      0UL, reinterpret_cast<unsigned char const*>(buf_.data()), buf_.size()));
   tiles::append<uint32_t>(buf_, crc);
 }
 
@@ -139,10 +142,9 @@ void merge_shards(shard_pool& pool, tile_db_handle& db_handle,
   utl::parallel_for_run(shards.size(), [&](std::size_t const i) {
     auto const span = shards[i].entries();
     sorted_per_shard[i].assign(span.begin(), span.end());
-    std::stable_sort(begin(sorted_per_shard[i]), end(sorted_per_shard[i]),
-                     [](auto const& a, auto const& b) {
-                       return a.tile_ < b.tile_;
-                     });
+    std::stable_sort(
+        begin(sorted_per_shard[i]), end(sorted_per_shard[i]),
+        [](auto const& a, auto const& b) { return a.tile_ < b.tile_; });
   });
 
   // K-way merge: collect (tile_key -> [(shard_idx, entry)]).
@@ -166,79 +168,123 @@ void merge_shards(shard_pool& pool, tile_db_handle& db_handle,
   struct tile_task {
     tile_key_t tile_;
     std::vector<std::string> blobs_;
+    std::size_t bytes_;
   };
 
-  // Parallel repack; serial append + LMDB write.
-  auto txn = db_handle.make_txn();
-  auto feature_dbi = db_handle.features_dbi(txn);
-  std::size_t batch_count = 0;
+  // The k-way merge on this thread is the producer: it hands one complete tile
+  // at a time to a bounded queue. A pool of worker threads pops tiles, packs
+  // them concurrently (CPU), and appends the packed blob to the pack file under
+  // `write_mtx`. `pack_handle.append` assigns sequential offsets, so it must be
+  // serialized -- but it now overlaps the *other* workers' packing instead of
+  // running in a separate barrier phase, keeping compression (CPU) and the
+  // pack-file writes (disk) busy at the same time.
+  //
+  // The queue is bounded by in-flight blob bytes: backpressure that caps peak
+  // memory usage. The LMDB feature_dbi entries are just 16-byte (offset,size)
+  // records; they are collected here and written in one serial pass at the end
+  // (see below), which keeps every LMDB txn on a single thread -- LMDB's write
+  // lock is a pthread mutex that must be released by the thread that took it.
+  // On-disk tile order is no longer tile-sorted (tiles land in pack-completion
+  // order); that is fine because each tile's LMDB record points at its own
+  // offset, so lookups are unaffected.
+  constexpr auto kMaxInFlightBytes = std::size_t{1} << 30;  // ~1 GiB in flight
 
-  // Stream the k-way merge in bounded batches instead of materializing every
-  // tile's blobs up front. The old code built one `tasks` vector holding a copy
-  // of *all* feature blobs on top of the shards that still held them, doubling
-  // peak memory and OOM'ing large imports (e.g. europe) on smaller boxes. A
-  // batch is only cut at a tile boundary, so a tile's blobs are never split.
-  // Processing order (tile-sorted) is unchanged, so the output is byte-identical.
-  constexpr auto kBatchBytes = std::size_t{1} << 30;  // ~1 GiB of blobs / batch
-  auto tasks = std::vector<tile_task>{};
-  auto tasks_bytes = std::size_t{0};
+  auto q_mtx = std::mutex{};
+  auto q_can_push = std::condition_variable{};
+  auto q_can_pop = std::condition_variable{};
+  auto queue = std::queue<tile_task>{};
+  auto queue_bytes = std::size_t{0};
+  auto queue_closed = false;
 
-  auto packed = std::vector<std::pair<geo::tile, std::string>>{};
-  auto flush_batch = [&] {
-    if (tasks.empty()) {
-      return;
+  auto const push_task = [&](tile_task&& t) {
+    auto lock = std::unique_lock{q_mtx};
+    q_can_push.wait(lock, [&] { return queue_bytes < kMaxInFlightBytes; });
+    queue_bytes += t.bytes_;
+    queue.push(std::move(t));
+    q_can_pop.notify_one();
+  };
+  auto const pop_task = [&]() -> std::optional<tile_task> {
+    auto lock = std::unique_lock{q_mtx};
+    q_can_pop.wait(lock, [&] { return !queue.empty() || queue_closed; });
+    if (queue.empty()) {
+      return std::nullopt;
     }
-    // Pack the batch's tiles in parallel -- each job writes its own `packed`
-    // slot, so no ordered collector (and its pending-mutex/reorder map) is
-    // needed. The pack-file append + LMDB writes then run serially on this
-    // thread: the LMDB write txn must stay on one thread, and the collect
-    // workers are spawned/joined per batch.
-    packed.assign(tasks.size(), {});
-    utl::parallel_for_run(tasks.size(), [&](std::size_t const i) {
-      auto const tile = key_to_tile(tasks[i].tile_);
-      packed[i] = {tile, pack_features(tile, metadata_coder, tasks[i].blobs_)};
-    });
+    auto t = std::move(queue.front());
+    queue.pop();
+    queue_bytes -= t.bytes_;
+    q_can_push.notify_one();
+    return t;
+  };
 
-    for (auto& [tile, blob] : packed) {
-      auto const rec = pack_handle.append(blob);
-      txn.put(feature_dbi, tile_to_key(tile), pack_records_serialize(rec));
-      if (++batch_count >= 1024U) {
-        txn.commit();
-        batch_count = 0;
-        txn = db_handle.make_txn();
-        feature_dbi = db_handle.features_dbi(txn);
+  auto write_mtx = std::mutex{};
+  auto results = std::vector<std::pair<geo::tile, pack_record>>{};
+
+  auto const n_workers = std::max(1U, std::thread::hardware_concurrency());
+  auto workers = std::vector<std::thread>{};
+  workers.reserve(n_workers);
+  for (auto w = 0U; w < n_workers; ++w) {
+    workers.emplace_back([&] {
+      for (auto t = pop_task(); t.has_value(); t = pop_task()) {
+        auto const tile = key_to_tile(t->tile_);
+        auto const blob = pack_features(tile, metadata_coder, t->blobs_);
+        auto lock = std::lock_guard{write_mtx};
+        results.emplace_back(tile, pack_handle.append(blob));
       }
-    }
+    });
+  }
 
-    tasks.clear();
-    tasks_bytes = 0;
-  };
-
+  // Producer: k-way merge emitting one tile_task per output tile.
+  auto cur = tile_task{};
+  auto have_cur = false;
   while (!heap.empty()) {
     auto const top = heap.top();
     heap.pop();
     auto const& span = sorted_per_shard[top.shard_idx_];
     auto const& e = span[top.pos_];
 
-    if (tasks.empty() || tasks.back().tile_ != e.tile_) {
-      // Starting a new tile: every buffered tile is complete, so flush the
-      // batch here (a tile boundary) if it has grown large enough.
-      if (tasks_bytes >= kBatchBytes) {
-        flush_batch();
+    if (!have_cur || cur.tile_ != e.tile_) {
+      if (have_cur) {
+        push_task(std::move(cur));
       }
-      tasks.push_back({e.tile_, {}});
+      cur = tile_task{e.tile_, {}, 0U};
+      have_cur = true;
     }
     auto blob = shards[top.shard_idx_].blob(e);
-    tasks_bytes += blob.size();
-    tasks.back().blobs_.emplace_back(std::move(blob));
+    cur.bytes_ += blob.size();
+    cur.blobs_.emplace_back(std::move(blob));
 
     auto const next = top.pos_ + 1U;
     if (next < span.size()) {
       heap.push({span[next].tile_, top.shard_idx_, next});
     }
   }
-  flush_batch();  // final partial batch
+  if (have_cur) {
+    push_task(std::move(cur));
+  }
 
+  {
+    auto lock = std::lock_guard{q_mtx};
+    queue_closed = true;
+  }
+  q_can_pop.notify_all();
+  for (auto& worker : workers) {
+    worker.join();
+  }
+
+  // Serial LMDB write pass: one thread owns every write txn. The 16-byte
+  // records are cheap, so this tail is negligible next to packing.
+  auto txn = db_handle.make_txn();
+  auto feature_dbi = db_handle.features_dbi(txn);
+  auto batch_count = std::size_t{0};
+  for (auto const& [tile, rec] : results) {
+    txn.put(feature_dbi, tile_to_key(tile), pack_records_serialize(rec));
+    if (++batch_count >= 1024U) {
+      txn.commit();
+      batch_count = 0;
+      txn = db_handle.make_txn();
+      feature_dbi = db_handle.features_dbi(txn);
+    }
+  }
   txn.commit();
 }
 

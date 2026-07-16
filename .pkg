@@ -89,4 +89,4 @@
 [cista]
   url=git@github.com:felixguendling/cista.git
   branch=master
-  commit=d0b6e04c9c73ba4974980ee9d22bcd9d8c53c8e3
+  commit=b4579e52762f91ba995fbd148818ec8be375133c
