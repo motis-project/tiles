@@ -89,7 +89,7 @@
 [cista]
   url=git@github.com:felixguendling/cista.git
   branch=master
-  commit=ca4d6d6da7c14637dca8c143c4a4735d6c71cbc1
+  commit=427f0a873be43f1de94289bd53d5678e07cd243f
 [unordered_dense]
   url=git@github.com:motis-project/unordered_dense.git
   branch=main
