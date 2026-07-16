@@ -78,6 +78,17 @@ struct pending_feature {
     zoom_levels_ = {min, max};
   }
 
+  // approximate area of the feature geometry in m² (mercator-projected; the
+  // internal fixed-coordinate area is px² @ z20, 1 m² ~= 454000 px², see
+  // set_approved_min_by_area). Lets profiles emit e.g. Shortbread's way_area
+  // so styles can gate labels by feature size.
+  double get_area_m2() {
+    if (!geometry_) {
+      geometry_ = read_geometry_();
+    }
+    return static_cast<double>(tiles::area(*geometry_)) / 454000.0;
+  }
+
   void set_target_layer(std::string target_layer) {
     target_layer_ = std::move(target_layer);
   }

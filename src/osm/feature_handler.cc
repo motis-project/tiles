@@ -25,6 +25,7 @@ struct script_runner {
         "has_any_tag", &pending_feature::has_any_tag,  //
         "set_approved_min", &pending_feature::set_approved_min,  //
         "set_approved_min_by_area", &pending_feature::set_approved_min_by_area,
+        "get_area_m2", &pending_feature::get_area_m2,  //
         "set_approved_full", &pending_feature::set_approved_full,  //
         "set_target_layer", &pending_feature::set_target_layer,  //
         "add_bool", &pending_feature::add_bool,  //

@@ -310,7 +310,7 @@ function process_node(node)
   -- from_level/to_level drive which levels it is shown on.
   if node:has_tag("highway", "elevator") then
     node:set_target_layer("indoor")
-    node:set_approved_min(17)
+    node:set_approved_min(16)
     node:add_string("indoor", "elevator")
     local from_level, to_level = split_level(node:get_tag("level"))
     if from_level ~= nil then
@@ -362,28 +362,43 @@ local function process_streets(way)
   local rail = false
 
   if highway ~= "" then
-    if highway == "motorway" or highway == "motorway_link" then
+    -- min zooms as in the old full.lua profile (NOT Shortbread's): links get
+    -- their own, much later min zoom instead of inheriting the parent's.
+    if highway == "motorway" then
       mz = 5; kind = "motorway"
-    elseif highway == "trunk" or highway == "trunk_link" then
-      mz = 6; kind = "trunk"
-    elseif highway == "primary" or highway == "primary_link" then
-      mz = 8; kind = "primary"
-    elseif highway == "secondary" or highway == "secondary_link" then
+    elseif highway == "trunk" then
+      mz = 5; kind = "trunk"
+    elseif highway == "motorway_link" then
+      mz = 9; kind = "motorway"
+    elseif highway == "trunk_link" then
+      mz = 9; kind = "trunk"
+    elseif highway == "primary" then
+      mz = 9; kind = "primary"
+    elseif highway == "secondary" then
       mz = 9; kind = "secondary"
-    elseif highway == "tertiary" or highway == "tertiary_link" then
-      mz = 10; kind = "tertiary"
+    elseif highway == "tertiary" then
+      mz = 9; kind = "tertiary"
+    elseif highway == "primary_link" then
+      mz = 12; kind = "primary"
+    elseif highway == "secondary_link" then
+      mz = 12; kind = "secondary"
+    elseif highway == "tertiary_link" then
+      mz = 12; kind = "tertiary"
     elseif highway == "unclassified" or highway == "residential" or
-           highway == "bus_guideway" or highway == "busway" then
+           highway == "living_street" or highway == "service" or
+           highway == "footway" or highway == "track" or highway == "steps" or
+           highway == "cycleway" or highway == "path" then
       mz = 12; kind = highway
-    elseif highway == "living_street" or highway == "pedestrian" or highway == "track" then
-      mz = 13; kind = highway
-    elseif highway == "service" then
-      mz = 14; kind = highway
-    elseif highway == "footway" or highway == "steps" or highway == "path" or
-           highway == "cycleway" then
+    elseif highway == "bus_guideway" or highway == "busway" then
+      mz = 12; kind = highway
+    elseif highway == "pedestrian" then
       mz = 13; kind = highway
     end
-  elseif (railway == "rail" or railway == "narrow_gauge") and service == "" then
+  elseif railway == "rail" and service == "" then
+    -- Shortbread uses 8; approve earlier so the main rail network is already
+    -- visible at country-level zooms (as the old full.lua profile did).
+    kind = railway; rail = true; mz = 5
+  elseif railway == "narrow_gauge" and service == "" then
     kind = railway; rail = true; mz = 8
   elseif ((railway == "rail" or railway == "narrow_gauge") and service ~= "") or
          railway == "light_rail" or railway == "tram" or railway == "subway" or
@@ -439,6 +454,14 @@ local function process_streets(way)
   -- (Shortbread's separate street_labels line layer is not produced here).
   set_names(way)
 
+  -- road ref for shields (Shortbread carries this on street_labels, which is
+  -- not produced here — see the layer notes at the top). Not for railways:
+  -- rail route refs would otherwise render road shields.
+  if not rail then
+    local ref = way:get_tag("ref")
+    if ref ~= "" then way:add_string("ref", ref) end
+  end
+
   -- level information for the indoor overlay (same idioms as full.lua):
   -- indoor footpaths are filtered by `level`; stairs (kind=steps) connect two
   -- floors and are filtered by from_level/to_level.
@@ -488,7 +511,7 @@ function process_way(way)
   -- highway=elevator way lands in the `indoor` layer instead of `streets`.
   if way:has_tag("highway", "elevator") then
     way:set_target_layer("indoor")
-    way:set_approved_min(17)
+    way:set_approved_min(16)
     way:add_string("indoor", "elevator")
     local from_level, to_level = split_level(way:get_tag("level"))
     if from_level ~= nil then
@@ -601,6 +624,9 @@ local function process_water_polygons(area)
   -- engine's area-based approval.
   area:set_approved_min_by_area(14, 1e6, 12, 1e7, 10, 1e9, 8, 1e10, 6, 1e11, 4, -1)
   area:add_string("kind", kind)
+  -- feature size in m² so the style can gate labels (Shortbread carries this
+  -- as way_area on the water_polygons_labels layer, which is not produced).
+  area:add_numeric("way_area", area:get_area_m2())
   set_names(area)
   return true
 end
@@ -651,7 +677,12 @@ local function process_land(area)
   if mz >= INF then return false end
 
   area:set_target_layer("land")
-  area:set_approved_min(mz)
+  -- area-scaled approval exactly like the old full.lua landuse layer (instead
+  -- of Shortbread's fixed per-kind min zooms): large areas (farmland, forests,
+  -- ...) from z8, medium from z10, small ones from z14.
+  area:set_approved_min_by_area(14, 1e8,
+                                10, 1e10,
+                                 8, -1)
   area:add_string("kind", kind)
   return true
 end
@@ -742,14 +773,14 @@ local function process_indoor(area)
   -- level info identical to full.lua: rooms carry `level`; elevators connect
   -- floors and carry from_level/to_level.
   if indoor == "elevator" then
-    area:set_approved_min(17)
+    area:set_approved_min(16)
     local from_level, to_level = split_level(area:get_tag("level"))
     if from_level ~= nil then
       area:add_integer("from_level", from_level)
       area:add_integer("to_level", to_level)
     end
   else
-    area:set_approved_min(18)
+    area:set_approved_min(17)
     area:add_tag_as_integer("level")
   end
   return true
@@ -815,13 +846,15 @@ function process_area(area)
     return
   end
 
+  -- transit platforms (land kind=public_transport, carries a level). Checked
+  -- BEFORE indoor (like the old full.lua) so platforms that also carry indoor
+  -- tags (e.g. underground S-Bahn platforms) still render as platforms.
+  if process_platform(area) then return end
+
   -- indoor rooms / corridors / elevators (indoor overlay). Checked before
   -- pois/land so an indoor room tagged e.g. amenity=cafe still lands in the
   -- `indoor` layer with its level.
   if process_indoor(area) then return end
-
-  -- transit platforms (land kind=public_transport, carries a level)
-  if process_platform(area) then return end
 
   -- water_polygons
   if process_water_polygons(area) then return end
