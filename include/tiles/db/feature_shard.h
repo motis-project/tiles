@@ -45,8 +45,7 @@ struct feature_shard {
   static constexpr std::size_t kCacheThresholdLower =
       kCacheThresholdUpper / 4 * 3;
 
-  feature_shard(std::filesystem::path const& tmp_dir,
-                std::uint32_t shard_id);
+  feature_shard(std::filesystem::path const& tmp_dir, std::uint32_t shard_id);
   ~feature_shard();
 
   feature_shard(feature_shard const&) = delete;
