@@ -558,12 +558,11 @@ function process_way(way)
     return
   end
 
-  -- ferries
+  -- ferries (from z5 like the old full.lua profile; Shortbread itself would
+  -- only carry them from z10)
   if way:has_tag("route", "ferry") then
-    local mz = 10
-    if way:get_tag("motor_vehicle") == "no" then mz = 12 end
     way:set_target_layer("ferries")
-    way:set_approved_min(mz)
+    way:set_approved_min(5)
     way:add_string("kind", "ferry")
     set_names(way)
     return
