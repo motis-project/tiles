@@ -1,8 +1,5 @@
 #include "tiles/osm/load_osm.h"
 
-#ifndef _WIN32
-#include <sys/mman.h>
-#endif
 #include <chrono>
 #include <cstdint>
 #include <atomic>
@@ -72,22 +69,12 @@ struct fiber_state {
 void load_osm(tile_db_handle& db_handle, shard_pool& pool,
               std::string const& osm_fname, std::string const& osm_profile,
               std::string const& tmp_dname, size_t flush_threshold) {
-  auto r = osm::raw_reader{
-      .file_ = cista::mmap{osm_fname.c_str(), cista::mmap::protection::READ}};
-
-  // Both passes read the PBF strictly forward:
-  // hint the kernel to ramp up readahead and evict pages behind the cursor.
-#ifdef MADV_SEQUENTIAL
-  ::madvise(const_cast<std::uint8_t*>(r.file_.data()), r.file_.size(),
-            MADV_SEQUENTIAL);
-#endif
+  auto r = osm::raw_reader{osm_fname};
 
   progress_tracker reader_progress;
 
   // Hybrid (delta-compressed) node index in two unnamed (O_TMPFILE) files.
-  auto node_idx = osm::hybrid_node_idx{
-      cista::mmap{tmp_dname.c_str(), cista::mmap::protection::TMPFILE},
-      cista::mmap{tmp_dname.c_str(), cista::mmap::protection::TMPFILE}};
+  auto node_idx = osm::hybrid_node_idx{tmp_dname};
   auto node_idx_merger = osm::hybrid_block_merger{node_idx};
 
   auto mp_manager = osm::polygon_manager{/*assemble_way_polygons=*/true};
