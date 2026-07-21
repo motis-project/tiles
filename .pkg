@@ -80,8 +80,8 @@
   commit=0087f000848de31b0090cb6f282348bd2fd3a9b8
 [osm]
   url=git@github.com:motis-project/osm.git
-  branch=master
-  commit=5abc59e7e2c92d2a1972968120464cb296f9082c
+  branch=dev
+  commit=2311ac613036187e98093e5963024c28407be1cb
 [cista]
   url=git@github.com:felixguendling/cista.git
   branch=master

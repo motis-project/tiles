@@ -114,9 +114,9 @@ void load_osm(tile_db_handle& db_handle, shard_pool& pool,
         local.out_.resize(b.raw_size_);
         local.decompressor_.decompress(b.compressed_, local.out_);
         auto enc = osm::hybrid_block_encoder{};
-        osm::decode_primitive(
+        osm::decode_primitive<
+            /*ReadNodes=*/true, /*ReadWays=*/true, /*ReadRelations=*/true>(
             local.out_, local.strings_,
-            /*read_nodes=*/true, /*read_ways=*/true, /*read_relations=*/true,
             [&](std::int64_t const id, geo::latlng const& pos, auto&& tags) {
               enc.node(osm::node{id, geo::fixed_latlng::from_latlng(pos)});
               if (std::ranges::begin(tags) != std::ranges::end(tags)) {
