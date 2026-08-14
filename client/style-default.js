@@ -147,7 +147,7 @@ export const style = (map) => {
             "filter": [
               "!in",
               "highway",
-              "footway", "track", "steps", "cycleway", "path", "unclassified"
+              "footway", "track", "steps", "cycleway", "path"
             ],
             "layout": {
               "line-cap": "round",
@@ -162,7 +162,7 @@ export const style = (map) => {
                   ["trunk", "motorway_link"], 3.5,
                   ["primary", "secondary", "aeroway", "trunk_link"], 3,
                   ["primary_link", "secondary_link", "tertiary", "tertiary_link"], 1.75,
-                  "residential", 1.5,
+                  ["residential", "unclassified"], 1.5,
                 0.75],
                 ["interpolate", ["linear"], ["zoom"],
                   5,  ["+", ["*", ["var", "base"], 0.1], 1],
@@ -184,7 +184,7 @@ export const style = (map) => {
             "paint": {
               "line-color": "#ffffff",
               "line-opacity": ["match", ["get", "highway"],
-                ["footway", "track", "steps", "cycleway", "path", "unclassified"], 0.66,
+                ["footway", "track", "steps", "cycleway", "path"], 0.66,
                 1],
               "line-width": [
                 "let",
@@ -193,7 +193,7 @@ export const style = (map) => {
                   ["trunk", "motorway_link"], 3.5,
                   ["primary", "secondary", "aeroway", "trunk_link"], 3,
                   ["primary_link", "secondary_link", "tertiary", "tertiary_link"], 1.75,
-                  "residential", 1.5,
+                  ["residential", "unclassified"], 1.5,
                 0.75],
                 ["interpolate", ["linear"], ["zoom"],
                   5,  ["*", ["var", "base"], 0.1],
