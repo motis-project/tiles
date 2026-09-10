@@ -23,6 +23,13 @@ create_resource("${CMAKE_CURRENT_SOURCE_DIR}/profile/" "${tiles-profiles-res}" t
 
 include(cmake/clang-tidy.cmake)
 
+# Clipper2 (fast polygon / rectangle clipping). Wired explicitly here because
+# the motis pkg tool does not (yet) emit an add_subdirectory() for it.
+if (NOT TARGET Clipper2)
+  add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/../Clipper2
+                   ${CMAKE_CURRENT_BINARY_DIR}/Clipper2 EXCLUDE_FROM_ALL)
+endif()
+
 # --- tiles lib
 file(GLOB_RECURSE tiles-files
   src/db/*.cc
@@ -39,7 +46,7 @@ target_compile_options(tiles PRIVATE ${TILES_WARNINGS})
 target_include_directories(tiles PUBLIC include)
 target_link_libraries(tiles
   boost
-  clipper
+  Clipper2
   fmt
   geo
   lmdb
@@ -93,6 +100,12 @@ set_property(TARGET tiles-benchmark PROPERTY CXX_STANDARD 23)
 target_compile_options(tiles-benchmark PRIVATE ${TILES_WARNINGS})
 target_include_directories(tiles-benchmark PUBLIC include)
 target_link_libraries(tiles-benchmark boost tiles lmdb geo)
+
+# --- tier-index experiment exe
+add_executable(tiles-index-experiment EXCLUDE_FROM_ALL src/index_experiment.cc)
+set_property(TARGET tiles-index-experiment PROPERTY CXX_STANDARD 23)
+target_include_directories(tiles-index-experiment PUBLIC include)
+target_link_libraries(tiles-index-experiment boost tiles lmdb geo)
 
 # --- test exe
 file(GLOB_RECURSE tiles-test-files
