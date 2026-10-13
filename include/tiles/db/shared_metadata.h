@@ -30,53 +30,23 @@ struct metadata_hash {
   }
 };
 
+using metadata_counts_t =
+    cista::raw::ankerl_map<metadata, uint64_t, metadata_hash>;
+
 struct shared_metadata_builder {
   static constexpr auto const kDefaultFlushThreshold =
       sizeof(void*) >= 8 ? 1e7 : 1e5;
 
-  explicit shared_metadata_builder(
-      size_t const flush_threshold = kDefaultFlushThreshold)
-      : flush_threshold_{flush_threshold} {}
+  explicit shared_metadata_builder(size_t = kDefaultFlushThreshold) {}
 
-  void update(std::vector<metadata> const& data) {
-    queue_.enqueue_bulk(data);
-
-    // TODO(root): flush in other thread
-    if (should_flush()) {
-      flush();
-    }
-  }
-
-  bool should_flush() { return queue_.pending_ > flush_threshold_; }
-
-  bool flush(bool force = false) {
-    if (!should_flush() && !force) {
-      return false;
-    }
-
-    std::vector<metadata> buf(flush_threshold_);
-    queue_.dequeue_bulk(buf);
-    queue_.finish_bulk(buf.size());  // directly (shutdown determined globally)
-    if (buf.empty()) {
-      return false;
-    }
-
-    // Count occurrences in a hash map: O(1) amortized per entry. The old
-    // builder did a sorted `inplace_merge` of each batch into `counts_`, i.e.
-    // O(counts_) per flush -> ~O(N^2 / threshold) overall, which serializes
-    // pass 2 on planet-scale metadata (millions of unique key/value pairs).
+  void merge(metadata_counts_t const& counts) {
     std::lock_guard<std::mutex> lock{mutex_};
-    for (auto& m : buf) {
-      ++counts_[std::move(m)];
+    for (auto const& [m, c] : counts) {
+      counts_[m] += c;
     }
-
-    return true;
   }
 
   void store(tile_db_handle& db_handle, lmdb::txn& txn) {
-    while (flush(true)) {
-    }
-
     // Drop pairs seen only once, then order by frequency (descending). The old
     // builder held `counts_` sorted by metadata and applied an unstable
     // count-descending sort on top; sorting the extracted entries by metadata
@@ -107,12 +77,28 @@ struct shared_metadata_builder {
     txn.put(meta_dbi, kMetaKeyFeatureMetaCoding, buf);
   }
 
-  size_t flush_threshold_;
-
-  queue_wrapper<metadata> queue_;
-
   std::mutex mutex_;
-  cista::raw::ankerl_map<metadata, uint64_t, metadata_hash> counts_;
+  metadata_counts_t counts_;
+};
+
+// The counts of one feature handler (thread or fiber): no lock and no copy of
+// the metadata per feature. Added to the shared counts when destroyed.
+struct shared_metadata_counts {
+  explicit shared_metadata_counts(shared_metadata_builder& b) : builder_{b} {}
+  shared_metadata_counts(shared_metadata_counts const&) = delete;
+  shared_metadata_counts(shared_metadata_counts&&) = delete;
+  shared_metadata_counts& operator=(shared_metadata_counts const&) = delete;
+  shared_metadata_counts& operator=(shared_metadata_counts&&) = delete;
+  ~shared_metadata_counts() { builder_.merge(counts_); }
+
+  void update(std::vector<metadata> const& data) {
+    for (auto const& m : data) {
+      ++counts_[m];  // copies m only for its first occurrence
+    }
+  }
+
+  shared_metadata_builder& builder_;
+  metadata_counts_t counts_;
 };
 
 struct shared_metadata_decoder {

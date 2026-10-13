@@ -10,6 +10,7 @@ namespace tiles {
 struct feature_shard;
 struct layer_names_builder;
 struct shared_metadata_builder;
+struct shared_metadata_counts;
 struct script_runner;
 
 void check_profile(std::string const& osm_profile);
@@ -34,7 +35,7 @@ private:
 
   feature_shard& shard_;
   layer_names_builder& layer_names_builder_;
-  shared_metadata_builder& shared_metadata_builder_;
+  std::unique_ptr<shared_metadata_counts> metadata_counts_;
 };
 
 }  // namespace tiles

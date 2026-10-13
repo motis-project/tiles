@@ -65,14 +65,15 @@ feature_handler::feature_handler(
     : runner_{std::make_unique<script_runner>(osm_profile)},
       shard_{shard},
       layer_names_builder_{layer_names_builder},
-      shared_metadata_builder_{shared_metadata_builder} {}
+      metadata_counts_{
+          std::make_unique<shared_metadata_counts>(shared_metadata_builder)} {}
 
 feature_handler::feature_handler(feature_handler&&) noexcept = default;
 feature_handler::~feature_handler() = default;
 
 template <typename OSMObject>
 void handle_feature(feature_shard& shard, layer_names_builder& layer_names,
-                    shared_metadata_builder& shared_metadata_builder,
+                    shared_metadata_counts& metadata_counts,
                     sol::protected_function const& process,
                     OSMObject const& obj) {
   auto pf = pending_feature{obj, [&obj] { return read_osm_geometry(obj); }};
@@ -99,7 +100,7 @@ void handle_feature(feature_shard& shard, layer_names_builder& layer_names,
   }
 
   pf.finish_metadata();
-  shared_metadata_builder.update(pf.metadata_);
+  metadata_counts.update(pf.metadata_);
 
   shard.insert(feature{static_cast<uint64_t>(pf.get_id()),
                        layer_names.get_layer_idx(pf.target_layer_),
@@ -108,15 +109,15 @@ void handle_feature(feature_shard& shard, layer_names_builder& layer_names,
 }
 
 void feature_handler::node(osmium::Node const& n) {
-  handle_feature(shard_, layer_names_builder_, shared_metadata_builder_,
+  handle_feature(shard_, layer_names_builder_, *metadata_counts_,
                  runner_->process_node_, n);
 }
 void feature_handler::way(osmium::Way const& w) {
-  handle_feature(shard_, layer_names_builder_, shared_metadata_builder_,
+  handle_feature(shard_, layer_names_builder_, *metadata_counts_,
                  runner_->process_way_, w);
 }
 void feature_handler::area(osmium::Area const& a) {
-  handle_feature(shard_, layer_names_builder_, shared_metadata_builder_,
+  handle_feature(shard_, layer_names_builder_, *metadata_counts_,
                  runner_->process_area_, a);
 }
 
