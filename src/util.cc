@@ -1,5 +1,6 @@
 #include "tiles/util.h"
 
+#include <cstdlib>
 #include <regex>
 
 #include "zlib.h"
@@ -26,28 +27,35 @@ std::string compress_gzip(std::string const& input) {
   /**
   Same as compress2, but with MAX_WBITS + 16 to indicate gzip header and trailer
   */
-  z_stream zs{};
+  static int const level = [] {
+    auto const* e = std::getenv("TILES_GZIP_LEVEL");
+    return e != nullptr ? std::atoi(e) : Z_BEST_COMPRESSION;
+  }();
 
-  auto error = deflateInit2(&zs, Z_BEST_COMPRESSION, Z_DEFLATED, MAX_WBITS + 16,
-                            8, Z_DEFAULT_STRATEGY);
+  // Reuse one deflate state per thread (deflateInit2 allocates ~256 KB of
+  // window/hash tables; doing it per tile is pure churn). deflateReset keeps
+  // the allocation and just rewinds the stream.
+  static thread_local z_stream* zs = [] {
+    auto* s = new z_stream{};
+    utl::verify(deflateInit2(s, level, Z_DEFLATED, MAX_WBITS + 16, 8,
+                             Z_DEFAULT_STRATEGY) == Z_OK,
+                "deflateInit2 failed");
+    return s;
+  }();
+  utl::verify(deflateReset(zs) == Z_OK, "deflateReset failed");
 
-  utl::verify(error == Z_OK, "deflateInit2 failed");
-
-  auto out_size = deflateBound(&zs, input.size());
+  auto out_size = deflateBound(zs, input.size());
   std::string buffer(out_size, '\0');
 
-  zs.next_in = reinterpret_cast<uint8_t*>(const_cast<char*>(input.data()));
-  zs.avail_in = input.size();
+  zs->next_in = reinterpret_cast<uint8_t*>(const_cast<char*>(input.data()));
+  zs->avail_in = input.size();
 
-  zs.next_out = reinterpret_cast<uint8_t*>(buffer.data());
-  zs.avail_out = buffer.size();
+  zs->next_out = reinterpret_cast<uint8_t*>(buffer.data());
+  zs->avail_out = buffer.size();
 
-  error = deflate(&zs, Z_FINISH);
-  utl::verify(error == Z_STREAM_END, "deflate failed");
+  utl::verify(deflate(zs, Z_FINISH) == Z_STREAM_END, "deflate failed");
 
-  buffer.resize(zs.total_out);
-
-  deflateEnd(&zs);
+  buffer.resize(zs->total_out);
   return buffer;
 }
 struct regex_matcher::impl {

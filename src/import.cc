@@ -4,6 +4,8 @@
 #include "conf/configuration.h"
 #include "conf/options_parser.h"
 
+#include "utl/progress_tracker.h"
+
 #include "tiles/db/clear_database.h"
 #include "tiles/db/database_stats.h"
 #include "tiles/db/feature_pack.h"
@@ -63,6 +65,10 @@ int run_tiles_import(int argc, char const** argv) {
     std::cout << "options error: " << e.what() << "\n";
     return 1;
   }
+
+  // standalone tiles-import lacks the progress tracker that motis' importer
+  // sets up; prepare_tiles/coastlines require an active (global) tracker.
+  utl::activate_progress_tracker("tiles-import");
 
   if (opt.has_any_task({"features"})) {
     check_profile(opt.osm_profile_);
