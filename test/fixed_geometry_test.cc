@@ -2,6 +2,9 @@
 
 #include <random>
 
+#include "boost/geometry.hpp"
+
+#include "tiles/fixed/algo/shift.h"
 #include "tiles/fixed/fixed_geometry.h"
 #include "tiles/fixed/io/deserialize.h"
 #include "tiles/fixed/io/serialize.h"
@@ -61,4 +64,29 @@ TEST(fixed_geometry_test, fixed_polyline_io) {
 
     EXPECT_TRUE(test_case == mpark::get<fixed_polyline>(deserialized));
   }
+}
+
+TEST(fixed_geometry_test, shift_polygon_winding) {
+  // z18: coords / 4 -> first outer flips, two of the holes collapse
+  fixed_polygon input;
+  input.resize(2);
+  input[0].outer() = {{7, 0}, {6, 7}, {12, 11}, {11, 14}, {7, 0}};
+  input[1].outer() = {
+      {100, 100}, {100, 200}, {200, 200}, {200, 100}, {100, 100}};
+  input[1].inners() = {
+      {{120, 120}, {180, 120}, {180, 180}, {120, 180}, {120, 120}},
+      {{130, 130}, {131, 130}, {131, 131}, {130, 131}, {130, 130}},
+      {{140, 140}, {160, 140}, {160, 141}, {140, 141}, {140, 140}}};
+
+  ASSERT_GT(boost::geometry::area(input[0].outer()), 0);
+
+  auto const result = shift(input, 18);
+  ASSERT_TRUE(mpark::holds_alternative<fixed_polygon>(result));
+  auto const& out = mpark::get<fixed_polygon>(result);
+
+  ASSERT_EQ(2, out.size());
+  EXPECT_GT(boost::geometry::area(out[0].outer()), 0);
+  EXPECT_GT(boost::geometry::area(out[1].outer()), 0);
+  ASSERT_EQ(1, out[1].inners().size());
+  EXPECT_LT(boost::geometry::area(out[1].inners()[0]), 0);
 }
