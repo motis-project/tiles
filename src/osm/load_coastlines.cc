@@ -5,7 +5,9 @@
 #include <type_traits>
 #include <variant>
 
-#include "clipper/clipper.hpp"
+#include <cstdint>
+
+#include "clipper2/clipper.h"
 
 #include "utl/to_vec.h"
 
@@ -23,17 +25,18 @@
 #include "tiles/osm/load_shapefile.h"
 #include "tiles/util_parallel.h"
 
-namespace cl = ClipperLib;
+namespace c2 = Clipper2Lib;
 
 namespace tiles {
 
-static_assert(sizeof(cl::cInt) == sizeof(fixed_coord_t), "coord type problem");
+static_assert(sizeof(std::int64_t) == sizeof(fixed_coord_t),
+              "coord type problem");
 
 struct coastline {
-  coastline(fixed_box box, cl::Paths geo) : box_{box}, geo_{std::move(geo)} {}
+  coastline(fixed_box box, c2::Paths64 geo) : box_{box}, geo_{std::move(geo)} {}
 
   fixed_box box_;
-  cl::Paths geo_;
+  c2::Paths64 geo_;
 };
 using coastline_ptr = std::shared_ptr<coastline>;
 
@@ -71,7 +74,7 @@ std::ostream& operator<<(std::ostream& os, fixed_box const& box) {
             << ")";
 }
 
-fixed_box bounding_box(cl::Paths const& geo) {
+fixed_box bounding_box(c2::Paths64 const& geo) {
   auto min_x = std::numeric_limits<fixed_coord_t>::max();
   auto min_y = std::numeric_limits<fixed_coord_t>::max();
   auto max_x = std::numeric_limits<fixed_coord_t>::min();
@@ -79,10 +82,10 @@ fixed_box bounding_box(cl::Paths const& geo) {
 
   for (auto const& path : geo) {
     for (auto const& pt : path) {
-      min_x = std::min(min_x, static_cast<fixed_coord_t>(pt.X));
-      min_y = std::min(min_y, static_cast<fixed_coord_t>(pt.Y));
-      max_x = std::max(max_x, static_cast<fixed_coord_t>(pt.X));
-      max_y = std::max(max_y, static_cast<fixed_coord_t>(pt.Y));
+      min_x = std::min(min_x, static_cast<fixed_coord_t>(pt.x));
+      min_y = std::min(min_y, static_cast<fixed_coord_t>(pt.y));
+      max_x = std::max(max_x, static_cast<fixed_coord_t>(pt.x));
+      max_y = std::max(max_y, static_cast<fixed_coord_t>(pt.y));
     }
   }
 
@@ -103,47 +106,49 @@ bool within(fixed_box const& outer, fixed_box const& inner) {
          outer.max_corner().y() >= inner.max_corner().y();
 }
 
-cl::Path box_to_path(fixed_box const& box) {
+c2::Path64 box_to_path(fixed_box const& box) {
   return {{box.min_corner().x(), box.min_corner().y()},
           {box.max_corner().x(), box.min_corner().y()},
           {box.max_corner().x(), box.max_corner().y()},
           {box.min_corner().x(), box.max_corner().y()}};
 }
 
-cl::Paths intersection(cl::Paths const& subject, cl::Path const& clip) {
-  cl::Clipper clpr;
-  utl::verify(clpr.AddPaths(subject, cl::ptSubject, true), "AddPath failed");
-  utl::verify(clpr.AddPath(clip, cl::ptClip, true), "AddPaths failed");
+c2::Paths64 intersection(c2::Paths64 const& subject, c2::Path64 const& clip) {
+  c2::Clipper64 clpr;
+  clpr.AddSubject(subject);
+  clpr.AddClip(c2::Paths64{clip});
 
-  cl::Paths solution;
-  utl::verify(clpr.Execute(cl::ctIntersection, solution, cl::pftEvenOdd,
-                           cl::pftEvenOdd),
-              "Execute failed");
+  c2::Paths64 solution;
+  utl::verify(
+      clpr.Execute(c2::ClipType::Intersection, c2::FillRule::EvenOdd, solution),
+      "Execute failed");
   return solution;
 }
 
-void to_fixed_polygon(fixed_polygon& polygon, cl::PolyNodes const& nodes) {
-  auto const path_to_ring = [](auto const& path) {
+void to_fixed_polygon(fixed_polygon& polygon, c2::PolyPath64 const& parent) {
+  auto const path_to_ring = [](c2::Path64 const& path) {
     utl::verify(!path.empty(), "path empty");
     fixed_ring ring;
     ring.reserve(path.size() + 1);
     for (auto const& pt : path) {
-      ring.emplace_back(pt.X, pt.Y);
+      ring.emplace_back(pt.x, pt.y);
     }
-    ring.emplace_back(path[0].X, path[0].Y);
+    ring.emplace_back(path.front().x, path.front().y);
     return ring;
   };
 
-  for (auto const* outer : nodes) {
-    utl::verify(!outer->IsHole(), "outer ring is hole");
+  for (auto const& outer_ptr : parent) {
+    auto const& outer = *outer_ptr;
+    utl::verify(!outer.IsHole(), "outer ring is hole");
     fixed_simple_polygon simple;
-    simple.outer() = path_to_ring(outer->Contour);
+    simple.outer() = path_to_ring(outer.Polygon());
 
-    for (auto const* inner : outer->Childs) {
-      utl::verify(inner->IsHole(), "inner ring is no hole");
-      simple.inners().emplace_back(path_to_ring(inner->Contour));
+    for (auto const& inner_ptr : outer) {
+      auto const& inner = *inner_ptr;
+      utl::verify(inner.IsHole(), "inner ring is no hole");
+      simple.inners().emplace_back(path_to_ring(inner.Polygon()));
 
-      to_fixed_polygon(polygon, inner->Childs);
+      to_fixed_polygon(polygon, inner);
     }
 
     polygon.emplace_back(std::move(simple));
@@ -151,26 +156,26 @@ void to_fixed_polygon(fixed_polygon& polygon, cl::PolyNodes const& nodes) {
 }
 
 std::optional<std::string> finalize_tile(
-    uint64_t const id, cl::Path const& draw_clip, cl::Path const& insert_clip,
+    uint64_t const id, c2::Path64 const& draw_clip,
+    c2::Path64 const& insert_clip,
     std::vector<coastline_ptr> const& coastlines) {
-  cl::Clipper clpr;
-  clpr.AddPath(draw_clip, cl::ptSubject, true);
+  c2::Clipper64 clpr;
+  clpr.AddSubject(c2::Paths64{draw_clip});
   for (auto const& coastline : coastlines) {
-    clpr.AddPaths(coastline->geo_, cl::ptClip, true);
+    clpr.AddClip(coastline->geo_);
   }
 
-  cl::PolyTree solution;
-  clpr.Execute(cl::ctDifference, solution, cl::pftEvenOdd, cl::pftEvenOdd);
-  utl::verify(!solution.Childs.empty(), "difference empty!");
+  c2::PolyTree64 solution;
+  clpr.Execute(c2::ClipType::Difference, c2::FillRule::EvenOdd, solution);
+  utl::verify(solution.Count() != 0, "difference empty!");
 
-  cl::Paths solution_paths;
-  cl::ClosedPathsFromPolyTree(solution, solution_paths);
+  auto const solution_paths = c2::PolyTreeToPaths64(solution);
   if (intersection(solution_paths, insert_clip).empty()) {
     return std::nullopt;
   }
 
   fixed_polygon polygon;
-  to_fixed_polygon(polygon, solution.Childs);
+  to_fixed_polygon(polygon, solution);
 
   boost::geometry::correct(polygon);
   return serialize_feature({id,
@@ -251,13 +256,13 @@ void load_coastlines(tile_db_handle& db_handle, feature_shard& inserter,
 
   auto convert_path = [](auto const& in) {
     return utl::to_vec(
-        in, [](auto const& pt) { return cl::IntPoint{pt.x(), pt.y()}; });
+        in, [](auto const& pt) { return c2::Point64{pt.x(), pt.y()}; });
   };
 
   {
     std::vector<coastline_ptr> coastlines;
     auto coastline_handler = [&](fixed_simple_polygon geo) {
-      cl::Paths coastline;
+      c2::Paths64 coastline;
       coastline.emplace_back(convert_path(geo.outer()));
       for (auto const& inner : geo.inners()) {
         coastline.emplace_back(convert_path(inner));

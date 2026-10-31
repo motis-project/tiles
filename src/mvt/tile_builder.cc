@@ -82,30 +82,31 @@ struct layer_builder {
     has_geometry_ = true;
     ++features_written_;
 
-    std::string feature_buf;
-    pbf_builder<ttm::Feature> feature_pb(feature_buf);
+    feature_buf_.clear();
+    pbf_builder<ttm::Feature> feature_pb(feature_buf_);
 
     encode_geometry(feature_pb, f.geometry_, spec_);
 
     feature_pb.add_uint64(ttm::Feature::optional_uint64_id, f.id_);
     write_metadata(feature_pb, f.meta_);
-    pb_.add_message(ttm::Layer::repeated_Feature_features, feature_buf);
+    pb_.add_message(ttm::Layer::repeated_Feature_features, feature_buf_);
   }
 
   void write_metadata(pbf_builder<ttm::Feature>& pb,
                       std::vector<metadata> const& meta) {
-    std::vector<uint32_t> t;
+    tags_.clear();
 
     for (auto const& m : meta) {
       if (m.key_ == "layer" || boost::starts_with(m.key_, "__")) {
         continue;
       }
 
-      t.emplace_back(utl::get_or_create_index(meta_key_cache_, m.key_));
-      t.emplace_back(utl::get_or_create_index(meta_value_cache_, m.value_));
+      tags_.emplace_back(utl::get_or_create_index(meta_key_cache_, m.key_));
+      tags_.emplace_back(utl::get_or_create_index(meta_value_cache_, m.value_));
     }
 
-    pb.add_packed_uint32(ttm::Feature::packed_uint32_tags, begin(t), end(t));
+    pb.add_packed_uint32(ttm::Feature::packed_uint32_tags, begin(tags_),
+                         end(tags_));
   }
 
   void aggregate_geometry() {
@@ -202,6 +203,10 @@ struct layer_builder {
 
   std::string buf_;
   pbf_builder<ttm::Layer> pb_;
+
+  // per-feature scratch, reused across features (cleared, capacity retained)
+  std::string feature_buf_;
+  std::vector<uint32_t> tags_;
 
   std::map<std::string, size_t> meta_key_cache_;
   std::map<std::string, size_t> meta_value_cache_;
