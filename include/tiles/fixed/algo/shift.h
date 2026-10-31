@@ -1,7 +1,5 @@
 #pragma once
 
-#include <algorithm>
-
 #include "utl/erase_if.h"
 
 #include "tiles/fixed/fixed_geometry.h"
@@ -51,37 +49,17 @@ inline fixed_geometry shift(fixed_polyline multi_polyline, uint32_t const z) {
 }
 
 inline fixed_geometry shift(fixed_polygon multi_polygon, uint32_t const z) {
-  // twice the signed area, > 0 for exterior rings in MVT winding order
-  auto const ring_area = [](fixed_ring const& r) {
-    fixed_coord_t sum = 0;
-    for (auto i = 1ULL; i < r.size(); ++i) {
-      sum +=
-          (r[i].x() - r[i - 1].x()) * (r[i - 1].y() + r[i].y() - 2 * r[0].y());
-    }
-    return sum;
-  };
-
-  // snapping may flip or collapse rings, but MVT decoders need the winding
-  auto const shift_ring = [&](fixed_ring& r, bool const exterior) {
-    shift_container(r, z);
-    if ((ring_area(r) > 0) != exterior) {
-      std::reverse(begin(r), end(r));
-    }
-  };
-  auto const degenerate = [&](fixed_ring const& r) {
-    return r.size() < 3 || ring_area(r) == 0;
-  };
-
   for (auto& polygon : multi_polygon) {
-    shift_ring(polygon.outer(), true);
+    shift_container(polygon.outer(), z);
     for (auto& ring : polygon.inners()) {
-      shift_ring(ring, false);
+      shift_container(ring, z);
     }
-    utl::erase_if(polygon.inners(), degenerate);
+
+    utl::erase_if(polygon.inners(), [](auto const& r) { return r.size() < 3; });
   }
 
   utl::erase_if(multi_polygon,
-                [&](auto const& p) { return degenerate(p.outer()); });
+                [](auto const& p) { return p.outer().size() < 3; });
 
   if (multi_polygon.empty()) {
     return fixed_null{};

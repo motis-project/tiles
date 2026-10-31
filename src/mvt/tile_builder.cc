@@ -68,10 +68,16 @@ struct layer_builder {
                mpark::holds_alternative<fixed_polygon>(f.geometry_)) {
       polygon_buffer_.emplace_back(std::move(f));
     } else {
-      f.geometry_ = clip(f.geometry_, spec_.draw_bounds_);
-      f.geometry_ = shift(f.geometry_, spec_.tile_.z_);
+      snap_and_clip(f);
       write_feature(f);
     }
+  }
+
+  void snap_and_clip(feature& f) const {
+    auto px_draw_bounds = spec_.draw_bounds_;
+    shift(px_draw_bounds, spec_.tile_.z_);
+    f.geometry_ =
+        clip(shift(std::move(f.geometry_), spec_.tile_.z_), px_draw_bounds);
   }
 
   void write_feature(feature const& f) {
@@ -115,8 +121,7 @@ struct layer_builder {
       //                                              spec_.tile_.z_)) {
 
       for (auto& f : polygon_buffer_) {
-        f.geometry_ = clip(f.geometry_, spec_.draw_bounds_);
-        f.geometry_ = shift(f.geometry_, spec_.tile_.z_);
+        snap_and_clip(f);
 
         if (f.layer_ != kLayerCoastlineIdx && ctx_.tb_drop_subpixel_polygons_ &&
             area(f.geometry_) < kScreenPixelArea) {
@@ -130,8 +135,7 @@ struct layer_builder {
     if (ctx_.tb_aggregate_lines_ && !line_buffer_.empty()) {
       for (auto& f :
            aggregate_line_features(std::move(line_buffer_), spec_.tile_.z_)) {
-        f.geometry_ = clip(f.geometry_, spec_.draw_bounds_);
-        f.geometry_ = shift(f.geometry_, spec_.tile_.z_);
+        snap_and_clip(f);
         write_feature(f);
       }
     }
