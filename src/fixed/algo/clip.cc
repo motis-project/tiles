@@ -45,7 +45,7 @@ fixed_geometry clip(fixed_polyline const& in, fixed_box const& box) {
   }
 }
 
-void to_fixed_polygon2(fixed_polygon& polygon, cl::PolyNodes const& nodes) {
+fixed_polygon to_fixed_polygon2(cl::Paths const& paths) {
   auto const path_to_ring = [](auto const& path) {
     utl::verify(!path.empty(), "path empty");
     fixed_ring ring;
@@ -57,20 +57,29 @@ void to_fixed_polygon2(fixed_polygon& polygon, cl::PolyNodes const& nodes) {
     return ring;
   };
 
-  for (auto const* outer : nodes) {
-    utl::verify(!outer->IsHole(), "outer ring is hole");
-    fixed_simple_polygon simple;
-    simple.outer() = path_to_ring(outer->Contour);
-
-    for (auto const* inner : outer->Childs) {
-      utl::verify(inner->IsHole(), "inner ring is no hole");
-      simple.inners().emplace_back(path_to_ring(inner->Contour));
-
-      to_fixed_polygon2(polygon, inner->Childs);
-    }
-
-    polygon.emplace_back(std::move(simple));
+  auto outers = std::vector<cl::Path const*>{};
+  auto holes = std::vector<cl::Path const*>{};
+  for (auto const& path : paths) {
+    (cl::Orientation(path) ? outers : holes).push_back(&path);
   }
+  std::sort(begin(outers), end(outers), [](auto const* a, auto const* b) {
+    return cl::Area(*a) < cl::Area(*b);
+  });
+
+  auto polygon = fixed_polygon{};
+  polygon.resize(outers.size());
+  for (auto i = 0U; i < outers.size(); ++i) {
+    polygon[i].outer() = path_to_ring(*outers[i]);
+  }
+  for (auto const* hole : holes) {
+    for (auto i = 0U; i < outers.size(); ++i) {
+      if (cl::PointInPolygon((*hole)[0], *outers[i]) != 0) {
+        polygon[i].inners().emplace_back(path_to_ring(*hole));
+        break;
+      }
+    }
+  }
+  return polygon;
 }
 
 fixed_geometry clip(fixed_polygon const& in, fixed_box const& box) {
@@ -97,17 +106,17 @@ fixed_geometry clip(fixed_polygon const& in, fixed_box const& box) {
   }
 
   cl::Clipper clpr;
-  utl::verify(clpr.AddPaths(subject, cl::ptSubject, true), "AddPath1 failed");
-  utl::verify(clpr.AddPath(clip, cl::ptClip, true), "AddPath2 failed");
-
-  cl::PolyTree solution;
-  clpr.Execute(cl::ctIntersection, solution, cl::pftEvenOdd, cl::pftEvenOdd);
-  if (solution.Childs.empty()) {
+  if (!clpr.AddPaths(subject, cl::ptSubject, true)) {
     return fixed_null{};
   }
+  utl::verify(clpr.AddPath(clip, cl::ptClip, true), "AddPath2 failed");
 
-  fixed_polygon out;
-  to_fixed_polygon2(out, solution.Childs);
+  auto solution = cl::Paths{};
+  clpr.Execute(cl::ctIntersection, solution, cl::pftEvenOdd, cl::pftEvenOdd);
+  auto out = to_fixed_polygon2(solution);
+  if (out.empty()) {
+    return fixed_null{};
+  }
 
   boost::geometry::correct(out);
   return out;

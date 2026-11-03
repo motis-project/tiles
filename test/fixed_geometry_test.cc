@@ -4,6 +4,7 @@
 
 #include "boost/geometry.hpp"
 
+#include "tiles/fixed/algo/clip.h"
 #include "tiles/fixed/algo/shift.h"
 #include "tiles/fixed/fixed_geometry.h"
 #include "tiles/fixed/io/deserialize.h"
@@ -66,9 +67,9 @@ TEST(fixed_geometry_test, fixed_polyline_io) {
   }
 }
 
-TEST(fixed_geometry_test, shift_polygon_winding) {
+TEST(fixed_geometry_test, snap_clip_polygon_winding) {
   // z18: coords / 4 -> first outer flips, two of the holes collapse
-  fixed_polygon input;
+  auto input = fixed_polygon{};
   input.resize(2);
   input[0].outer() = {{7, 0}, {6, 7}, {12, 11}, {11, 14}, {7, 0}};
   input[1].outer() = {
@@ -80,7 +81,7 @@ TEST(fixed_geometry_test, shift_polygon_winding) {
 
   ASSERT_GT(boost::geometry::area(input[0].outer()), 0);
 
-  auto const result = shift(input, 18);
+  auto const result = clip(shift(input, 18), fixed_box{{0, 0}, {100, 100}});
   ASSERT_TRUE(mpark::holds_alternative<fixed_polygon>(result));
   auto const& out = mpark::get<fixed_polygon>(result);
 
