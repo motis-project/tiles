@@ -87,8 +87,7 @@ void feature_shard::flush(std::size_t const threshold_upper,
     auto& bucket = it->second;
     persist_bucket(key_to_tile(key), bucket.mem_, bucket.mem_size_);
     cache_size_ -= bucket.mem_size_;
-    bucket.mem_size_ = 0;
-    bucket.mem_.clear();
+    cache_.erase(it);
   }
 }
 
