@@ -41,7 +41,7 @@ struct feature_shard {
     std::uint32_t size_;
   };
 
-  static constexpr std::size_t kCacheThresholdUpper = 256ULL * 1024 * 1024;
+  static constexpr std::size_t kCacheThresholdUpper = 32ULL * 1024 * 1024;
   static constexpr std::size_t kCacheThresholdLower =
       kCacheThresholdUpper / 4 * 3;
 
