@@ -6,6 +6,10 @@
   url=git@github.com:motis-project/clipper.git
   branch=master
   commit=2abf72015b85f1cfd38706b21d4f28b8c359c7d5
+[Clipper2]
+  url=git@github.com:motis-project/Clipper2.git
+  branch=main
+  commit=482e7a58d3559fe4fe3b5e454a100d284bc3286d
 [concurrentqueue]
   url=git@github.com:motis-project/concurrentqueue.git
   branch=master
