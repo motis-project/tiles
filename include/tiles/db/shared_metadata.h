@@ -82,8 +82,12 @@ struct shared_metadata_builder {
 };
 
 // The counts of one feature handler (thread or fiber): no lock and no copy of
-// the metadata per feature. Added to the shared counts when destroyed.
+// the metadata per feature. Added to the shared counts when it holds more than
+// kMaxLocalPairs pairs and when destroyed, so common pairs do not pile up once
+// per handler.
 struct shared_metadata_counts {
+  static constexpr auto kMaxLocalPairs = std::size_t{1U} << 16U;
+
   explicit shared_metadata_counts(shared_metadata_builder& b) : builder_{b} {}
   shared_metadata_counts(shared_metadata_counts const&) = delete;
   shared_metadata_counts(shared_metadata_counts&&) = delete;
@@ -94,6 +98,10 @@ struct shared_metadata_counts {
   void update(std::vector<metadata> const& data) {
     for (auto const& m : data) {
       ++counts_[m];  // copies m only for its first occurrence
+    }
+    if (counts_.size() > kMaxLocalPairs) {
+      builder_.merge(counts_);
+      counts_.clear();
     }
   }
 

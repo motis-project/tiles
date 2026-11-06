@@ -85,11 +85,11 @@
 [osm]
   url=git@github.com:motis-project/osm.git
   branch=dev
-  commit=126d0f05776476b571c1edf9239ba987a1cf2215
+  commit=29061f0f66cf3b739c97709f4aeaf884badd52ee
 [cista]
   url=git@github.com:felixguendling/cista.git
   branch=master
-  commit=427f0a873be43f1de94289bd53d5678e07cd243f
+  commit=9f68d847d8f36f0b88c37b63b1976c1588db2f1d
 [unordered_dense]
   url=git@github.com:motis-project/unordered_dense.git
   branch=main

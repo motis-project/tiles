@@ -134,6 +134,11 @@ void load_osm(tile_db_handle& db_handle, shard_pool& pool,
       },
       reader_progress->update_fn());
 
+  // The coastline and pass-1 shards get no more inserts.
+  for (auto& s : pool.shards()) {
+    s.flush(0U, 0U);
+  }
+
   node_idx_merger.finish();
   mp_manager.index_relation_members();
   r.reset();

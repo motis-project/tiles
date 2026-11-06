@@ -12,6 +12,12 @@
 
 #include "zlib.h"
 
+#if CISTA_USE_MIMALLOC
+#include "mimalloc.h"
+#elif defined(__GLIBC__)
+#include <malloc.h>
+#endif
+
 #include "utl/concat.h"
 #include "utl/equal_ranges.h"
 #include "utl/equal_ranges_linear.h"
@@ -123,8 +129,19 @@ void pack_features(
                                });
 }
 
+// Give memory freed by the previous steps back to the operating system.
+void release_free_memory() {
+#if CISTA_USE_MIMALLOC
+  mi_collect(true);
+#elif defined(__GLIBC__)
+  ::malloc_trim(0U);
+#endif
+}
+
 void merge_shards(shard_pool& pool, tile_db_handle& db_handle,
                   pack_handle& pack_handle) {
+  release_free_memory();
+
   auto& shards = pool.shards();
   if (shards.empty()) {
     return;
