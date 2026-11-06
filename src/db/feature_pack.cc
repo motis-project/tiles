@@ -157,6 +157,7 @@ void merge_shards(shard_pool& pool, tile_db_handle& db_handle,
   using shard_entry = feature_shard::entry;
   auto sorted_per_shard = std::vector<std::vector<shard_entry>>(shards.size());
   utl::parallel_for_run(shards.size(), [&](std::size_t const i) {
+    shards[i].count_page_refs();
     auto const span = shards[i].entries();
     sorted_per_shard[i].assign(span.begin(), span.end());
     std::stable_sort(
@@ -185,6 +186,7 @@ void merge_shards(shard_pool& pool, tile_db_handle& db_handle,
   struct tile_task {
     tile_key_t tile_;
     std::vector<std::string> blobs_;
+    std::vector<std::pair<std::size_t, shard_entry>> sources_;
     std::size_t bytes_;
   };
 
@@ -242,6 +244,9 @@ void merge_shards(shard_pool& pool, tile_db_handle& db_handle,
   for (auto w = 0U; w < n_workers; ++w) {
     workers.emplace_back([&] {
       for (auto t = pop_task(); t.has_value(); t = pop_task()) {
+        for (auto const& [shard_idx, e] : t->sources_) {
+          shards[shard_idx].release(e);
+        }
         auto const tile = key_to_tile(t->tile_);
         auto const blob = pack_features(tile, metadata_coder, t->blobs_);
         auto lock = std::lock_guard{write_mtx};
@@ -263,12 +268,13 @@ void merge_shards(shard_pool& pool, tile_db_handle& db_handle,
       if (have_cur) {
         push_task(std::move(cur));
       }
-      cur = tile_task{e.tile_, {}, 0U};
+      cur = tile_task{e.tile_, {}, {}, 0U};
       have_cur = true;
     }
     auto blob = shards[top.shard_idx_].blob(e);
     cur.bytes_ += blob.size();
     cur.blobs_.emplace_back(std::move(blob));
+    cur.sources_.emplace_back(top.shard_idx_, e);
 
     auto const next = top.pos_ + 1U;
     if (next < span.size()) {

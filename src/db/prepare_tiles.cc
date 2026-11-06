@@ -115,11 +115,12 @@ prepare_manager make_prepare_manager(tile_db_handle& db_handle,
   auto c = lmdb::cursor{txn, feature_dbi};
   for (auto el = c.get<tile_key_t>(lmdb::cursor_op::FIRST); el;
        el = c.get<tile_key_t>(lmdb::cursor_op::NEXT)) {
-    auto const tile = key_to_tile(el->first);
-    minx = std::min(minx, tile.x_);
-    miny = std::min(miny, tile.y_);
-    maxx = std::max(maxx, tile.x_);
-    maxy = std::max(maxy, tile.y_);
+    auto const bounds =
+        key_to_tile(el->first).bounds_on_z(kTileDefaultIndexZoomLvl);
+    minx = std::min(minx, bounds.minx_);
+    miny = std::min(miny, bounds.miny_);
+    maxx = std::max(maxx, bounds.maxx_ - 1U);
+    maxy = std::max(maxy, bounds.maxy_ - 1U);
   }
 
   utl::verify(minx != std::numeric_limits<uint32_t>::max() &&

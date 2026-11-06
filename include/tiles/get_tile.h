@@ -82,21 +82,21 @@ void render_seaside(tile_builder& builder, render_ctx const& ctx,
 template <typename Fn>
 void pack_records_foreach(lmdb::cursor& c, geo::tile const& query_tile,
                           Fn&& fn) {
-  // XXX not working on zoom level zero "whole database" ?!
-  auto const bounds = query_tile.bounds_on_z(kTileDefaultIndexZoomLvl);
-  for (auto y = bounds.miny_; y < bounds.maxy_; ++y) {
-    auto const key_begin =
-        tile_to_key(bounds.minx_, y, kTileDefaultIndexZoomLvl);
-    auto const key_end = tile_to_key(bounds.maxx_, y, kTileDefaultIndexZoomLvl);
+  for (auto z = 0U; z <= static_cast<uint32_t>(kTileDefaultIndexZoomLvl); ++z) {
+    auto const bounds = query_tile.bounds_on_z(z);
+    for (auto y = bounds.miny_; y < bounds.maxy_; ++y) {
+      auto const key_begin = tile_to_key(bounds.minx_, y, z);
+      auto const key_end = tile_to_key(bounds.maxx_, y, z);
 
-    for (auto el = c.get(lmdb::cursor_op::SET_RANGE, key_begin);
-         el && el->first < key_end;
-         el = c.get<decltype(key_begin)>(lmdb::cursor_op::NEXT)) {
+      for (auto el = c.get(lmdb::cursor_op::SET_RANGE, key_begin);
+           el && el->first < key_end;
+           el = c.get<decltype(key_begin)>(lmdb::cursor_op::NEXT)) {
 
-      auto const result_tile = key_to_tile(el->first);
-      pack_records_foreach(el->second, [&](auto const& pack_record) {
-        fn(result_tile, pack_record);
-      });
+        auto const result_tile = key_to_tile(el->first);
+        pack_records_foreach(el->second, [&](auto const& pack_record) {
+          fn(result_tile, pack_record);
+        });
+      }
     }
   }
 }

@@ -72,4 +72,21 @@ inline geo::tile_range make_tile_range(fixed_box /*copy*/ box,
   return geo::make_tile_range(x_1, y_1, x_2, y_2, z);
 }
 
+inline uint32_t index_zoom_level(fixed_box const& box) {
+  auto z = static_cast<uint32_t>(kTileDefaultIndexZoomLvl);
+  for (; z != 0U; --z) {
+    auto b = box;
+    shift(b, z);
+    auto const n_x =
+        b.max_corner().x() / kTileSize - b.min_corner().x() / kTileSize + 1;
+    auto const n_y =
+        b.max_corner().y() / kTileSize - b.min_corner().y() / kTileSize + 1;
+    constexpr auto const kMaxIndexTiles = fixed_coord_t{16};
+    if (n_x * n_y <= kMaxIndexTiles) {
+      break;
+    }
+  }
+  return z;
+}
+
 }  // namespace tiles

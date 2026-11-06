@@ -2,6 +2,7 @@
 
 #ifndef _WIN32
 #include <sys/mman.h>
+#include <unistd.h>
 #endif
 #include <cstring>
 #include <algorithm>
@@ -39,15 +40,15 @@ feature_shard::~feature_shard() {
 
 geo::tile feature_shard::insert(feature const& f) {
   auto const box = bounding_box(f.geometry_);
-  auto const range = make_tile_range(box);
+  auto const range = make_tile_range(box, index_zoom_level(box));
   utl::verify(range.begin() != range.end(), "shard: no tile for feature");
 
   auto const value = serialize_feature(f);
   for (auto const& tile : range) {
     insert(tile, value);
-  }
-  if (cache_size_ > kCacheThresholdUpper) {
-    flush();
+    if (cache_size_ > kCacheThresholdUpper) {
+      flush();
+    }
   }
   return *range.begin();
 }
@@ -125,6 +126,38 @@ void feature_shard::grow_idx_to(std::size_t const new_size) {
   idx_.resize(new_size);
 #ifdef MADV_POPULATE_WRITE
   ::madvise(idx_.data() + old_size, new_size - old_size, MADV_POPULATE_WRITE);
+#endif
+}
+
+void feature_shard::count_page_refs() {
+#ifdef MADV_REMOVE
+  auto const page = static_cast<std::size_t>(::sysconf(_SC_PAGESIZE));
+  page_refs_ =
+      std::vector<std::atomic_uint16_t>((pack_.size() + page - 1U) / page);
+  for (auto const& e : entries()) {
+    for (auto p = e.offset_ / page; p <= (e.offset_ + e.size_ - 1U) / page;
+         ++p) {
+      page_refs_[p].fetch_add(1U, std::memory_order_relaxed);
+    }
+  }
+#endif
+}
+
+void feature_shard::release([[maybe_unused]] entry const& e) {
+#ifdef MADV_REMOVE
+  auto const page = static_cast<std::size_t>(::sysconf(_SC_PAGESIZE));
+  auto const last = (e.offset_ + e.size_ - 1U) / page;
+  auto free_begin = e.offset_ / page;
+  for (auto p = free_begin; p <= last + 1U; ++p) {
+    if (p <= last && page_refs_[p].fetch_sub(1U) == 1U) {
+      continue;
+    }
+    if (free_begin != p) {
+      ::madvise(pack_.data() + free_begin * page, (p - free_begin) * page,
+                MADV_REMOVE);
+    }
+    free_begin = p + 1U;
+  }
 #endif
 }
 
