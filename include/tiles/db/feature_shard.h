@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cstdint>
+#include <atomic>
 #include <deque>
 #include <filesystem>
 #include <mutex>
@@ -70,6 +71,11 @@ struct feature_shard {
   std::span<entry const> entries() const noexcept;
   std::string_view blob(entry const& e) const noexcept;
 
+  // Merge phase: count the entries on each pack page, then give the pages of
+  // consumed entries back to the file system (thread-safe).
+  void count_page_refs();
+  void release(entry const& e);
+
 private:
   void persist_bucket(geo::tile tile, std::vector<std::string> const& mem,
                       std::size_t mem_size);
@@ -85,6 +91,7 @@ private:
 
   cista::mmap pack_;  // bytes
   cista::mmap idx_;  // packed `entry` records; size_/sizeof(entry) = count
+  std::vector<std::atomic_uint16_t> page_refs_;
 };
 
 // Lazy shard allocator. Each worker fiber calls `acquire()` once on its
